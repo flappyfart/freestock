@@ -13,6 +13,25 @@
   height: 100%;
   z-index: -1;
   pointer-events: none;
+  overflow: hidden;
+  background: #fbfcff url("/motion/dither-poster.webp") center / cover no-repeat;
+  opacity: 0.62;
+}
+.dither-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.ambient-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 42%, #ffffffcc 0%, #ffffff8a 38%, #ffffff14 78%);
+}
+.hero-artwork {
+  mix-blend-mode: multiply;
 }
 .motion-toggle {
   position: fixed;
