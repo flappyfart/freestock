@@ -1,0 +1,110 @@
+/* Adapted from Uiverse.io by satyamchaudharydev, quick-chicken-50 (MIT). */
+.wallet-connection-panel,
+.wallet-connect-option {
+  min-width: 0;
+}
+.wallet-connect-option {
+  width: 100%;
+  max-width: 100%;
+  margin-block: 14px;
+  border-radius: 12px;
+  background: #071525;
+}
+.earn .wallet-connect-button,
+.earn .wallet-connect-button:hover,
+.earn .wallet-connect-button:active {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 88px;
+  margin: 0;
+  padding: 18px 20px;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  translate: none;
+  text-align: left;
+  cursor: pointer;
+}
+.wallet-connect-text {
+  --wallet-sweep-color: #37ff8b;
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  padding-right: 6px;
+  color: transparent;
+  font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2vw, 25px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: clamp(1px, 0.2vw, 3px);
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.75);
+  pointer-events: none;
+}
+.wallet-connect-hover {
+  position: absolute;
+  box-sizing: border-box;
+  inset: 0;
+  width: 0%;
+  overflow: hidden;
+  border-right: 6px solid var(--wallet-sweep-color);
+  color: var(--wallet-sweep-color);
+  -webkit-text-stroke: 1px var(--wallet-sweep-color);
+  transition:
+    width 0.5s ease,
+    filter 0.5s ease;
+}
+.wallet-connect-button:is(:hover, :focus-visible, :active):not(:disabled) .wallet-connect-hover {
+  width: 100%;
+  filter: drop-shadow(0 0 23px var(--wallet-sweep-color));
+}
+.wallet-connect-provider {
+  max-width: 100%;
+  color: #b9c9df;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.earn .wallet-connect-button:focus-visible {
+  outline: 3px solid #37ff8b;
+  outline-offset: 4px;
+}
+.earn .wallet-connect-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (max-width: 380px) {
+  .earn .wallet-connect-button {
+    padding-inline: 14px;
+  }
+  .wallet-connect-text {
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wallet-connect-hover {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .wallet-connect-option {
+    border: 1px solid ButtonText;
+  }
+  .wallet-connect-text,
+  .wallet-connect-provider {
+    color: ButtonText;
+    -webkit-text-stroke: 0;
+  }
+  .wallet-connect-hover {
+    display: none;
+  }
+}

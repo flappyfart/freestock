@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatUnits } from "ethers";
 import { ArrowUpRight, Check, RefreshCw, Wallet } from "lucide-react";
 import PilotWorkspace from "./pilot-workspace";
+import { WalletConnectButton } from "./wallet-connect-button";
 import { EarnShell } from "../earn-shell";
 import { CHAIN_ID, RPC_URL, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
 type Provider = {
@@ -204,7 +205,7 @@ export default function LiveWorkspace() {
           </p>
         </section>
         <div className="live-grid">
-          <section className="earn-builder">
+          <section className="earn-builder wallet-connection-panel">
             <div className="earn-row">
               <h2>Connect your wallet</h2>
               <Wallet size={20} />
@@ -220,9 +221,10 @@ export default function LiveWorkspace() {
               </p>
             ) : (
               providers.map((p) => (
-                <button
-                  className="earn-button"
+                <WalletConnectButton
                   key={p.info.uuid}
+                  walletName={p.info.name}
+                  reconnect={selected?.info.uuid === p.info.uuid && !!connected}
                   disabled={busy}
                   onClick={() =>
                     void act(async () => {
@@ -230,11 +232,7 @@ export default function LiveWorkspace() {
                       await readWallet(p.provider, true);
                     })
                   }
-                >
-                  {selected?.info.uuid === p.info.uuid && connected ? "Reconnect" : "Connect"}{" "}
-                  {p.info.name}
-                  <ArrowUpRight size={16} />
-                </button>
+                />
               ))
             )}
             {connected && (

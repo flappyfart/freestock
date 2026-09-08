@@ -10,11 +10,13 @@ Adapted, recolored and composed with accessible controls:
 - VassoD (Vassiliki Doropoulou), frosted control: https://uiverse.io/VassoD/hard-panther-41
 - njesenberger (Nicolas Jesenberger), raised mechanical switch: https://uiverse.io/njesenberger/rude-stingray-22
 - reglobby (murphyy), holographic switch: https://uiverse.io/reglobby/stupid-penguin-97
+- satyamchaudharydev (satyam), outline and glow wallet button: https://uiverse.io/satyamchaudharydev/quick-chicken-50
 
 Official archive revision: adbd2adde0a299a3956ea288fb444ec01891ca41.
 Copyright (c) the named component authors. Copyright 2026 VassoD (Vassiliki Doropoulou).
 Copyright 2026 njesenberger (Nicolas Jesenberger). The mechanical switch is adapted under the MIT License below.
 Copyright 2026 reglobby (murphyy). The current holographic switch is adapted under the MIT License below.
+Copyright 2026 satyamchaudharydev (satyam). The wallet connection button is adapted under the MIT License below.
 
 MIT License
 

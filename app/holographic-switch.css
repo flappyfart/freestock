@@ -3,12 +3,12 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 18px 24px;
-  padding: 13px 0 25px;
+  gap: 12px 14px;
+  padding: 10px 0 15px;
 }
 .mechanical-label {
   display: grid;
-  flex: 1 1 200px;
+  flex: 1 1 140px;
   gap: 5px;
   min-width: 0;
 }
@@ -32,15 +32,15 @@
 .mechanical-setting .fs-holo-switch:active {
   position: relative;
   display: block;
-  flex: 0 0 150px;
-  width: 150px;
-  height: 60px;
+  flex: 0 0 90px;
+  width: 90px;
+  height: 44px;
   min-height: 44px;
   padding: 0;
   border: 0;
   border-radius: 30px;
   appearance: none;
-  background: #071525;
+  background: transparent;
   box-shadow: none;
   transform: none;
   translate: none;
@@ -50,6 +50,17 @@
   perspective: 800px;
   touch-action: manipulation;
   cursor: pointer;
+}
+.fs-holo-visual {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 150px;
+  height: 60px;
+  border-radius: 30px;
+  background: #071525;
+  transform: scale(0.6);
+  transform-origin: top left;
 }
 .fs-holo-switch *,
 .fs-holo-switch *::before,
@@ -318,6 +329,9 @@
   opacity: 1;
   color: rgba(0, 150, 255, 0.6);
   text-shadow: 0 0 5px rgba(0, 100, 255, 0.4);
+}
+.fs-holo-data-text {
+  font-size: 16px;
 }
 
 .fs-holo-data-text.fs-holo-on {
