@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 
-const INTRO_KEY = "freestock-nvidia-intro-v1";
+const INTRO_KEY = "freestock-nvidia-intro-v2";
 
 export function LandingIntro() {
   const [visible, setVisible] = useState(true);
@@ -70,7 +70,7 @@ export function LandingIntro() {
         <video
           ref={videoRef}
           className="intro-hands"
-          src="/motion/nvidia-arrival.mp4"
+          src="/motion/nvidia-arrival-clean.mp4"
           muted
           playsInline
           preload="none"

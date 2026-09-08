@@ -62,4 +62,4 @@ Source: https://github.com/rsms/inter
 
 Nexaris (https://nexaris.com/) informed the white/cobalt palette, rounded surfaces and motion direction; no Nexaris artwork or runtime scripts are bundled. The stock hero artwork was generated specifically for freestock. Plus Jakarta Sans is distributed under the SIL Open Font License; see `public/fonts/PLUS-JAKARTA-LICENSE.txt`.
 
-The owner supplied `qdxrxqynamlfi7tmunoc.mp4` for the landing sequence. Its reaching-hands footage is shortened, muted, and composited with a replacement NVIDIA card. The visible Made with Paper attribution in the original clip is retained. The clip is a decorative introduction and does not depict a real stock purchase or award.
+The owner supplied `qdxrxqynamlfi7tmunoc.mp4` for the landing sequence. Its reaching-hands footage is shortened, muted, and composited with a replacement NVIDIA card. The original clip includes a Made with Paper mark; the edited intro removes that on-screen mark at the owner's request. The clip is a decorative introduction and does not depict a real stock purchase or award.
