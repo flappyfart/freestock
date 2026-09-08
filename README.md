@@ -1,6 +1,6 @@
 # freestock
 
-Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. Apple Liquid Glass-inspired web materials extend the supplied Visitors theme. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
+Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. Apple Liquid Glass-inspired web materials use a dark forest-green palette with vivid lime actions, following the user’s Robinhood-inspired theme request. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
 
 ## Use the product
 
@@ -43,7 +43,7 @@ Each private preview is an independent scenario. Accounts do not share a real po
 
 ## Design
 
-The strongest glass material sits on floating navigation and controls, with quieter translucent content surfaces. Native Liquid Glass optics are approximated with CSS blur, saturation and edge highlights. Contrast and reduced-transparency preferences switch to opaque surfaces; reduced-motion preferences disable animation. OpenRunde is self-hosted. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/OFL.txt`.
+The dark-green palette is isolated in `app/dark-green.css`, with semantic color tokens, dark dialog and status treatments, and dark accessibility fallbacks. The strongest glass material sits on floating navigation and controls, with quieter translucent content surfaces. Native Liquid Glass optics are approximated with CSS blur, saturation and edge highlights. Contrast and reduced-transparency preferences switch to opaque surfaces; reduced-motion preferences disable animation. OpenRunde is self-hosted. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/OFL.txt`.
 
 ## Production activation remains blocked
 

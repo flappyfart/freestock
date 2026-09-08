@@ -1,0 +1,135 @@
+/* Robinhood-inspired forest palette. Keeps freestock's existing glass materials. */
+:root {
+  color-scheme: dark;
+  --paper: #09140e;
+  --linen: #11241a;
+  --fog: #2b4434;
+  --carbon: #eff6ed;
+  --muted: #afc1af;
+  --accent: #ccff00;
+  --lavender: var(--accent);
+  --background: #09140e;
+  --foreground: #eff6ed;
+  --border: #2b4434;
+  --color-primary: #ccff00;
+  --color-primary-foreground: #142000;
+  --color-background: #09140e;
+  --color-foreground: #eff6ed;
+  --color-muted-foreground: #afc1af;
+  --color-popover: #14271b;
+  --color-popover-foreground: #eff6ed;
+  --glass-fill: rgba(20, 43, 28, .74);
+  --glass-line: rgba(216, 246, 204, .16);
+  --glass-shadow: 0 14px 36px rgba(0, 8, 3, .17), 0 2px 5px rgba(0, 8, 3, .11), inset 0 1px 0 rgba(228, 255, 215, .1), inset 0 -1px 0 rgba(0, 0, 0, .18);
+}
+body {
+  background-color: #09140e;
+  background-image: radial-gradient(ellipse at 4% 8%, rgba(30, 77, 43, .65), transparent 56%), radial-gradient(ellipse at 94% 68%, rgba(36, 69, 27, .42), transparent 50%), linear-gradient(155deg, #0c1b11, #09140e 60%, #142416);
+  color: var(--foreground);
+}
+::selection { background: #ccff00; color: #142000; }
+button:hover:not(:disabled) { background: rgba(196, 242, 167, .09); }
+button:focus-visible, a:focus-visible, input:focus-visible { outline-color: var(--accent); }
+.wordmark { color: #eff6ed; }
+.wordmark > svg { filter: none; color: var(--accent); }
+.wordmark > span { color: var(--accent); }
+.main-nav { background: rgba(18, 40, 25, .64); border-color: rgba(220, 255, 204, .18); box-shadow: var(--glass-shadow); }
+.main-nav button, .main-nav .nav-item { color: #b8cbb5; }
+.main-nav .nav-item[data-active], .main-nav button.nav-active { color: #d8ff63; background: transparent; }
+.main-nav .nav-item:hover { background: transparent; color: #eff6ed; }
+.nav-glider { background: rgba(64, 87, 35, .45); box-shadow: inset 0 1px 0 rgba(236, 255, 191, .13), 0 3px 9px #0003; }
+.nav-count { background: #ccff00; color: #142000; }
+.account-pill, .page-heading .pill, .pill { background: rgba(25, 48, 31, .7); border-color: #d4ffc326; color: #d6e5d1; box-shadow: inset 0 1px 0 #eeffe70a; }
+.account-pill:hover { background: #263d29; }
+.avatar { background: #304c27; color: #dcf7cf; box-shadow: inset 0 1px 0 #eaffd212; }
+.preview-strip { background: rgba(5, 18, 10, .28); border-color: rgba(217, 247, 207, .09); color: #b1c7ad; }
+.page-heading p:last-child, .small-label, .caption, .footnote, footer,
+.savings-bottom strong span, .amount-input > span:last-child,
+.deposit-explainer > div, .pool-line, .pool-panel > p:last-child,
+.savings-graph > span, .prize-copy p, .how-strip p > span,
+.simulation-controls p > span, .withdrawal-banner p span,
+.draw-feature p, .draw-stats span, .draw-stats small,
+.stock-picker > p, .stock-picker small, .empty-state p,
+.draw-identity h3 > span, .draw-identity p, .draw-result > span,
+.draw-proof, .portfolio-empty, .holding-list small, .activity-list p,
+.activity-amount small, .modal-description, .modal-copy,
+.confirmation-amount > span, .about-content p, .design-credits,
+.readiness-intro, .readiness-item p, .readiness-footnote, .loading-line {
+  color: #afc1af;
+}
+.panel { background: var(--glass-fill); border-color: var(--glass-line); box-shadow: var(--glass-shadow); }
+.panel::before { box-shadow: inset 1px 1px 1px #e8ffd40b, inset -1px -1px 1px #0003; }
+.savings-panel { background: rgba(17, 37, 24, .79); }
+.deposit-panel { background: rgba(29, 53, 32, .72); }
+.prize-panel { background: rgba(24, 48, 28, .62); border-color: var(--glass-line); }
+.pool-panel { background: rgba(17, 38, 24, .73); }
+.section-top > svg, .simulation-controls > div > svg, .empty-state > svg { color: #aeca9e; }
+.balance { color: #f2f8ec; }
+.balance > span { color: #aec2a7; }
+.deposit-explainer strong, .pool-line > span:last-child { color: #e4efdc; }
+.savings-bottom, .savings-bottom > div + div, .pool-divider, .how-strip, .portfolio-section, .design-credits { border-color: #d0edbe1a; }
+.graph-grid { background: repeating-linear-gradient(to bottom, transparent 0, transparent 38px, #bad99e16 38px, #bad99e16 39px); }
+.amount-input { background: #06170d66; border-color: #c6edac29; box-shadow: inset 0 2px 5px #0002, 0 1px 0 #c1f5a209; }
+.amount-input:focus-within { outline-color: #ccff00; }
+.amount-input input { color: #eff6ed; caret-color: #ccff00; }
+.amount-input input::placeholder { color: #afc1af; }
+.quick-amounts button, .money-mode button { background: #c9f7a509; border-color: #d0f2b923; color: #c0d4b5; box-shadow: inset 0 1px 0 #edffdd09; }
+.quick-amounts button:hover:not(:disabled), .money-mode button:hover:not(:disabled) { background: #ccff0017; color: #eaf8df; }
+.money-mode button[aria-pressed="true"] { background: #cee99e14; border-color: #d6f8ae47; color: #deffae; box-shadow: inset 0 1px 0 #ecffd010; }
+.primary { background: #ccff00; color: #142000; border-color: #ebff93a6; box-shadow: inset 0 1px 1px #f0ffc270, inset 0 -1px 1px #6a840052, 0 5px 15px #0002; }
+.primary:hover:not(:disabled) { background: #d9ff4d; color: #142000; box-shadow: inset 0 1px 1px #f4ffccaa, 0 7px 20px #0003; }
+.arrow-capsule { background: rgba(18, 38, 3, .87); color: #d9ff58; box-shadow: inset 0 1px 1px #ffffff1a, 0 2px 5px #32480033; }
+.secondary { background: rgba(36, 61, 38, .63); border-color: #d0f1b92e; box-shadow: inset 0 1px 0 #eaffd30b, 0 3px 8px #0001; color: #e4efd9; }
+.secondary:hover:not(:disabled) { background: #355432; color: #f0f7e8; }
+.text-button { color: #d3e7c6; }
+.text-button:hover { background: transparent; color: #ccff00; }
+.stock-ticket { background: rgba(37, 64, 33, .63); border-color: #e3ffc936; box-shadow: inset 0 1px 1px #f1ffcd21, 0 14px 25px #0003, 0 2px 3px #0002; }
+.ticket-top > svg, .ticket-top small, .ticket-value > span, .ticket-bottom { color: #c1d5b3; }
+.ticket-value { color: #f3f9e7; }
+.ticket-bottom { border-color: #d4f0b632; }
+.prize-copy > .pill { background: #d2f7a907; border-color: #d2f7a925; color: #c2d8b4; }
+img.stock-logo { background: #eaf4e4; border-color: #f3ffe9; }
+.spy-mark { background: #314c2b; color: #eaf8d8; border-color: #d7f2bc38; }
+.step-icon { background: #24462a80; border-color: #d2f6b321; color: #cbdfbc; box-shadow: inset 0 1px 0 #efffd00a; }
+.simulation-controls { background: #122c177a; border-color: #d3f6b81f; box-shadow: inset 0 1px 0 #e4ffc109; }
+.withdrawal-banner { background: #1a3321bb; border-color: #c7e9b22b; box-shadow: var(--glass-shadow); }
+.draw-feature { background: #19351fd1; }
+.stock-picker { background: #132a1bcc; }
+.stock-picker button { background: #accf8f05; border-color: #d3f0be1f; color: #e0edd4; }
+.stock-picker button:hover:not(:disabled) { background: #c4f59112; }
+.stock-picker button[aria-pressed="true"] { background: #ccff0010; border-color: #ccff0078; box-shadow: inset 0 1px 0 #edffbd12; color: #e3ffb6; }
+.draw-list { background: #142c1bbd; border-color: #d7f1c626; box-shadow: var(--glass-shadow); }
+.draw-row + .draw-row, .draw-proof[open], .activity-toolbar, .activity-list li + li { border-color: #d1efb818; }
+.empty-state { background: #122919ba; border-color: #d2eec024; box-shadow: var(--glass-shadow); }
+.holding-list > div { background: #183421b3; border-color: #d9f7c62b; }
+.filter-buttons button { color: #b4c8a9; }
+.filter-buttons button[aria-pressed="true"] { background: #cdff0014; color: #d9ffa5; box-shadow: inset 0 1px 0 #eaffc411; }
+.activity-icon { background: #31502d73; border-color: #d8f2bb24; color: #d5e8c5; }
+.activity-section .empty-state { background: none; box-shadow: none; }
+.freestock-dialog { background: rgba(15, 34, 21, .96) !important; color: #eff6ed !important; border-color: #d3f6b83b !important; box-shadow: inset 0 1px 0 #edffcb14, 0 26px 80px #0009 !important; }
+.freestock-dialog [data-slot="dialog-close"] { background: #294630; color: #deefcf; }
+[data-slot="dialog-overlay"] { background: rgba(0, 10, 3, .6); }
+.modal-note { background: #223e24a1; border-color: #d2eeb221; color: #c1d6b4; }
+.message-banner { background: #1b3525db; border-color: #d7f6c62c; color: #d5e9c8; }
+.message-banner.success { background: #1c3d20ed; border-color: #a9e98047; color: #d8ffba; }
+.success-icon { stroke: #ccff00; }
+.message-banner.error { background: #40291fed; border-color: #ffbda23d; color: #ffceb5; }
+.message-banner.error .secondary { background: #573828; border-color: #ffcbae42; color: #ffe2cc; }
+.skip-link { background: #ccff00; color: #142000; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .main-nav, .panel, .stock-ticket, .freestock-dialog, .secondary, .message-banner { background: #152c1b; }
+  .primary { background: #ccff00; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body { background: #09140e; }
+  .main-nav, .panel, .stock-ticket, .freestock-dialog, .secondary,
+  .message-banner, .amount-input, .simulation-controls, .withdrawal-banner {
+    background: #142a1b !important;
+    border-color: #7b9c6b !important;
+    color: #eff6ed;
+  }
+  .primary { background: #ccff00 !important; color: #142000; }
+  .caption, .footnote, footer, .small-label { color: #d2e2c9; }
+  .nav-glider { background: #34552b; }
+  .message-banner.error { color: #ffceb5; }
+}

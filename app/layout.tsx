@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./dark-green.css";
 export const metadata: Metadata = {
   title: "freestock | Savings with a little possibility",
   description:
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="forest">
       <body>{children}</body>
     </html>
   );

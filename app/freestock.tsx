@@ -139,7 +139,7 @@ function SavingsChart({ state }: { state: State }) {
       >
         <path
           d={points.length === 1 ? "M0 102 L600 102" : path}
-          stroke="#918df6"
+          stroke="var(--accent, #ccff00)"
           strokeWidth="2.4"
           fill="none"
           vectorEffect="non-scaling-stroke"
