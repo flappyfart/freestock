@@ -1,0 +1,15 @@
+import type { Metadata } from "next";
+import "./globals.css";
+export const metadata: Metadata = {
+  title: "freestock | Savings with a little possibility",
+  description:
+    "Explore freestock: a private, simulated savings pool where yield funds stock prizes.",
+  robots: { index: false, follow: false },
+};
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
