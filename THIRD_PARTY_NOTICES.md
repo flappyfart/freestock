@@ -66,3 +66,6 @@ The owner supplied `qdxrxqynamlfi7tmunoc.mp4` for the landing sequence. Its reac
 
 
 The owner supplied `a9ekptulht2f1glph7ar.mp4` and `yknj7ul7zvjvnejfmpyf.mp4` as dither-motion references. The background video is an original mathematical flow rendered with ordered dithering; no frames, branding, or website copy from those reference clips are included.
+
+
+The AAPL, NVDA, and MSFT hero cutouts are background-extraction edits of the original generated freestock stock artwork. The ribbon backdrop is removed, each card keeps its full chrome outline, and transparent alpha is preserved in the website assets.

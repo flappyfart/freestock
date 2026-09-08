@@ -1142,18 +1142,6 @@ export default function Freestock() {
                   fees. A $10 prize is reserved only from available simulated net yield.
                 </p>
               </section>
-              <section>
-                <h3>Built toward a live product.</h3>
-                <p>
-                  Real deposits and trading are disabled. Vault access tests, independent security
-                  review, stock settlement, and legal eligibility must be completed before launch.
-                  Live principal and withdrawal liquidity would not be guaranteed.
-                </p>
-                <Link href="/readiness" className="text-button">
-                  See integration readiness
-                  <ArrowUpRight size={14} />
-                </Link>
-              </section>
               <div className="design-credits">
                 Interface elements adapted from{" "}
                 <a href="https://uiverse.io/adamgiebl/new-bird-34" target="_blank" rel="noreferrer">

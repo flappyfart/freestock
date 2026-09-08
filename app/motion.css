@@ -31,7 +31,7 @@
   background: radial-gradient(ellipse at 50% 42%, #ffffffcc 0%, #ffffff8a 38%, #ffffff14 78%);
 }
 .hero-artwork {
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
 }
 .motion-toggle {
   position: fixed;
@@ -416,8 +416,27 @@ html[data-motion-paused="true"] .particle-orb img {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-artwork img {
-    animation: artwork-float 6s ease-in-out infinite alternate;
+  .stock-bubble img {
+    animation: stock-bubble-bounce var(--bubble-period, 5.6s) ease-in-out infinite;
+    animation-delay: var(--bubble-delay, 0s);
+  }
+  .stock-bubble--aapl {
+    --bubble-period: 5.2s;
+    --bubble-delay: -1.7s;
+    --bubble-rise: -12px;
+    --bubble-turn: -2deg;
+  }
+  .stock-bubble--nvda {
+    --bubble-period: 6.1s;
+    --bubble-delay: -0.4s;
+    --bubble-rise: -16px;
+    --bubble-turn: 1.5deg;
+  }
+  .stock-bubble--msft {
+    --bubble-period: 4.8s;
+    --bubble-delay: -3.1s;
+    --bubble-rise: -10px;
+    --bubble-turn: 2deg;
   }
   .app-shell [data-scroll-reveal="pending"] {
     opacity: 0;
@@ -432,13 +451,6 @@ html[data-motion-paused="true"] .particle-orb img {
     opacity: 1;
     animation: none;
   }
-  @supports (animation-timeline: view()) {
-    .hero-artwork {
-      animation: hero-parallax linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 100%;
-    }
-  }
 }
 @keyframes scroll-arrive {
   from {
@@ -450,24 +462,19 @@ html[data-motion-paused="true"] .particle-orb img {
     transform: translateY(0) scale(1);
   }
 }
-@keyframes artwork-float {
-  from {
-    transform: translateY(0) scale(1.035);
+@keyframes stock-bubble-bounce {
+  0%,
+  100% {
+    transform: translateY(4px) rotate(0deg);
   }
-  to {
-    transform: translateY(-8px) scale(1.05);
+  45% {
+    transform: translateY(var(--bubble-rise, -12px)) rotate(var(--bubble-turn, 1.5deg));
   }
-}
-@keyframes hero-parallax {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-55px);
+  72% {
+    transform: translateY(-3px) rotate(0deg);
   }
 }
-html[data-motion-paused="true"] .hero-artwork,
-html[data-motion-paused="true"] .hero-artwork img {
+html[data-motion-paused="true"] .stock-bubble img {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -475,8 +482,7 @@ html[data-motion-paused="true"] .hero-artwork img {
     opacity: 1;
     transform: none;
   }
-  .hero-artwork,
-  .hero-artwork img {
+  .stock-bubble img {
     transform: none;
   }
 }

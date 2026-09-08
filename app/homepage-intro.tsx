@@ -1,5 +1,5 @@
 "use client";
-/* oxlint-disable next/no-img-element -- Locally generated decorative SVG; fixed dimensions prevent layout shift. */
+/* oxlint-disable next/no-img-element -- Local transparent decorative artwork; fixed dimensions prevent layout shift. */
 import { useState } from "react";
 import { ArrowRight, Clock3, Gift, Wallet } from "lucide-react";
 import { EXAMPLE_POOLS, prizeProjection, type ExamplePool } from "@/lib/prize-projection";
@@ -23,7 +23,17 @@ export function HomepageIntro() {
   return (
     <section className="home-intro" aria-labelledby="home-title">
       <div className="hero-artwork" aria-hidden="true">
-        <img src="/freestock-hero.png" alt="" width="1536" height="1024" fetchPriority="high" />
+        {(["aapl", "nvda", "msft"] as const).map((stock) => (
+          <span className={`stock-bubble stock-bubble--${stock}`} key={stock}>
+            <img
+              src={`/stocks/bubble-${stock}.webp`}
+              alt=""
+              width="1024"
+              height="1024"
+              fetchPriority={stock === "nvda" ? "high" : "auto"}
+            />
+          </span>
+        ))}
       </div>
       <div className="home-intro-copy">
         <p className="small-label">

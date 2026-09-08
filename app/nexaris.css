@@ -1229,22 +1229,39 @@ h3,
   margin-top: 30px;
 }
 .home-intro {
-  overflow: clip;
+  overflow: visible;
   margin-bottom: 76px;
 }
 .hero-artwork {
-  height: clamp(230px, 29vw, 390px);
-  margin: 0 -24px;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.15fr) minmax(0, 0.8fr);
+  align-items: center;
+  gap: clamp(4px, 2vw, 24px);
+  width: min(100%, 1040px);
+  height: auto;
+  padding: 32px 12px 28px;
+  margin: 0 auto 22px;
+  overflow: visible;
   position: relative;
   isolation: isolate;
-  mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+  mask-image: none;
+}
+.stock-bubble {
+  display: block;
+  justify-self: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 270px;
+}
+.stock-bubble--nvda {
+  max-width: 360px;
 }
 .hero-artwork img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 42%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 .home-intro-copy {
@@ -1605,13 +1622,6 @@ footer .text-button:focus-visible {
   .home-intro h1 {
     font-size: clamp(40px, 6.8vw, 56px);
   }
-  .hero-artwork {
-    height: 275px;
-    margin-inline: -28px;
-  }
-  .hero-artwork img {
-    object-position: center 38%;
-  }
   .money-story {
     padding: 36px 28px;
     border-radius: 36px;
@@ -1637,8 +1647,8 @@ footer .text-button:focus-visible {
     height: 46px;
   }
   .hero-artwork {
-    height: 240px;
-    margin-inline: -20px;
+    padding: 28px 4px 24px;
+    margin-bottom: 16px;
   }
   .home-intro-copy > .small-label {
     font-size: 10px;
