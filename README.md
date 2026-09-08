@@ -45,6 +45,8 @@ Each private preview is an independent scenario. Accounts do not share a real po
 
 The dark-green palette is isolated in `app/dark-green.css`, with semantic color tokens, dark dialog and status treatments, and dark accessibility fallbacks. The strongest glass material sits on floating navigation and controls, with quieter translucent content surfaces. Native Liquid Glass optics are approximated with CSS blur, saturation and edge highlights. Contrast and reduced-transparency preferences switch to opaque surfaces; reduced-motion preferences disable animation. OpenRunde is self-hosted. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/OFL.txt`.
 
+The homepage introduces the savings-to-prizes model before the account dashboard. `app/homepage-intro.tsx` explains the earnings tradeoff, follows a $100 deposit through 700 entries and a sample draw, and shows both winning and nonwinning outcomes. An anchor leads into the existing deposit flow; plain-language FAQs explain funding, odds, withdrawals, simulated assets, and the limits of the example. `app/homepage.css` provides responsive layout and preserves the forest glass theme.
+
 ## Production activation remains blocked
 
 This is a tested application foundation, not an audited or funded protocol. The implementation does not include live custody contracts, a VRF consumer, a CCIP sender/receiver, a stock execution adapter, or an indexer. There is deliberately no environment switch that enables real deposits.

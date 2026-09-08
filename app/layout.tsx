@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./dark-green.css";
+import "./homepage.css";
 export const metadata: Metadata = {
-  title: "freestock | Savings with a little possibility",
+  title: "freestock | Save for a chance to win stock prizes",
   description:
     "Explore freestock: a private, simulated savings pool where yield funds stock prizes.",
   robots: { index: false, follow: false },

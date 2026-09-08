@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { HomepageIntro, HomepageQuestions } from "./homepage-intro";
 import {
   initialState,
   parseAmount,
@@ -223,7 +224,7 @@ export default function Freestock() {
         setModal(null);
         setNotice(
           command.type === "deposit"
-            ? "Simulated funds added. Your entries will build as time advances."
+            ? "Practice money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner."
             : command.type === "withdraw"
               ? "Withdrawal reserved. Complete it below to return funds to your practice wallet."
               : command.type === "advance"
@@ -248,7 +249,9 @@ export default function Freestock() {
     [accept],
   );
   const toolsRef = useRef({ ready, retry, run });
-  useEffect(() => { toolsRef.current = { ready, retry, run }; }, [ready, retry, run]);
+  useEffect(() => {
+    toolsRef.current = { ready, retry, run };
+  }, [ready, retry, run]);
   useEffect(() => {
     const context = (
       document as Document & {
@@ -357,8 +360,8 @@ export default function Freestock() {
       Record<Draw["status"], { label: string; type: "resolve" | "settle_prize" | "claim" }>
     > = {
       closed: { label: "Reveal example result", type: "resolve" },
-      randomness_ready: { label: "Settle example prize", type: "settle_prize" },
-      claimable: { label: "Claim simulated allocation", type: "claim" },
+      randomness_ready: { label: "Finish the draw", type: "settle_prize" },
+      claimable: { label: "Claim practice prize", type: "claim" },
     };
     const action = actions[draw.status];
     return action ? (
@@ -399,7 +402,7 @@ export default function Freestock() {
             }}
           />
           {[
-            ["overview", "Overview"],
+            ["overview", "Home"],
             ["draws", "Prize draws"],
             ["activity", "Activity"],
           ].map(([value, label]) => (
@@ -417,7 +420,7 @@ export default function Freestock() {
       <div className="preview-strip">
         <span>
           <Sparkles size={14} />
-          Private preview. Explore with simulated USDG.
+          Interactive demo. Try freestock with practice money.
         </span>
         <span>
           No real funds connected
@@ -425,30 +428,26 @@ export default function Freestock() {
         </span>
       </div>
       <main className="workspace" id="main-content">
-        <div className="page-heading">
-          <div>
-            <p className="small-label">A LITTLE SAVING. A LOT OF POSSIBILITY.</p>
-            <h1>
-              {pane === "overview"
-                ? "Make room for a little more."
-                : pane === "draws"
-                  ? "A little anticipation."
-                  : "Every step, accounted for."}
-            </h1>
-            <p>
-              {pane === "overview"
-                ? "Your savings build entries. Pool yield powers stock prizes."
-                : pane === "draws"
-                  ? "Follow your entries from a saved balance to an example stock prize."
+        {pane === "overview" ? (
+          <HomepageIntro />
+        ) : (
+          <div className="page-heading">
+            <div>
+              <p className="small-label">YOUR PRACTICE ACCOUNT</p>
+              <h1>{pane === "draws" ? "Your stock prize draws." : "Every step, accounted for."}</h1>
+              <p>
+                {pane === "draws"
+                  ? "Reveal a winner, finish the draw, then claim if you win. All prizes are pretend."
                   : "Your deposits, withdrawals, entries, and prizes in one place."}
-            </p>
+              </p>
+            </div>
+            <button className="pill" onClick={() => setModal("about")}>
+              <Layers size={15} />
+              How it works
+              <CircleHelp size={13} />
+            </button>
           </div>
-          <button className="pill" onClick={() => setModal("about")}>
-            <Layers size={15} />
-            USDG pool
-            <CircleHelp size={13} />
-          </button>
-        </div>
+        )}
         {signedOut && (
           <div className="message-banner">
             <Info size={18} />
@@ -497,33 +496,40 @@ export default function Freestock() {
           </div>
         )}
         <TabsContent value="overview" className="pane-content">
+          <div className="demo-heading">
+            <div>
+              <h2>Give it a try.</h2>
+              <p>Add practice money. Skip ahead 7 days. Then reveal the draw.</p>
+            </div>
+            <span className="pill">You start with $10,000 of practice money</span>
+          </div>
           <div className="dashboard-grid">
             <section className="savings-panel panel">
               <div className="section-top">
-                <h2>Your savings</h2>
+                <h2>Your practice savings</h2>
                 <Wallet size={18} />
               </div>
               <div className="balance">
                 {money(state.balance).split(".")[0]}
                 <span>.{money(state.balance).split(".")[1]}</span>
               </div>
-              <p className="caption">Simulated USDG balance</p>
+              <p className="caption">Practice balance · USDG is the demo’s dollar unit</p>
               <SavingsChart state={state} />
               <div className="savings-bottom">
                 <div>
                   <span className="caption">This draw’s entries</span>
                   <strong>
                     {num(entries(state.weights[0]), 2)}
-                    <span> USDG-days</span>
+                    <span> entries</span>
                   </strong>
                 </div>
                 <div>
-                  <span className="caption">Claimed stock allocations</span>
+                  <span className="caption">Practice prizes claimed</span>
                   <strong>{money(won)}</strong>
                 </div>
               </div>
             </section>
-            <section className="deposit-panel panel">
+            <section className="deposit-panel panel" id="try-demo" tabIndex={-1}>
               <div className="section-top">
                 <h2>{mode === "deposit" ? "Add to your savings" : "Withdraw savings"}</h2>
                 {mode === "deposit" ? <ArrowDownLeft size={19} /> : <ArrowUpFromLine size={19} />}
@@ -600,11 +606,14 @@ export default function Freestock() {
                   Next example prize
                 </span>
                 <h2>
-                  A little {names[state.stock]}.<br />A lot to look forward to.
+                  A chance to win
+                  <br />
+                  $10 of {names[state.stock]}.
                 </h2>
                 <p>
-                  Save over time for a chance at a<br />
-                  $10 simulated stock allocation.
+                  Paid for by the pool’s earnings.
+                  <br />
+                  A pretend prize in this demo.
                 </p>
                 <button className="text-button" onClick={() => setPane("draws")}>
                   Explore the draw
@@ -615,7 +624,7 @@ export default function Freestock() {
             </section>
             <section className="pool-panel panel">
               <div className="section-top">
-                <h2>A shared possibility</h2>
+                <h2>How prizes are funded</h2>
                 <Layers size={18} />
               </div>
               <p className="caption">Example pool savings</p>
@@ -630,13 +639,13 @@ export default function Freestock() {
               </div>
               <div className="pool-divider" />
               <div className="pool-line">
-                <span>Uncommitted simulated yield</span>
+                <span>Practice earnings available for prizes</span>
                 <span>{money(state.availableYield)}</span>
               </div>
               <p>
-                Only realized yield can fund prizes.
+                Earnings after costs pay for prizes.
                 <br />
-                Savings are never a prize budget.
+                Deposits aren’t spent on the draw.
               </p>
             </section>
           </div>
@@ -659,11 +668,15 @@ export default function Freestock() {
               </Button>
             </div>
           )}
-          <section className="simulation-controls">
+          <section
+            className="simulation-controls"
+            id="skip-time"
+            aria-label="Advance the demo clock"
+          >
             <div>
               <Clock3 size={19} />
               <p>
-                <strong>Try a little time travel.</strong>
+                <strong>Skip ahead to see a draw.</strong>
                 <span>
                   Day {state.day} of your preview. {daysLeft} simulated day
                   {daysLeft === 1 ? "" : "s"} until draw #{nextDraw}.
@@ -688,53 +701,29 @@ export default function Freestock() {
               </Button>
             </div>
           </section>
-          <section className="how-strip">
-            <div>
-              <span className="step-icon">
-                <Plus size={17} />
-              </span>
-              <p>
-                <strong>Save at your own pace.</strong>
-                <span>Add simulated USDG to the pool.</span>
-              </p>
-            </div>
-            <div>
-              <span className="step-icon">
-                <History size={17} />
-              </span>
-              <p>
-                <strong>Let your entries build.</strong>
-                <span>Amount and time both count.</span>
-              </p>
-            </div>
-            <div>
-              <span className="step-icon">
-                <Gift size={17} />
-              </span>
-              <p>
-                <strong>See what comes next.</strong>
-                <span>Pool yield funds the prizes.</span>
-              </p>
-            </div>
-          </section>
+          <p className="simulation-guide">
+            After skipping ahead, open Prize draws to reveal who won. A draw can complete only when
+            the pool has enough practice earnings.
+          </p>
+          <HomepageQuestions />
         </TabsContent>
         <TabsContent value="draws" className="pane-content">
           <div className="draw-layout">
             <section className="panel draw-feature">
               <div>
                 <span className="pill">Example draw #{nextDraw}</span>
-                <h2>Your next possibility.</h2>
+                <h2>Your next stock prize draw.</h2>
                 <p>
-                  A $10 simulated allocation, funded only when enough simulated yield is available.
+                  A $10 practice prize, paid for only when the pool has enough earnings after costs.
                 </p>
                 <div className="draw-stats">
                   <div>
                     <span>Your current entries</span>
                     <strong>{num(entries(state.weights[0]), 2)}</strong>
-                    <small>USDG-days</small>
+                    <small>One dollar saved for one day = one entry</small>
                   </div>
                   <div>
-                    <span>Current entry share</span>
+                    <span>Your chance if the draw closed now</span>
                     <strong>{num(odds, 2)}%</strong>
                     <small>Changes until entries lock</small>
                   </div>
@@ -778,8 +767,10 @@ export default function Freestock() {
             {state.draws.length === 0 ? (
               <div className="empty-state">
                 <Gift size={27} />
-                <h3>Something to look forward to.</h3>
-                <p>Add savings and advance the preview by seven days to close your first draw.</p>
+                <h3>Your first draw starts with savings.</h3>
+                <p>
+                  Add practice money, then use +7 days on Home. Come back here to reveal the winner.
+                </p>
                 <Button className="secondary" onClick={() => setPane("overview")}>
                   Start with your savings
                   <ArrowRight size={14} />
@@ -811,9 +802,9 @@ export default function Freestock() {
                       </strong>
                       <span>
                         {draw.status === "closed"
-                          ? "Ready for simulated randomness"
+                          ? "Reveal the result to find out who won"
                           : draw.status === "randomness_ready"
-                            ? "Result saved. Settlement is a separate step."
+                            ? "Winner picked. Select Finish the draw to award the practice prize."
                             : draw.status === "claimable"
                               ? "Ready for you to claim"
                               : draw.status === "unfunded"
@@ -955,14 +946,14 @@ export default function Freestock() {
           <DialogTitle className="modal-title">
             {modal === "funds"
               ? mode === "deposit"
-                ? "A little more in savings."
+                ? "Add practice money to savings."
                 : "Request your withdrawal."
-              : "A little about freestock."}
+              : "How freestock works."}
           </DialogTitle>
           <DialogDescription className="modal-description">
             {modal === "funds"
               ? "Review your simulated transaction before confirming."
-              : "A savings pool where realized yield funds randomly awarded stock-token prizes."}
+              : "Save together. The pool’s earnings pay for prizes. A random draw picks a winner."}
           </DialogDescription>
           {modal === "funds" ? (
             <>
@@ -1002,22 +993,27 @@ export default function Freestock() {
           ) : (
             <div className="about-content">
               <section>
-                <h3>Save. Build entries. See what happens.</h3>
+                <h3>Saving earns you chances to win.</h3>
                 <p>
-                  Every USDG held for a simulated day earns one USDG-day of entries. Draws lock
-                  every seven simulated days. Your share of all entries determines your chance.
+                  Each practice dollar saved for one day earns one entry. Save $100 for seven days
+                  to earn 700 entries. Your share of all entries is your chance of winning. Entries
+                  start fresh after each weekly demo draw.
                 </p>
               </section>
               <section>
-                <h3>A clear separation.</h3>
+                <h3>Everything here is practice.</h3>
                 <p>
-                  You start with 10,000 practice USDG. Four example savers contribute 32,500. These
-                  figures are invented scenario inputs. No real people, funds, lending, shares, or
-                  stock tokens are represented.
+                  You start with $10,000 of practice money, labeled USDG. Four example savers
+                  contribute $32,500. These figures are invented scenario inputs. No real people,
+                  funds, lending, shares, or stock tokens are represented.
                 </p>
               </section>
               <section>
                 <h3>What funds a prize?</h3>
+                <p>
+                  Pool earnings fund prizes instead of interest paid to every saver. Deposits are
+                  not spent on draws. In this demo, a draw leaves your savings balance unchanged.
+                </p>
                 <p>
                   The scenario assumes 4% annual gross yield and deducts 10% of that yield as
                   example costs. These are editable code assumptions, not quoted returns or proposed
