@@ -22,8 +22,8 @@ export function HomepageIntro() {
   const prize = displayMoney(projection.weeklyPrize);
   return (
     <section className="home-intro" aria-labelledby="home-title">
-      <div className="particle-orb" aria-hidden="true">
-        <img src="/particle-orb.svg" alt="" width="640" height="640" />
+      <div className="hero-artwork" aria-hidden="true">
+        <img src="/freestock-hero.png" alt="" width="1536" height="1024" fetchPriority="high" />
       </div>
       <div className="home-intro-copy">
         <p className="small-label">
@@ -38,6 +38,13 @@ export function HomepageIntro() {
           The idea: pool savings, earn interest from lending, and use that interest to fund stock
           prizes. A random draw picks the winner.
         </p>
+        <a className="primary arrow-button home-cta" href="#try-demo">
+          Try a practice draw
+          <span className="arrow-capsule" aria-hidden="true">
+            <ArrowRight size={17} />
+          </span>
+        </a>
+        <p className="home-demo-note">Practice draws use $10 prizes. No real money or stocks.</p>
         <p className="home-tradeoff">
           The earnings go to prizes, instead of interest paid to every saver. Your deposit isn’t
           spent on the draw.
@@ -60,13 +67,6 @@ export function HomepageIntro() {
           Assumes 4% annual earnings, with 10% of earnings covering costs. The remaining weekly
           earnings go to one winner. Illustrative rates and rules, not promised returns.
         </p>
-        <a className="primary arrow-button home-cta" href="#try-demo">
-          Try a practice draw
-          <span className="arrow-capsule" aria-hidden="true">
-            <ArrowRight size={17} />
-          </span>
-        </a>
-        <p className="home-demo-note">Practice draws use $10 prizes. No real money or stocks.</p>
       </div>
 
       <div className="money-story panel" aria-labelledby="money-story-title">

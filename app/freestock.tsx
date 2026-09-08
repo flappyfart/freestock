@@ -29,6 +29,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HomepageIntro, HomepageQuestions } from "./homepage-intro";
+import { MotionEffects } from "./motion-effects";
+import { LandingIntro } from "./landing-intro";
+import { ScrollMotion } from "./scroll-motion";
 import { prizeSummary } from "@/lib/prizes";
 import {
   initialState,
@@ -496,6 +499,9 @@ export default function Freestock() {
   }
   return (
     <Tabs value={pane} onValueChange={(v) => setPane(String(v))} className="app-shell">
+      <MotionEffects />
+      <LandingIntro />
+      <ScrollMotion />
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

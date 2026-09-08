@@ -1,6 +1,6 @@
 # freestock
 
-Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. The interface follows the supplied Auros theme: deep teal surfaces, medium-weight typography, pale-pink statistics, aurora action buttons, and a decorative particle orb. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
+Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. The interface follows the requested Nexaris direction: white and cobalt surfaces, dimensional stock artwork, large rounded cards, and accessible motion. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
 
 ## Use the product
 
@@ -43,7 +43,11 @@ Each private preview is an independent scenario. Accounts do not share a real po
 
 ## Design
 
-The active theme is `app/auros.css`, loaded after structural and homepage styles. It uses the exact Liquid Abyss, Deep, and Kelp surface stack, 16px cards, 6px controls, no elevation shadows, and a self-hosted Inter substitute for Matter. The original decorative SVG orb animates slowly and stops for reduced-motion preferences; stronger-contrast settings remove it and simplify gradients. The earlier forest theme remains archived but is not imported. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/`.
+The active theme is `app/nexaris.css`, followed by `app/motion.css`. It adapts the Nexaris reference with white surfaces, cobalt sections, rounded controls, and self-hosted Plus Jakarta Sans headings with Inter body text. The original stock artwork was generated for freestock. The earlier Auros and forest themes remain archived but are not imported. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/`.
+
+`app/landing-intro.tsx` presents the user-supplied reaching-hands clip with its central cross removed and an NVIDIA card rendered over it. The edited clip is silent, 3 seconds, and ends before the original flashing sequence. The intro dismisses within 3.5 seconds, supports Skip/Escape/Tab, skips repeat visits in the same tab session, and is hidden for reduced motion. Playback failure and deep links skip it. The real account loads independently beneath the intro.
+
+`app/motion-effects.tsx` draws a decorative blue dot field, bounded to about 6,000 dots and 24 frames per second; it pauses in hidden tabs and has a visible pause control. `app/scroll-motion.tsx` progressively reveals below-fold sections once, including newly mounted tabs, while keeping focused/deep-linked content immediately visible. Server-rendered content remains visible without the enhancement. Reduced-motion preferences disable all entrance/hover movement. Hero bobbing and supported CSS scroll parallax share the pause control.
 
 The homepage introduces the savings-to-prizes model with `app/homepage-intro.tsx`: the earnings tradeoff, a $100 deposit through 700 entries, and both winning and nonwinning outcomes. After a user's first draw, an account summary appears above that fixed example. Waiting prizes have direct claim buttons; claimed stocks are listed separately from deposited savings. Account state refreshes on Home navigation and when the tab regains focus. `lib/prizes.ts` derives user-only totals, excluding awards to other savers; regression tests cover pending claims, repeated claims, reload serialization, and separate savings accounting.
 

@@ -1,0 +1,463 @@
+/* Motion follows Nexaris: floating artwork, scroll reveals, and tactile controls. */
+:root {
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+.ambient-field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+.motion-toggle {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right: 18px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #0066ff40;
+  border-radius: 6px;
+  background: #fff;
+  color: #515765;
+  font-size: 12px;
+}
+
+/* A single movement system prevents legacy transforms from stacking. */
+.app-shell button,
+.app-shell a.primary,
+.app-shell a.secondary,
+.freestock-dialog button {
+  translate: none;
+  transition:
+    transform 280ms var(--motion-ease),
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    filter 220ms ease;
+}
+.app-shell button:active:not(:disabled),
+.app-shell a.primary:active,
+.app-shell a.secondary:active,
+.freestock-dialog button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  translate: none;
+  transition-duration: 100ms;
+}
+.app-shell button:disabled {
+  transform: none;
+}
+.arrow-button .arrow-capsule,
+.arrow-button:hover:not(:disabled) .arrow-capsule {
+  width: 34px;
+  transition: transform 350ms var(--motion-ease);
+}
+.arrow-button:focus-visible .arrow-capsule svg {
+  transform: translateX(2px);
+}
+.panel,
+.stock-ticket,
+.simulation-controls,
+.withdrawal-banner,
+.claimed-stock-list > div,
+.holding-list > div {
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition:
+    transform 450ms var(--motion-ease),
+    outline-color 300ms ease;
+}
+.panel:focus-within,
+.simulation-controls:focus-within,
+.withdrawal-banner:focus-within {
+  outline-color: #0066ff66;
+}
+.draw-row,
+.activity-list > li,
+.prize-inbox-row,
+.questions-list details {
+  transition: background-color 220ms ease;
+}
+.questions-list summary > span,
+.money-step-icon,
+.stock-picker .stock-logo {
+  transition: transform 400ms var(--motion-ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-intro-copy,
+  .page-heading,
+  .prize-overview,
+  .pane-content .panel,
+  .simulation-controls,
+  .withdrawal-banner,
+  .holding-list > div,
+  .claimed-stock-list > div {
+    animation: surface-arrive 650ms var(--motion-ease) backwards;
+  }
+  .dashboard-grid > :nth-child(2),
+  .draw-layout > :nth-child(2) {
+    animation-delay: 70ms;
+  }
+  .dashboard-grid > :nth-child(3) {
+    animation-delay: 140ms;
+  }
+  .dashboard-grid > :nth-child(4) {
+    animation-delay: 210ms;
+  }
+  .message-banner {
+    animation: surface-arrive 300ms var(--motion-ease) backwards;
+  }
+  .questions-list details[open] > p {
+    animation: answer-arrive 280ms var(--motion-ease);
+  }
+  html[data-intro-playing="true"] .home-intro-copy,
+  html[data-intro-playing="true"] .prize-overview,
+  html[data-intro-playing="true"] .pane-content .panel {
+    animation: none;
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .app-shell button:hover:not(:disabled),
+  .app-shell a.primary:hover,
+  .app-shell a.secondary:hover,
+  .freestock-dialog button:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  .app-shell button:active:not(:disabled),
+  .app-shell a.primary:active,
+  .app-shell a.secondary:active,
+  .freestock-dialog button:active:not(:disabled) {
+    transform: translateY(1px) scale(0.97);
+  }
+  .panel:hover,
+  .simulation-controls:hover,
+  .withdrawal-banner:hover {
+    outline-color: #0066ff52;
+  }
+  .dashboard-grid > .panel:hover,
+  .stock-picker:hover,
+  .holding-list > div:hover,
+  .claimed-stock-list > div:hover {
+    transform: translateY(-4px);
+    outline-color: #0066ff52;
+  }
+  .stock-ticket:hover {
+    transform: perspective(800px) rotateY(-5deg) rotateX(3deg) translateY(-2px);
+    outline-color: #0066ff66;
+  }
+  .arrow-button:hover:not(:disabled) .arrow-capsule {
+    transform: translateX(-3px);
+  }
+  .money-steps li:hover .money-step-icon {
+    transform: translateY(-3px) rotate(-6deg);
+  }
+  .stock-picker button:hover:not(:disabled) .stock-logo {
+    transform: scale(1.08) rotate(-4deg);
+  }
+  .draw-row:hover,
+  .activity-list > li:hover,
+  .prize-inbox-row:hover,
+  .questions-list details:hover {
+    background-color: #0066ff08;
+  }
+}
+@keyframes surface-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes answer-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The supplied reaching-hands clip is silent and shortened before its strobe. */
+.landing-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  background: #000;
+  color: #edfffe;
+  animation: intro-depart 3500ms linear forwards;
+}
+.intro-scene {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100vw, 142.433vh);
+  height: max(56.1667vw, 80vh);
+  transform: translate(-50%, -50%);
+  container-type: inline-size;
+}
+.intro-hands {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+.intro-card-anchor {
+  position: absolute;
+  left: 50.5%;
+  top: 50.5%;
+  width: 25%;
+  transform: translate(-50%, -50%);
+  perspective: 1000px;
+}
+.intro-stock-card {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1.06;
+  padding: 2.1cqw;
+  border: 1px solid #cbfffcba;
+  border-radius: 1.4cqw;
+  background: linear-gradient(145deg, #145ef4, #031444 55%, #06358b);
+  color: #edfffe;
+  transform-style: preserve-3d;
+  animation: nvidia-arrive 3500ms var(--motion-ease) both;
+}
+.intro-stock-card::after {
+  content: "";
+  position: absolute;
+  inset: -80%;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 42%, #edfffe22 49%, transparent 56%);
+  animation: card-reflection 3100ms var(--motion-ease) both;
+}
+.intro-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.65cqw;
+  font-size: 1.12cqw;
+  letter-spacing: 0.04em;
+}
+.intro-card-top img {
+  background: #bfffa5;
+  width: 3.1cqw;
+  height: 3.1cqw;
+  padding: 0.5cqw;
+  border-radius: 0.55cqw;
+}
+.intro-card-top > svg {
+  margin-left: auto;
+  width: 1.5cqw;
+}
+.intro-card-symbol {
+  margin-top: 4cqw;
+  font-size: 5.1cqw;
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 1;
+}
+.intro-stock-card > p {
+  margin-top: 0.8cqw;
+  font-size: 1cqw;
+  color: #d4e3ff;
+}
+.intro-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #cbfffc33;
+  padding-top: 1.2cqw;
+  margin-top: 3.8cqw;
+  font-size: 0.75cqw;
+  letter-spacing: 0.05em;
+}
+.intro-card-bottom > span:first-child {
+  font-size: 1.25cqw;
+  letter-spacing: -0.05em;
+}
+.intro-wordmark {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  font-size: 27px;
+  letter-spacing: -0.05em;
+}
+.intro-caption {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  font-size: 13px;
+  color: #bbc7c6;
+}
+.intro-skip {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  min-height: 44px;
+  border: 1px solid #edfffe55;
+  border-radius: 6px;
+  background: #fff;
+  color: #010320;
+  font-size: 13px;
+}
+@keyframes intro-depart {
+  0%,
+  82% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes nvidia-arrive {
+  0% {
+    transform: rotateY(-18deg) rotateX(6deg) rotateZ(-6deg) scale(0.98);
+  }
+  38% {
+    transform: rotateY(9deg) rotateX(-3deg) rotateZ(3deg) scale(1);
+  }
+  75% {
+    transform: rotateY(-3deg) rotateX(2deg) rotateZ(-2deg) scale(1.025);
+  }
+  100% {
+    transform: rotateY(0) rotateX(0) rotateZ(0) scale(1.08);
+  }
+}
+@keyframes card-reflection {
+  from {
+    transform: translateX(-35%);
+  }
+  to {
+    transform: translateX(35%);
+  }
+}
+html[data-motion-paused="true"] .particle-orb img {
+  animation-play-state: paused;
+}
+@media (max-width: 640px) {
+  .intro-wordmark {
+    top: 28px;
+    left: 20px;
+    font-size: 24px;
+  }
+  .intro-skip {
+    top: 20px;
+    right: 18px;
+  }
+  .intro-caption {
+    bottom: max(36px, env(safe-area-inset-bottom));
+  }
+  .motion-toggle {
+    right: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-intro,
+  .motion-toggle {
+    display: none;
+  }
+  .app-shell button,
+  .app-shell a.primary,
+  .app-shell a.secondary,
+  .freestock-dialog button,
+  .panel,
+  .stock-ticket,
+  .simulation-controls,
+  .withdrawal-banner,
+  .holding-list > div,
+  .claimed-stock-list > div,
+  .money-step-icon,
+  .stock-picker .stock-logo,
+  .arrow-capsule,
+  .arrow-capsule svg {
+    transform: none !important;
+    translate: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-artwork img {
+    animation: artwork-float 6s ease-in-out infinite alternate;
+  }
+  .app-shell [data-scroll-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: none;
+  }
+  .app-shell [data-scroll-reveal="enter"] {
+    opacity: 1;
+    animation: scroll-arrive 700ms var(--motion-ease) backwards;
+  }
+  .app-shell [data-scroll-reveal="done"] {
+    opacity: 1;
+    animation: none;
+  }
+  @supports (animation-timeline: view()) {
+    .hero-artwork {
+      animation: hero-parallax linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+@keyframes scroll-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes artwork-float {
+  from {
+    transform: translateY(0) scale(1.035);
+  }
+  to {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+@keyframes hero-parallax {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-55px);
+  }
+}
+html[data-motion-paused="true"] .hero-artwork,
+html[data-motion-paused="true"] .hero-artwork img {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell [data-scroll-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .hero-artwork,
+  .hero-artwork img {
+    transform: none;
+  }
+}
