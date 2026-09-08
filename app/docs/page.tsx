@@ -14,8 +14,8 @@ export default function Page() {
             works today.
           </h1>
           <p>
-            Mechanics, data sources and the boundary between the working practice product and future
-            onchain execution.
+            Mechanics, data sources and the boundary between the practice product and the separate
+            wallet-approved pilot.
           </p>
         </section>
         <div className="education-layout">
@@ -74,7 +74,7 @@ export default function Page() {
                     </tr>
                     <tr>
                       <td>Real deposits and trading</td>
-                      <td>Disabled</td>
+                      <td>Private wallet pilot for the declared participant; each transaction needs wallet approval</td>
                     </tr>
                   </tbody>
                 </table>
@@ -260,8 +260,10 @@ export default function Page() {
                 Compounding is an internal transfer, not additional income.
               </p>
               <p>
-                No private keys, wallet signatures or real funds are used. The availability
-                self-check is informational and does not store your answers.
+                The practice account uses no real funds. The separate wallet pilot never receives your
+                private key; your wallet signs only after an explicit review. Its transaction recovery
+                references are saved in this browser, with all balances and receipts read from chain.
+                The availability self-check is informational and does not grant pilot access.
               </p>
             </section>
             <section id="execution">
@@ -275,14 +277,14 @@ export default function Page() {
               <p>
                 Automation needs explicit user permissions and limits for spending, slippage, costs
                 and conversion size. It should pause when liquidity, eligibility, quotes or token
-                status are unsuitable. Partial basket fills need individual receipts and a visible
-                unspent balance. Borrowed proceeds are never treated as earnings.
+                status are unsuitable. This pilot uses atomic basket purchases: a failed leg reverts the whole harvest.
+                Each confirmed purchase records its actual spend and received token amount. Borrowed proceeds are never treated as earnings.
               </p>
               <p>
                 The first owner-controlled account has passed 39 checks against a local copy of the
                 actual vault, router and NVIDIA pool. The test deposited fake USDG, advanced local
                 time, bought NVIDIA tokens from gains and withdrew the remaining assets. No real
-                funds or public transactions were involved. The contract is not deployed on mainnet.
+                funds or public transactions were involved. The builder has not deployed a public account or submitted real transactions; each participant must create their own account from their wallet.
                 A complete leveraged LP-to-stock strategy has not been verified here.{" "}
                 <a
                   href="https://blog.uniswap.org/robinhood-chain-is-live"
@@ -294,12 +296,13 @@ export default function Page() {
               </p>
               <p>
                 The intended launch audience is eligible users outside the US. Country availability,
-                issuer restrictions and transaction eligibility still apply; no country has been
-                activated for real funds in this app.
+                issuer restrictions and transaction eligibility still apply; general registration is not activated. The private wallet pilot is limited to the
+                specifically enabled signed-in participant.
               </p>
               <p>
-                The intended pilot starts in Norway with a 100 USDG deposit limit and NVIDIA only.
-                Eligibility review is pending. The account can reserve gains as principal or
+                The private pilot starts with a 100 USDG deposit limit and NVIDIA, Apple, Tesla,
+                Alphabet and SPY. The participant declared Norway residence/location and non-US-person
+                status. These declarations are not an identity verification or legal approval. The account can reserve gains as principal or
                 purchase tokens, but it has no keeper or background spending permission. Vault
                 shares already accumulate the underlying return. Donations to an account also count
                 as gains; the balance model does not prove that every gain came from borrower

@@ -9,16 +9,35 @@ async function get(path, authenticated = true) {
   requests++;
   const r = await fetch(new URL(path, origin), {
     redirect: "error",
-    headers: authenticated ? { "oai-authenticated-user-id": "live-integration-test", "oai-authenticated-user-email": "live-test@sites.test" } : {},
+    headers: authenticated
+      ? {
+          "oai-authenticated-user-id": "live-integration-test",
+          "oai-authenticated-user-email": "live-test@sites.test",
+        }
+      : {},
   });
   assert.match(r.headers.get("cache-control"), /no-store/);
   return { status: r.status, data: await r.json() };
 }
-for (const route of ["wallet", "quote", "deposit-preview", "account-plan"]) {
+for (const route of [
+  "wallet",
+  "quote",
+  "deposit-preview",
+  "account-plan",
+  "pilot/prepare",
+  "pilot/account",
+  "pilot/receipt",
+]) {
   assert.equal((await get(`/api/live/${route}`, false)).status, 401);
 }
-console.log("PASS authentication on all four account/quote routes");
-for (const path of ["wallet?address=no", "deposit-preview?address=" + wallet + "&amount=100.000001", "quote?symbol=UNKNOWN&amount=10", "quote?symbol=NVDA&amount=1e2", "account-plan?address=0x0000000000000000000000000000000000000000"]) {
+console.log("PASS authentication on all seven account/quote/pilot routes");
+for (const path of [
+  "wallet?address=no",
+  "deposit-preview?address=" + wallet + "&amount=100.000001",
+  "quote?symbol=UNKNOWN&amount=10",
+  "quote?symbol=NVDA&amount=1e2",
+  "account-plan?address=0x0000000000000000000000000000000000000000",
+]) {
   assert.equal((await get(`/api/live/${path}`)).status, 400);
 }
 console.log("PASS exact amount, stock and address validation");
@@ -52,6 +71,8 @@ assert.equal(setup.data.simulation, "passed");
 assert.equal(setup.data.canSubmit, false);
 assert.equal(setup.data.transaction.from, wallet);
 assert.equal(setup.data.depositLimit, "100000000");
-assert.deepEqual(setup.data.stocks, ["NVDA"]);
+assert.deepEqual(setup.data.stocks, ["NVDA", "AAPL", "TSLA", "GOOGL", "SPY"]);
 console.log("PASS direct deposit preview and actual-chain account creation simulation");
-console.log(`${requests} read-only API checks passed; no signatures, approvals or transactions submitted.`);
+console.log(
+  `${requests} read-only API checks passed; no signatures, approvals or transactions submitted.`,
+);

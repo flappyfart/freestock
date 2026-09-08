@@ -5,6 +5,8 @@ export function GET() {
     status: "ok",
     product: "freestock",
     mode: "simulation",
+    walletPilot: "separate, participant-restricted, wallet-approved",
+    walletPilotStatusEndpoint: "/api/live/status",
     realDepositsEnabled: LAUNCH_POLICY.realDepositsEnabled,
     realTradingEnabled: LAUNCH_POLICY.realTradingEnabled,
     launch: LAUNCH_POLICY,

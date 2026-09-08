@@ -1,12 +1,13 @@
 import { Interface, keccak256 } from "ethers";
 import artifact from "../../contracts/artifacts/FreestockYieldAccount.artifact.json" with { type: "json" };
-import { CHAIN_ID, USDG, VAULT, STOCK_TOKENS } from "./config.ts";
+import { CHAIN_ID, USDG, VAULT } from "./config.ts";
+import { ENABLED_STOCKS } from "./basket.ts";
 import { address } from "./validation.ts";
 
 export const PILOT_ROUTER = "0xcaf681a66d020601342297493863e78c959e5cb2";
 export const DEPOSIT_LIMIT = 100_000_000n;
-// Begin with the one stock whose full vault-to-token route passed execution tests.
-export const PILOT_STOCKS = STOCK_TOKENS.filter((s) => s.symbol === "NVDA");
+// Every enabled stock passed actual swap and onward-transfer checks on a local mainnet fork.
+export const PILOT_STOCKS = ENABLED_STOCKS;
 export function accountPlan(ownerInput: string) {
   const owner = address(ownerInput);
   const iface = new Interface(artifact.abi);
@@ -26,7 +27,7 @@ export function accountPlan(ownerInput: string) {
     transaction: { from: owner, data, value: "0x0", chainId: "0x1237" },
     canSubmit: false,
     reason:
-      "Account deployment is awaiting participant eligibility and an explicit wallet-approved pilot. This plan does not create an account or transfer funds.",
+      "This read-only setup preview does not deploy. Use the private wallet pilot to review an actual wallet transaction.",
   };
 }
 

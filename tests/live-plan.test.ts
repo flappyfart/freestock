@@ -3,8 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Interface, keccak256, toUtf8Bytes, ZeroAddress } from "ethers";
 import { amount, address } from "../lib/live/validation.ts";
-import { accountPlan, matchesAccountRuntime, PILOT_ROUTER } from "../lib/live/account-plan.ts";
-import { VAULT, USDG, STOCK_TOKENS } from "../lib/live/config.ts";
+import {
+  accountPlan,
+  matchesAccountRuntime,
+  PILOT_ROUTER,
+  PILOT_STOCKS,
+} from "../lib/live/account-plan.ts";
+import { VAULT, USDG } from "../lib/live/config.ts";
 import artifact from "../contracts/artifacts/FreestockYieldAccount.artifact.json" with { type: "json" };
 const owner = "0x0000000000000000000000000000000000001234";
 
@@ -19,7 +24,7 @@ void test("wallet validation rejects zero, malformed and non-address data", () =
   assert.equal(address(owner), owner);
   for (const v of [ZeroAddress, "0x123", "user.eth", "", {}, 1234]) assert.throws(() => address(v));
 });
-void test("setup bytecode encodes only canonical dependencies and the tested NVIDIA route", () => {
+void test("setup bytecode encodes only canonical dependencies and the five tested stock routes", () => {
   const plan = accountPlan(owner);
   const iface = new Interface(artifact.abi);
   const args = iface
@@ -32,7 +37,7 @@ void test("setup bytecode encodes only canonical dependencies and the tested NVI
     Array.from(args[3])
       .map(String)
       .map((a) => a.toLowerCase()),
-    [STOCK_TOKENS[0].address.toLowerCase()],
+    PILOT_STOCKS.map((s) => s.address.toLowerCase()),
   );
   assert.equal(args[4], 100_000_000n);
   assert.equal(plan.transaction.from, owner);

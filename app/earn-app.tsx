@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, Layers, RefreshCw } from "lucide-react";
 import { EarnShell } from "./earn-shell";
+import { MechanicalSwitch } from "./mechanical-switch";
 import { LandingIntro } from "./landing-intro";
 import {
   STOCKS,
@@ -42,28 +43,28 @@ function StockMark({ symbol, size = 24 }: { symbol: Stock; size?: number }) {
 }
 function PayoutPicker({ value, change }: { value: Preferences; change: (v: Preferences) => void }) {
   const [basket, setBasket] = useState(value.allocation.length > 1);
-  const [split, setSplit] = useState(value.compoundBps > 0 && value.compoundBps < 10000);
+  const split = value.compoundBps > 0 && value.compoundBps < 10000;
   const total = value.allocation.reduce((n, a) => n + a.bps, 0);
   return (
     <div className="payout-picker">
-      <label>
-        Earnings destination
-        <select
-          value={split ? "split" : value.compoundBps === 10000 ? "compound" : "stocks"}
-          onChange={(e) => {
-            setSplit(e.target.value === "split");
-            change({
-              ...value,
-              compoundBps:
-                e.target.value === "compound" ? 10000 : e.target.value === "split" ? 5000 : 0,
-            });
-          }}
-        >
-          <option value="stocks">Buy stock tokens</option>
-          <option value="compound">Auto-compound into this position</option>
-          <option value="split">Split: compound + buy stocks</option>
-        </select>
-      </label>
+      <MechanicalSwitch
+        label="Auto-compound"
+        description={
+          value.compoundBps > 0
+            ? "Reinvest available earnings in this practice position."
+            : "Send available earnings toward your stock picks."
+        }
+        checked={value.compoundBps > 0}
+        onChange={(checked) => change({ ...value, compoundBps: checked ? 10000 : 0 })}
+      />
+      {value.compoundBps > 0 && (
+        <MechanicalSwitch
+          label="Buy stocks too"
+          description="Split new earnings between compounding and stock purchases."
+          checked={split}
+          onChange={(checked) => change({ ...value, compoundBps: checked ? 5000 : 10000 })}
+        />
+      )}
       {split && (
         <label>
           Reinvest into this position (%)
@@ -80,38 +81,28 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
       )}
       {value.compoundBps < 10000 && (
         <>
-          <div className="earn-segment" aria-label="Stock destination">
-            <button
-              type="button"
-              aria-pressed={!basket}
-              onClick={() => {
-                setBasket(false);
-                change({
-                  ...value,
-                  allocation: [{ symbol: value.allocation[0]?.symbol ?? "NVDA", bps: 10000 }],
-                });
-              }}
-            >
-              Single stock
-            </button>
-            <button
-              type="button"
-              aria-pressed={basket}
-              onClick={() => {
-                setBasket(true);
-                change({
-                  ...value,
-                  allocation: [
-                    { symbol: "NVDA", bps: 3400 },
-                    { symbol: "AAPL", bps: 3300 },
-                    { symbol: "MSFT", bps: 3300 },
-                  ],
-                });
-              }}
-            >
-              Stock basket
-            </button>
-          </div>
+          <MechanicalSwitch
+            label="Stock basket"
+            description={
+              basket
+                ? "Split each purchase across several stocks."
+                : "Put each purchase into one stock."
+            }
+            checked={basket}
+            onChange={(checked) => {
+              setBasket(checked);
+              change({
+                ...value,
+                allocation: checked
+                  ? [
+                      { symbol: "NVDA", bps: 3400 },
+                      { symbol: "AAPL", bps: 3300 },
+                      { symbol: "SPY", bps: 3300 },
+                    ]
+                  : [{ symbol: value.allocation[0]?.symbol ?? "NVDA", bps: 10000 }],
+              });
+            }}
+          />
           {!basket ? (
             <label>
               Stock token
@@ -164,16 +155,16 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
               ))}
             </fieldset>
           )}
-          <label>
-            Convert earnings
-            <select
-              value={value.auto ? "auto" : "manual"}
-              onChange={(e) => change({ ...value, auto: e.target.value === "auto" })}
-            >
-              <option value="auto">Automatically at a minimum amount</option>
-              <option value="manual">When I choose</option>
-            </select>
-          </label>
+          <MechanicalSwitch
+            label="Auto-convert"
+            description={
+              value.auto
+                ? "Buy your stock picks when the practice minimum is reached."
+                : "Convert earnings when you choose."
+            }
+            checked={value.auto}
+            onChange={(checked) => change({ ...value, auto: checked })}
+          />
           {value.auto && (
             <label>
               Conversion minimum (practice USDG)

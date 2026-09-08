@@ -1,0 +1,122 @@
+{
+  "startedAt": "2026-09-08T23:24:55.209Z",
+  "rpc": "http://127.0.0.1:18546",
+  "api": "http://127.0.0.1:3013",
+  "chainId": 4663,
+  "forkBlock": 58065058,
+  "forkBlockHash": "0x360c98ead6fcff5b014f857cd57939035ead668de49e66735ee54453d060af2a",
+  "localFakeFundsOnly": true,
+  "publicTransactions": false,
+  "privateKeysRecorded": false,
+  "checks": [
+    "Local Anvil chain and pinned source header verified before key loading",
+    "Scratch fixture key permissions0600",
+    "Sender and cached recipient are the existing distinct fake-funds fixtures",
+    "Ordinary local USDG transfer mined successfully",
+    "Cached recipient received exactly one USDG base unit",
+    "USDG transfer receipt with matching nonce returnsHTTP200",
+    "Matching nonce USDG transfer is classified replaced with its exact hash",
+    "Replacement preserves the verified empty account snapshot",
+    "USDG transfer receipt without nonce returnsHTTP422",
+    "Without nonce ordinary USDG transfer remains outside supported pilot actions"
+  ],
+  "responses": [
+    {
+      "query": {
+        "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "hash": "0x7bf1b4770f90fd53719f66c93023574738045f1cde4f5666f8d5576fd5334c75",
+        "nonce": "0xa"
+      },
+      "status": 200,
+      "body": {
+        "status": "replaced",
+        "hash": "0x7bf1b4770f90fd53719f66c93023574738045f1cde4f5666f8d5576fd5334c75",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "account": "0x6c595A6Aa6a1acfDbE1c9F0c3aB4CA49a601CF39",
+        "snapshot": {
+          "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+          "account": "0x6c595A6Aa6a1acfDbE1c9F0c3aB4CA49a601CF39",
+          "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+          "principal": "0",
+          "assetValue": "0",
+          "availableGains": "0",
+          "spendableWithRoundingBuffer": "0",
+          "walletUsdg": "99949999",
+          "walletNvda": "44230137748088",
+          "stocks": [
+            {
+              "symbol": "NVDA",
+              "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+              "balance": "44230137748088"
+            },
+            {
+              "symbol": "AAPL",
+              "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+              "balance": "31548165004229"
+            },
+            {
+              "symbol": "TSLA",
+              "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+              "balance": "27267464846610"
+            },
+            {
+              "symbol": "GOOGL",
+              "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+              "balance": "29491650341088"
+            },
+            {
+              "symbol": "SPY",
+              "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+              "balance": "13026169666668"
+            }
+          ],
+          "allowance": "0",
+          "block": 58065082
+        }
+      }
+    },
+    {
+      "query": {
+        "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "hash": "0x7bf1b4770f90fd53719f66c93023574738045f1cde4f5666f8d5576fd5334c75"
+      },
+      "status": 422,
+      "body": {
+        "error": "The approval does not match this account."
+      }
+    }
+  ],
+  "nodeInfo": {
+    "currentBlockNumber": "0x37600b9",
+    "currentBlockTimestamp": 1788909613,
+    "currentBlockHash": "0x0c14e4db08cc8a8dc4e8f64fef75abf5059e0abbeeb367c3c0bfd66233c82419",
+    "hardFork": "Cancun",
+    "transactionOrder": "fees",
+    "environment": {
+      "baseFee": "0x8eff6f",
+      "chainId": 4663,
+      "gasLimit": "0x4000000000000",
+      "gasPrice": "0x3c29c96f"
+    },
+    "forkConfig": {
+      "forkUrl": "https://rpc.mainnet.chain.robinhood.com",
+      "forkBlockNumber": 58065058,
+      "forkRetryBackoff": 1000
+    },
+    "network": "ethereum"
+  },
+  "transaction": {
+    "hash": "0x7bf1b4770f90fd53719f66c93023574738045f1cde4f5666f8d5576fd5334c75",
+    "from": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+    "to": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "recipient": "0x213b8790F99FFD573487686c7e4791880E3b6a6f",
+    "amount": "1",
+    "amountUnit": "USDG base units (0.000001 USDG)",
+    "nonce": "0xa"
+  },
+  "status": "passed",
+  "assertionCount": 10,
+  "completedAt": "2026-09-08T23:24:55.430Z"
+}

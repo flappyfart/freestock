@@ -64,9 +64,10 @@ export default function Page() {
                 </div>
               </div>
               <p className="learn-callout">
-                The current freestock app is a simulation. You can create saved practice positions
-                and explore the flow. It does not deposit, borrow, stake, provide liquidity or buy
-                real tokens.
+                The homepage uses practice funds. The separate Live integration page offers a
+                private wallet pilot for USDG lending and buying selected Stock Tokens with
+                available gains. Real actions require your wallet approval; borrowing, staking and
+                LP execution are not active.
               </p>
             </section>
             <section id="strategies">
@@ -186,7 +187,8 @@ export default function Page() {
                 A future auto-conversion service could check frequently and execute once an amount
                 threshold is met. It would wait when withdrawals are queued, liquidity is
                 insufficient, a usable quote is missing, a token is halted, or costs exceed your
-                limits. A basket may need multiple trades and cannot be assumed to fill all at once.
+                limits. The current wallet pilot bundles its basket trades atomically, so all legs
+                must meet their limits for the harvest to complete.
               </p>
               <p>
                 Freestock therefore should not promise a stock purchase every second. Small earnings
@@ -254,11 +256,11 @@ export default function Page() {
                 net earnings can reach the same stock-purchase or compounding layer.
               </p>
               <p>
-                Today you can use live wallet balances and stock-pool quotes on the Live integration
-                page, plus saved lending scenarios, an LP model, custom baskets and simulated
-                automation. The first real contract route has passed local execution tests with fake
-                funds. Real funds, background transactions and supported staking have not been
-                activated.
+                The private wallet pilot supports deposits, stock purchases, reserving gains and
+                withdrawals, with every action approved in your wallet. Its five-stock route has
+                passed local execution tests with fake funds. The builder has not moved real funds.
+                Saved scenarios, the LP model and automation settings remain simulations; background
+                conversion, staking and leveraged positions are not active.
               </p>
               <Link href="/docs" className="earn-link">
                 See the exact current mechanics <ArrowUpRight size={17} />

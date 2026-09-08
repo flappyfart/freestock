@@ -1240,3 +1240,53 @@ html[data-motion-paused="true"] .earn-bubble {
     flex: 1;
   }
 }
+
+.pilot-workspace > .earn-builder {
+  margin: 25px 0;
+}
+.pilot-workspace > .live-result {
+  margin-block: 20px;
+}
+.pilot-ack {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-block: 22px;
+}
+.pilot-ack input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  margin-top: 3px;
+  accent-color: #1956f5;
+}
+.live-workspace .education-title {
+  padding-top: 28px;
+}
+.live-workspace .education-title h1 {
+  font-size: clamp(36px, 4vw, 58px);
+}
+
+.pilot-weights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+  gap: 12px;
+}
+.pilot-weights p {
+  grid-column: 1 / -1;
+}
+
+.earn-segment button {
+  border: 1px solid #c3ccd8;
+  background: linear-gradient(#f8f9fb, #dfe4ed);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 2px 2px rgb(20 41 75 / 0.12);
+}
+.earn-segment button[aria-pressed="true"] {
+  background: #245bd7;
+  color: #fff;
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.2);
+}

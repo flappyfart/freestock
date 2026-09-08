@@ -1,0 +1,147 @@
+{
+  "startedAt": "2026-09-08T23:20:23.075Z",
+  "rpc": "http://127.0.0.1:18546",
+  "api": "http://127.0.0.1:3013",
+  "chainId": 4663,
+  "forkBlock": 58065058,
+  "forkBlockHash": "0x360c98ead6fcff5b014f857cd57939035ead668de49e66735ee54453d060af2a",
+  "localFakeFundsOnly": true,
+  "publicTransactions": false,
+  "privateKeysRecorded": false,
+  "checks": [
+    "Guarded fixture key remains scratch-only with permissions0600",
+    "Local fixture owner matches previous verified API account",
+    "Unrelated recipient is a separate earlier fake-funds fixture",
+    "unrelated_recipient: local transaction succeeded",
+    "unrelated_recipient: HTTP200 for recorded nonce0x8",
+    "unrelated_recipient: classifiedreplaced with exact transaction hash",
+    "Replacement retains verified account snapshot",
+    "zero_self_transfer: local transaction succeeded",
+    "zero_self_transfer: HTTP200 for recorded nonce0x9",
+    "zero_self_transfer: classifiedcancelled with exact transaction hash",
+    "zero_self_transfer: HTTP422 for recorded nonce0xa",
+    "Mismatched nonce produces explicit rejection"
+  ],
+  "transactions": [
+    {
+      "label": "unrelated_recipient",
+      "to": "0x213b8790F99FFD573487686c7e4791880E3b6a6f",
+      "value": "1",
+      "nonce": "0x8",
+      "hash": "0xaf8eca5c9d6d8dbcf6412879a3e98b370701b84c39f059e5250a91de9630f19a"
+    },
+    {
+      "label": "zero_self_transfer",
+      "to": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+      "value": "0",
+      "nonce": "0x9",
+      "hash": "0xb26d99b0893e237640e496351e2ea074e79a97e6f096379e18762f5f041bf11e"
+    }
+  ],
+  "responses": [
+    {
+      "params": {
+        "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "hash": "0xaf8eca5c9d6d8dbcf6412879a3e98b370701b84c39f059e5250a91de9630f19a",
+        "nonce": "0x8"
+      },
+      "httpStatus": 200,
+      "body": {
+        "status": "replaced",
+        "hash": "0xaf8eca5c9d6d8dbcf6412879a3e98b370701b84c39f059e5250a91de9630f19a",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "account": "0x6c595A6Aa6a1acfDbE1c9F0c3aB4CA49a601CF39",
+        "snapshot": {
+          "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+          "account": "0x6c595A6Aa6a1acfDbE1c9F0c3aB4CA49a601CF39",
+          "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+          "principal": "0",
+          "assetValue": "0",
+          "availableGains": "0",
+          "spendableWithRoundingBuffer": "0",
+          "walletUsdg": "99950000",
+          "walletNvda": "44230137748088",
+          "stocks": [
+            {
+              "symbol": "NVDA",
+              "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+              "balance": "44230137748088"
+            },
+            {
+              "symbol": "AAPL",
+              "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+              "balance": "31548165004229"
+            },
+            {
+              "symbol": "TSLA",
+              "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+              "balance": "27267464846610"
+            },
+            {
+              "symbol": "GOOGL",
+              "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+              "balance": "29491650341088"
+            },
+            {
+              "symbol": "SPY",
+              "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+              "balance": "13026169666668"
+            }
+          ],
+          "allowance": "0",
+          "block": 58065080
+        }
+      }
+    },
+    {
+      "params": {
+        "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "hash": "0xb26d99b0893e237640e496351e2ea074e79a97e6f096379e18762f5f041bf11e",
+        "nonce": "0x9"
+      },
+      "httpStatus": 200,
+      "body": {
+        "status": "cancelled",
+        "hash": "0xb26d99b0893e237640e496351e2ea074e79a97e6f096379e18762f5f041bf11e"
+      }
+    },
+    {
+      "params": {
+        "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+        "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+        "hash": "0xb26d99b0893e237640e496351e2ea074e79a97e6f096379e18762f5f041bf11e",
+        "nonce": "0xa"
+      },
+      "httpStatus": 422,
+      "body": {
+        "error": "This replacement transaction uses a different nonce."
+      }
+    }
+  ],
+  "nodeInfo": {
+    "currentBlockNumber": "0x37600b7",
+    "currentBlockTimestamp": 1788908860,
+    "currentBlockHash": "0x642c62c51ed450a645f1efc5bfe694bfa05d9530750a57814cb9d9f1ed88df54",
+    "hardFork": "Cancun",
+    "transactionOrder": "fees",
+    "environment": {
+      "baseFee": "0xbac5c8",
+      "chainId": 4663,
+      "gasLimit": "0x4000000000000",
+      "gasPrice": "0x3c558fc8"
+    },
+    "forkConfig": {
+      "forkUrl": "https://rpc.mainnet.chain.robinhood.com",
+      "forkBlockNumber": 58065058,
+      "forkRetryBackoff": 1000
+    },
+    "network": "ethereum"
+  },
+  "owner": "0xFA4565d83d7BBA5980eDff8805c6cAEDdA1E7Bc7",
+  "deployment": "0x49c334fc59912135ea41a727a869db195372463ccd4c0046002c618659ed12b3",
+  "status": "passed",
+  "assertionCount": 12,
+  "completedAt": "2026-09-08T23:20:23.386Z"
+}

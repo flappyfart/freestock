@@ -28,6 +28,10 @@ export async function rpc(method: string, params: unknown[]) {
       "eth_call",
       "eth_getCode",
       "eth_estimateGas",
+      "eth_gasPrice",
+      "eth_getTransactionByHash",
+      "eth_getTransactionReceipt",
+      "eth_getTransactionCount",
     ].includes(method)
   )
     throw new LiveError("Unsupported chain read.", 400);
@@ -166,6 +170,6 @@ export async function previewDeposit(account: string, input: string) {
     expiresAt: new Date(Date.now() + 60000).toISOString(),
     canSubmit: false,
     reason:
-      "Submission is not activated. This previews a direct vault deposit; the freestock yield-account pilot needs participant eligibility and wallet approval.",
+      "This read-only check previews a direct vault deposit. Use the separate private wallet pilot for a reviewed yield-account deposit.",
   };
 }

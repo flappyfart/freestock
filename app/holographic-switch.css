@@ -1,0 +1,691 @@
+.mechanical-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px 24px;
+  padding: 13px 0 25px;
+}
+.mechanical-label {
+  display: grid;
+  flex: 1 1 200px;
+  gap: 5px;
+  min-width: 0;
+}
+.mechanical-label label {
+  display: block;
+  margin: 0;
+  cursor: pointer;
+  color: #152b4e;
+  font-size: 15px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.mechanical-label small {
+  color: #4c5d75;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.mechanical-setting .fs-holo-switch,
+.mechanical-setting .fs-holo-switch:hover,
+.mechanical-setting .fs-holo-switch:active {
+  position: relative;
+  display: block;
+  flex: 0 0 150px;
+  width: 150px;
+  height: 60px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  appearance: none;
+  background: #071525;
+  box-shadow: none;
+  transform: none;
+  translate: none;
+  scale: none;
+  rotate: none;
+  isolation: isolate;
+  perspective: 800px;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.fs-holo-switch *,
+.fs-holo-switch *::before,
+.fs-holo-switch *::after {
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* From Uiverse.io by reglobby: https://uiverse.io/reglobby/stupid-penguin-97 */
+.fs-holo-track {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 30, 60, 0.4);
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow:
+    0 0 15px rgba(0, 80, 255, 0.2),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.fs-holo-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse at center, rgba(0, 80, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(90deg, rgba(0, 60, 120, 0.1) 0%, rgba(0, 30, 60, 0.2) 100%);
+  opacity: 0.6;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fs-holo-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 10px;
+  background: linear-gradient(90deg, rgba(0, 170, 255, 0.3) 0%, rgba(0, 80, 255, 0.1) 100%);
+  border-radius: 30px 30px 0 0;
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+.fs-holo-track-lines {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+
+.fs-holo-track-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 150, 255, 0.3) 0px,
+    rgba(0, 150, 255, 0.3) 5px,
+    transparent 5px,
+    transparent 15px
+  );
+  animation: fs-holo-track-line-move 3s linear infinite;
+}
+
+@keyframes fs-holo-track-line-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(20px);
+  }
+}
+
+.fs-holo-thumb {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  left: 3px;
+  top: 3px;
+  background: radial-gradient(circle, rgba(10, 40, 90, 0.9) 0%, rgba(0, 20, 50, 0.8) 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 2px 15px rgba(0, 0, 0, 0.5),
+    inset 0 0 15px rgba(0, 150, 255, 0.5);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 2;
+  border: 1px solid rgba(0, 170, 255, 0.6);
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.fs-holo-thumb-core {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(0, 180, 255, 0.6) 0%, rgba(0, 50, 120, 0.2) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
+  opacity: 0.9;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fs-holo-thumb-inner {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(100, 200, 255, 0.5) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(100, 200, 255, 0.7);
+  opacity: 0.7;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: fs-holo-pulse 2s infinite alternate;
+}
+
+@keyframes fs-holo-pulse {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.fs-holo-thumb-scan {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 150, 255, 0.5) 20%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(0, 150, 255, 0.5) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  top: 0;
+  left: 0;
+  filter: blur(1px);
+  animation: fs-holo-thumb-scan 2s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes fs-holo-thumb-scan {
+  0% {
+    top: -5px;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    top: 54px;
+    opacity: 0;
+  }
+}
+
+.fs-holo-thumb-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.fs-holo-thumb-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(100, 200, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(100, 200, 255, 0.8);
+  animation: fs-holo-thumb-particle-float 3s infinite ease-out;
+  opacity: 0;
+}
+
+.fs-holo-thumb-particle:nth-child(1) {
+  top: 70%;
+  left: 30%;
+  animation-delay: 0.2s;
+}
+
+.fs-holo-thumb-particle:nth-child(2) {
+  top: 60%;
+  left: 60%;
+  animation-delay: 0.6s;
+}
+
+.fs-holo-thumb-particle:nth-child(3) {
+  top: 50%;
+  left: 40%;
+  animation-delay: 1s;
+}
+
+.fs-holo-thumb-particle:nth-child(4) {
+  top: 40%;
+  left: 70%;
+  animation-delay: 1.4s;
+}
+
+.fs-holo-thumb-particle:nth-child(5) {
+  top: 80%;
+  left: 50%;
+  animation-delay: 1.8s;
+}
+
+@keyframes fs-holo-thumb-particle-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-30px) scale(0);
+    opacity: 0;
+  }
+}
+
+.fs-holo-data {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.fs-holo-data-text {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
+}
+
+.fs-holo-data-text.fs-holo-off {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+  color: rgba(0, 150, 255, 0.6);
+  text-shadow: 0 0 5px rgba(0, 100, 255, 0.4);
+}
+
+.fs-holo-data-text.fs-holo-on {
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  color: rgba(0, 255, 150, 0.6);
+  text-shadow: 0 0 5px rgba(0, 255, 100, 0.4);
+}
+
+.fs-holo-status-indicator {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 180, 255, 0.8) 0%, rgba(0, 80, 200, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+  animation: fs-holo-blink 2s infinite alternate;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fs-holo-status-indicator.fs-holo-off {
+  top: 25px;
+  right: 15px;
+}
+
+.fs-holo-status-indicator.fs-holo-on {
+  top: 25px;
+  left: 15px;
+  opacity: 0;
+  background: radial-gradient(circle, rgba(0, 255, 150, 0.8) 0%, rgba(0, 200, 80, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(0, 255, 150, 0.5);
+}
+
+@keyframes fs-holo-blink {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.fs-holo-energy-rings {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  left: 3px;
+  top: 3px;
+  pointer-events: none;
+  z-index: 1;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fs-holo-energy-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid transparent;
+  opacity: 0;
+}
+
+.fs-holo-energy-ring:nth-child(1) {
+  width: 50px;
+  height: 50px;
+  border-top-color: rgba(0, 150, 255, 0.5);
+  border-right-color: rgba(0, 150, 255, 0.3);
+  animation: fs-holo-spin 3s linear infinite;
+}
+
+.fs-holo-energy-ring:nth-child(2) {
+  width: 40px;
+  height: 40px;
+  border-bottom-color: rgba(0, 150, 255, 0.5);
+  border-left-color: rgba(0, 150, 255, 0.3);
+  animation: fs-holo-spin 2s linear infinite reverse;
+}
+
+.fs-holo-energy-ring:nth-child(3) {
+  width: 30px;
+  height: 30px;
+  border-left-color: rgba(0, 150, 255, 0.5);
+  border-top-color: rgba(0, 150, 255, 0.3);
+  animation: fs-holo-spin 1.5s linear infinite;
+}
+
+@keyframes fs-holo-spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.fs-holo-interface-lines {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fs-holo-interface-line {
+  position: absolute;
+  background: rgba(0, 150, 255, 0.3);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.fs-holo-interface-line:nth-child(1) {
+  width: 15px;
+  height: 1px;
+  bottom: -5px;
+  left: 20px;
+}
+
+.fs-holo-interface-line:nth-child(2) {
+  width: 1px;
+  height: 8px;
+  bottom: -12px;
+  left: 35px;
+}
+
+.fs-holo-interface-line:nth-child(3) {
+  width: 25px;
+  height: 1px;
+  bottom: -12px;
+  left: 35px;
+}
+
+.fs-holo-interface-line:nth-child(4) {
+  width: 15px;
+  height: 1px;
+  bottom: -5px;
+  right: 20px;
+}
+
+.fs-holo-interface-line:nth-child(5) {
+  width: 1px;
+  height: 8px;
+  bottom: -12px;
+  right: 35px;
+}
+
+.fs-holo-interface-line:nth-child(6) {
+  width: 25px;
+  height: 1px;
+  bottom: -12px;
+  right: 10px;
+}
+
+.fs-holo-reflection {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 40%);
+  border-radius: 30px;
+  pointer-events: none;
+}
+
+.fs-holo-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  background: radial-gradient(ellipse at center, rgba(0, 150, 255, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+  filter: blur(10px);
+  opacity: 0.5;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 0;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track {
+  background: rgba(0, 60, 30, 0.4);
+  border-color: rgba(0, 255, 150, 0.3);
+  box-shadow:
+    0 0 15px rgba(0, 255, 150, 0.2),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track::before {
+  background:
+    radial-gradient(ellipse at center, rgba(0, 255, 150, 0.1) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(90deg, rgba(0, 120, 60, 0.1) 0%, rgba(0, 60, 30, 0.2) 100%);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track::after {
+  background: linear-gradient(90deg, rgba(0, 255, 150, 0.3) 0%, rgba(0, 160, 80, 0.1) 100%);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-track-line {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 255, 150, 0.3) 0px,
+    rgba(0, 255, 150, 0.3) 5px,
+    transparent 5px,
+    transparent 15px
+  );
+  animation-direction: reverse;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-thumb {
+  left: calc(100% - 57px);
+  background: radial-gradient(circle, rgba(10, 90, 40, 0.9) 0%, rgba(0, 50, 20, 0.8) 100%);
+  border-color: rgba(0, 255, 150, 0.6);
+  box-shadow:
+    0 2px 15px rgba(0, 0, 0, 0.5),
+    inset 0 0 15px rgba(0, 255, 150, 0.5);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-thumb-core {
+  background: radial-gradient(circle, rgba(0, 255, 150, 0.6) 0%, rgba(0, 120, 50, 0.2) 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-thumb-inner {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(100, 255, 200, 0.5) 100%);
+  box-shadow: 0 0 10px rgba(100, 255, 200, 0.7);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-thumb-scan {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 255, 150, 0.5) 20%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(0, 255, 150, 0.5) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-thumb-particle {
+  background: rgba(100, 255, 200, 0.8);
+  box-shadow: 0 0 5px rgba(100, 255, 200, 0.8);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-data-text.fs-holo-off {
+  opacity: 0;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-data-text.fs-holo-on {
+  opacity: 1;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-status-indicator.fs-holo-off {
+  opacity: 0;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-status-indicator.fs-holo-on {
+  opacity: 1;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-energy-rings {
+  left: calc(100% - 57px);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-energy-ring {
+  opacity: 1;
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-energy-ring:nth-child(1) {
+  border-top-color: rgba(0, 255, 150, 0.5);
+  border-right-color: rgba(0, 255, 150, 0.3);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-energy-ring:nth-child(2) {
+  border-bottom-color: rgba(0, 255, 150, 0.5);
+  border-left-color: rgba(0, 255, 150, 0.3);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-energy-ring:nth-child(3) {
+  border-left-color: rgba(0, 255, 150, 0.5);
+  border-top-color: rgba(0, 255, 150, 0.3);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-interface-line {
+  background: rgba(0, 255, 150, 0.3);
+}
+
+.fs-holo-switch[aria-checked="true"] .fs-holo-track .fs-holo-glow {
+  background: radial-gradient(ellipse at center, rgba(0, 255, 150, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+.fs-holo-switch:hover:not(:disabled) .fs-holo-track {
+  box-shadow:
+    0 0 20px rgba(0, 150, 255, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.fs-holo-switch[aria-checked="true"]:hover:not(:disabled) .fs-holo-track {
+  box-shadow:
+    0 0 20px rgba(0, 255, 150, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Keep the supplied effects within their own control, with readable state text. */
+.fs-holo-track {
+  inset: 0;
+}
+.fs-holo-data,
+.fs-holo-interface-lines,
+.fs-holo-glow {
+  top: 0;
+  left: 0;
+}
+.fs-holo-data-text.fs-holo-off {
+  right: 32px;
+  color: #9cddff;
+}
+.fs-holo-data-text.fs-holo-on {
+  left: 32px;
+  color: #a0ffd0;
+}
+.fs-holo-energy-rings {
+  z-index: 3;
+}
+.fs-holo-status-indicator.fs-holo-on {
+  visibility: hidden;
+}
+.fs-holo-switch[aria-checked="true"] .fs-holo-status-indicator.fs-holo-off {
+  visibility: hidden;
+}
+.fs-holo-switch[aria-checked="true"] .fs-holo-status-indicator.fs-holo-on {
+  visibility: visible;
+}
+.mechanical-setting .fs-holo-switch:focus-visible {
+  outline: 3px solid #184cc3;
+  outline-offset: 5px;
+}
+.mechanical-setting .fs-holo-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.fs-holo-switch:disabled * {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mechanical-setting .fs-holo-switch,
+  .fs-holo-switch *,
+  .fs-holo-switch *::before,
+  .fs-holo-switch *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .fs-holo-thumb-scan {
+    opacity: 0;
+  }
+  .fs-holo-thumb-particle {
+    opacity: 0.65;
+  }
+}
+@media (forced-colors: active) {
+  .mechanical-setting .fs-holo-switch {
+    border: 2px solid ButtonText;
+  }
+  .fs-holo-thumb {
+    background: ButtonFace;
+    border: 2px solid ButtonText;
+  }
+  .fs-holo-switch .fs-holo-data-text.fs-holo-off,
+  .fs-holo-switch .fs-holo-data-text.fs-holo-on {
+    color: ButtonText;
+  }
+}

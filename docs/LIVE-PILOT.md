@@ -2,15 +2,21 @@
 
 ## What works now
 
-The private `/live` page connects an injected Ethereum wallet using EIP-6963, reads actual Robinhood Chain balances, obtains current Uniswap V3 quotes, simulates direct vault deposits when the wallet has balance and allowance, and prepares an unsigned per-user account deployment. Account creation is simulated against the current chain and its returned runtime is compared with the tested compiler output, excluding constructor-set immutable slots. It does not sign, approve, deploy, deposit or trade.
+`/live` connects an injected wallet using EIP-6963. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
 
-`/api/live/status` reports all funded and background automation flags as false. All wallet, quote, deposit and account-plan routes require Sites identity. Responses are private and uncached; unsupported addresses, symbols and amounts fail closed. The server RPC wrapper only allows reads and simulations, never transaction submission. A dedicated HTTPS RPC can be configured through the optional `ROBINHOOD_RPC_URL` runtime value. The official public RPC is the fallback and has availability/rate limits.
+Preparation verifies chain 4663, exact deployment calldata, canonical deployment receipt/block, CREATE address, runtime bytes, constructor ownership and fixed dependencies. Deposits apply a 0.1% share minimum; stock legs have a 1% minimum-output allowance and a 120-second onchain deadline. A fresh actual-sender simulation and gas estimate precede each wallet prompt. Plans expire after 45 seconds and bind the nonce. Client validation repeats route, amount, recipient, expiry, sender and network checks. Receipts and token purchase events are reconciled against the verified account.
+
+Only the exact signed-in participant configured by `FREESTOCK_PILOT_USER_ID`, with country `NO` and non-US-person declaration `no`, receives entry/trading preparation. This is product authorization based on the participant's declarations, not issuer identity verification. Withdrawal preparation remains available for an existing verified account even if new pilot actions are disabled. Public availability self-checks do not grant access. All routes require Sites identity and return private, uncached responses.
+
+Pending wallet requests use a device-only owner/chain journal with unique request IDs, nonces and transaction/account references. Web Locks serialize updates across tabs. Unknown submission outcomes stay locked against automatic retries; late replies cannot replace successor requests. Recovery checks original sender/nonce and canonical receipts, including wallet cancellation or another transaction consuming that nonce. Journal state is not a balance ledger. No background trading runs.
+
+`ROBINHOOD_RPC_URL` optionally selects a dedicated HTTPS RPC. Otherwise reads use the official public RPC with its availability/rate limits. The server RPC wrapper allows only reads and simulations. The browser wallet alone submits transactions after user approval.
 
 ## Tested execution path
 
 Chain 4663. Canonical 6-decimal USDG `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`; Steakhouse USDG vault `0xBeEff033F34C046626B8D0A041844C5d1A5409dd`; Router02 `0xcaf681a66d020601342297493863e78c959e5cb2`; QuoterV2 `0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7`; factory `0x1f7d7550b1b028f7571e69a784071f0205fd2efa`.
 
-The first account constructor allows NVIDIA only: `0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC`. The selected USDG/NVDA fee-500 pool is `0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3`. Other stock quotes are exploratory; MSFT has no direct fee-500 pool and rejects. The quote service checks half-size versus full-size output to reject exhausted or strongly nonlinear routes; it includes a 1% minimum-output allowance and 60-second validity. These are not execution promises or oracle valuations.
+The account constructor allows the five tested stocks. NVIDIA is: `0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC`. The selected USDG/NVDA fee-500 pool is `0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3`. AAPL, TSLA, GOOGL and SPY also passed swap/transfer tests. MSFT has no direct fee-500 pool and rejects. The quote service checks half-size versus full-size output to reject exhausted or strongly nonlinear routes; it includes a 1% minimum-output allowance and 60-second validity. These are not execution promises or oracle valuations.
 
 The account has one immutable owner, set to the actual constructor caller. New deposits must leave the principal baseline at or below 100 USDG. Compounded gains can raise that baseline above 100; this is a deposit limit, not a total-assets cap. Only the owner can deposit, withdraw, compound or harvest. There is no operator, arbitrary external call, upgrade or background permission.
 
@@ -26,22 +32,27 @@ Available gains equal account asset value above the recorded principal baseline.
 - The account test advanced **local time by 30 days**. Genuine adapter accounting at that pinned state produced a surplus, but neither that amount nor time acceleration represents a real deposit, live earnings or a return forecast. A two-micro-USDG buffer was retained for rounding.
 - The vault explorer reports a partial source match. Its exact deployed Git commit has not been proven. Local success does not prove future liquidity or eligibility.
 
-Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifacts/account-standard-input.json` permits exact recompilation. The source/artifact hash is tested automatically. Mainnet deployment is **not complete**.
+Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifacts/account-standard-input.json` permits exact recompilation. The source/artifact hash is tested automatically. No public transaction was submitted by the builder. Mainnet deployment occurs only when the participant creates an account in their own wallet.
 
-## Norway pilot and remaining activation work
+## Norway pilot and boundaries
 
-The intended first participant lives in and is physically located in Norway. NVIDIA's Final Terms explicitly include Norway among non-exempt offer jurisdictions. This is a country-level finding, not approval of freestock or verification of a participant. Non-US-person and prohibited-investor restrictions still apply. The participant's US-person status remains unconfirmed.
+The participant declared residence and physical location in Norway and that they are not a US person or acting for one. Norway is explicitly included in the Final Terms for all five selected tokens. This is a country-level finding, not approval of freestock or identity verification. Investor representations and applicable issuer restrictions still apply.
 
-The prospectus documents direct secondary blockchain purchases separately from purchases through an Authorised Participant. It also contains broader KYC/AML wording; this work does not assert that a residence checkbox is a completed eligibility verification. No issuer API key is required for the verified direct AMM calls, and no mandatory AMM provider-approval workflow has been established here.
+The prospectus distinguishes direct secondary blockchain purchases from purchases through an Authorised Participant, while also containing broader KYC/AML wording. This work does not assert that self-attestation alone is a completed verification. No issuer API key is required for the verified direct AMM route, and no mandatory AMM provider-preapproval workflow was established.
 
-Funded activation still requires participant eligibility to be resolved, an actual participant-wallet deployment, verified deployment identity, a complete wallet submission/receipt workflow, and a fresh actual-sender simulation immediately before each deposit, withdrawal or harvest. The user's wallet must approve every financial transaction. Check spendable withdrawal liquidity and current costs; preview value alone is insufficient. Keep withdrawals available if new deposits or trading are later disabled. Real automation, staking adapters and leveraged LP execution are separate unfinished integrations.
+The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. This is a limited private pilot, not an unrestricted public product.
 
 ## Verification performed on this version
 
-- 55 unit tests passed, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
+- 63 unit tests passed, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
 - Lint, TypeScript and the production build passed.
-- 15 local read-only live API checks passed against current mainnet reads: authentication, input validation, balances, NVIDIA quote, MSFT route rejection, unfunded deposit preview and simulated account creation.
+- 18 local read-only live API checks passed against current mainnet reads: authentication, input validation, balances, NVIDIA quote, MSFT route rejection, unfunded deposit preview and simulated account creation.
 - Existing practice API regression: 12 groups / 46 requests passed in an isolated local database. No hosted account was changed.
+
+- The full five-stock API and wallet pipeline passed **93 assertions** on a separate fresh local fork pinned to block **58,065,058**, hash `0x360c98ead6fcff5b014f857cd57939035ead668de49e66735ee54453d060af2a`. It used a fresh fake-funded wallet, deposited 10, donated 0.1 to create gains, reserved 0.02, purchased five 0.01 stock legs and withdrew the remaining 10.05 USDG. The donation was **not lending income**; genuine adapter-interest conversion was proved separately by the earlier 39-check test. No public transactions, privileged impersonation or gate overrides were used.
+- UI switches follow the supplied Uiverse.io design by reglobby with accessible native controls, clear state text, focus indicators and reduced-motion support.
+- 12 additional local receipt-recovery assertions passed: a confirmed unrelated transaction at the recorded nonce reports replacement, a zero-value self-transaction reports cancellation, and a mismatched nonce is rejected. Both signed transactions stayed on the fake-funded local fork.
+- 10 further recovery assertions passed for an ordinary USDG transfer: a matching recorded nonce reports replacement and retains the verified account snapshot; the same transfer without a recovery nonce is rejected. One micro-USDG moved only on the fake-funded local fork.
 
 ## Primary sources
 
@@ -52,3 +63,5 @@ Funded activation still requires participant eligibility to be resolved, an actu
 - [Building with Stock Tokens](https://docs.robinhood.com/chain/building-with-stock-tokens/)
 - [NVIDIA Final Terms, Norway on page 8](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_nvidia.pdf#page=8)
 - [Base Prospectus](https://cdn.robinhood.com/assets/robinhood/legal/rhj_base_prospectus.pdf): pages 72, 119, 131 and 150–151 for purchaser, secondary-market and eligibility provisions.
+
+Additional Final Terms with Norway included: [AAPL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_apple.pdf#page=8), [TSLA](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_tesla.pdf#page=8), [GOOGL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_alphabet_class_a.pdf#page=8), [SPY](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_spdr_s_p_500_etf_trust.pdf#page=9).

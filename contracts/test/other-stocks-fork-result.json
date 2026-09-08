@@ -1,0 +1,125 @@
+{
+  "createdAt": "2026-09-08T22:59:34.601Z",
+  "rpc": "http://127.0.0.1:18546",
+  "forkBlock": 58065058,
+  "forkBlockHash": "0x360c98ead6fcff5b014f857cd57939035ead668de49e66735ee54453d060af2a",
+  "localOnly": true,
+  "fakeFunds": true,
+  "publicTransactions": false,
+  "privilegedImpersonation": false,
+  "gateOverrides": false,
+  "results": [
+    {
+      "symbol": "AAPL",
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "fee": 500,
+      "amountIn": "1000000",
+      "decimals": "18",
+      "quotedOut": "3154816858261639",
+      "approval": {
+        "hash": "0xa7b09eb2d84c642e969c06a9f4fc05174061f65be4308f70affb5b08ff1b832c",
+        "status": 1
+      },
+      "swap": {
+        "hash": "0x80ea3de773dcadc5b9b895736ce20f4be16fe52a4b949eca04b540e697bf953e",
+        "status": 1,
+        "gasUsed": "163393"
+      },
+      "spent": "1000000",
+      "received": "3154816858261639",
+      "allowanceAfter": "0",
+      "sentOnward": "1577408429130819",
+      "transfer": {
+        "hash": "0x7c8c1af99e814efefda8674f3bdb303f683f194d6d77c39a8c90d8917d7b7dd9",
+        "status": 1
+      },
+      "recipientDelta": "1577408429130819",
+      "passed": true
+    },
+    {
+      "symbol": "TSLA",
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "fee": 500,
+      "amountIn": "1000000",
+      "decimals": "18",
+      "quotedOut": "2726747499181144",
+      "approval": {
+        "hash": "0xa9d524d1577dcc0aa79e7250cf7e912da7494204b433c651018154b96162f752",
+        "status": 1
+      },
+      "swap": {
+        "hash": "0x21fc4a6b250c4e45f8228ccbdbf0b1c8920bd036c31694036ab4016fe2f3a54b",
+        "status": 1,
+        "gasUsed": "164794"
+      },
+      "spent": "1000000",
+      "received": "2726747499181144",
+      "allowanceAfter": "0",
+      "sentOnward": "1363373749590572",
+      "transfer": {
+        "hash": "0x2f7916662a233c68db077a17177ef38a826725539db908d352a55fe0544147e4",
+        "status": 1
+      },
+      "recipientDelta": "1363373749590572",
+      "passed": true
+    },
+    {
+      "symbol": "GOOGL",
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "fee": 500,
+      "amountIn": "1000000",
+      "decimals": "18",
+      "quotedOut": "2949165231751552",
+      "approval": {
+        "hash": "0xc474a684a00cb7ef17bd15cad0744af953be56795cc100b80fb668649f944dff",
+        "status": 1
+      },
+      "swap": {
+        "hash": "0x33faaa96b608797761c7d75fe38135e125b91526cbdd58a7d6db1fd93bebc322",
+        "status": 1,
+        "gasUsed": "164903"
+      },
+      "spent": "1000000",
+      "received": "2949165231751552",
+      "allowanceAfter": "0",
+      "sentOnward": "1474582615875776",
+      "transfer": {
+        "hash": "0x173278d6bc25cba9e194b6fdb31185c891783be9811e96aafc0e0612e152d1b4",
+        "status": 1
+      },
+      "recipientDelta": "1474582615875776",
+      "passed": true
+    },
+    {
+      "symbol": "SPY",
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "fee": 500,
+      "amountIn": "1000000",
+      "decimals": "18",
+      "quotedOut": "1302617005343190",
+      "approval": {
+        "hash": "0x48b673be75cb0afd5782b109e68955dd5c0cd1218df02873c088b3e6c3986a5a",
+        "status": 1
+      },
+      "swap": {
+        "hash": "0x485f8485b3db8c32f0e39c5a03381cdee22927aa0200ba441beec1ac05a8387c",
+        "status": 1,
+        "gasUsed": "160115"
+      },
+      "spent": "1000000",
+      "received": "1302617005343190",
+      "allowanceAfter": "0",
+      "sentOnward": "651308502671595",
+      "transfer": {
+        "hash": "0x17aafae7846003c020c2e15a07e2f5b5b484f5ab3b5a153b80d9da87138d5740",
+        "status": 1
+      },
+      "recipientDelta": "651308502671595",
+      "passed": true
+    }
+  ],
+  "wallet": "0x213b8790F99FFD573487686c7e4791880E3b6a6f",
+  "recipient": "0xaF07498339842752BEF9a86E8199b894094d7DC5",
+  "remainingUSDG": "0",
+  "completed": true
+}

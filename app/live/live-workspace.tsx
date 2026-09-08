@@ -2,8 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { formatUnits } from "ethers";
 import { ArrowUpRight, Check, RefreshCw, Wallet } from "lucide-react";
+import PilotWorkspace from "./pilot-workspace";
 import { EarnShell } from "../earn-shell";
-import { CHAIN_ID, RPC_URL, EXPLORER_URL, VAULT, STOCK_TOKENS } from "../../lib/live/config";
+import { CHAIN_ID, RPC_URL, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
 type Provider = {
   request(args: { method: string; params?: unknown[] }): Promise<unknown>;
   on?: (event: string, cb: (v: unknown) => void) => void;
@@ -31,15 +32,6 @@ type Quote = {
   expiresAt: string;
   pool: string;
 };
-type Setup = {
-  owner: string;
-  depositLimit: string;
-  simulation: string;
-  block: number;
-  expiresAt: string;
-  reason: string;
-  stocks: string[];
-};
 type Preview = {
   assets: string;
   previewShares: string;
@@ -64,8 +56,7 @@ export default function LiveWorkspace() {
     [input, setInput] = useState("10"),
     [symbol, setSymbol] = useState("NVDA"),
     [quote, setQuote] = useState<Quote | null>(null),
-    [preview, setPreview] = useState<Preview | null>(null),
-    [setup, setSetup] = useState<Setup | null>(null);
+    [preview, setPreview] = useState<Preview | null>(null);
   const generation = useRef(0);
   useEffect(() => {
     const listener = (event: Event) => {
@@ -100,7 +91,6 @@ export default function LiveWorkspace() {
       setConnected(null);
       setNetwork(null);
       setSnapshot(null);
-      setSetup(null);
       setQuote(null);
       setPreview(null);
       setError("Wallet or network changed. Reconnect to refresh the exact account.");
@@ -127,7 +117,6 @@ export default function LiveWorkspace() {
     setConnected(owner);
     setNetwork(chainId);
     setSnapshot(null);
-    setSetup(null);
     setPreview(null);
     setQuote(null);
     if (chainId !== CHAIN_ID) return;
@@ -191,15 +180,6 @@ export default function LiveWorkspace() {
     if (!r.ok) throw Error(data.error ?? "Deposit preview unavailable.");
     if (id === generation.current) setPreview(data);
   }
-  async function checkSetup() {
-    if (!connected) return;
-    const id = generation.current;
-    setSetup(null);
-    const r = await fetch(`/api/live/account-plan?address=${connected}`);
-    const data = (await r.json()) as Setup & { error?: string };
-    if (!r.ok) throw Error(data.error ?? "Account setup is unavailable.");
-    if (id === generation.current) setSetup(data);
-  }
   return (
     <EarnShell active="Live integration">
       <div className="earn-wrap live-workspace">
@@ -208,8 +188,8 @@ export default function LiveWorkspace() {
             <i /> MAINNET CONNECTION
           </span>
           <p>
-            Real wallet balances and contract quotes. Funded transactions remain locked until the
-            pilot is activated.
+            Real wallet balances and contract quotes. The private wallet pilot uses real funds only
+            when you explicitly approve a transaction.
           </p>
         </div>
         <section className="education-title">
@@ -459,77 +439,23 @@ export default function LiveWorkspace() {
             </p>
           </section>
         )}
-        <section className="earn-section">
-          <div className="section-title">
-            <h2>The first funded pilot</h2>
-            <span className="earn-pill">Norway · eligibility review pending</span>
-          </div>
-          <p>
-            Start with USDG lending and NVIDIA Stock Tokens. Your wallet owns the account, and every
-            action requires your approval. New deposits are limited to a principal balance of 100
-            USDG; retained gains can grow beyond that limit.
-          </p>
-          <button
-            className="earn-button"
-            disabled={busy || !connected || network !== CHAIN_ID}
-            onClick={() => void act(checkSetup)}
-          >
-            Review account setup <ArrowUpRight size={16} />
-          </button>
-          {setup && (
-            <div className="live-result" aria-live="polite">
-              <strong>Account creation simulated successfully</strong>
-              <p>
-                The setup was checked against the live vault and router at block{" "}
-                {setup.block.toLocaleString()}. The account would belong to your connected wallet,
-                support NVIDIA purchases from gains and set a {format(setup.depositLimit)} USDG
-                deposit limit.
-              </p>
-              <p>{setup.reason}</p>
-              <small>
-                This is a setup preview. No account has been deployed and no approval was requested.
-              </small>
-            </div>
-          )}
-          <div className="learn-options">
-            <article>
-              <h3>One vault, your account</h3>
-              <p>
-                A dedicated account tracks contributed capital separately from available gains. You
-                hold its control through your wallet.
-              </p>
-            </article>
-            <article>
-              <h3>Spend gains on stocks</h3>
-              <p>
-                Stock purchases must stay within available gains after losses. Your wallet approves
-                each harvest; no operator has spending authority.
-              </p>
-            </article>
-            <article>
-              <h3>Keep returns invested</h3>
-              <p>
-                Vault shares accumulate the underlying lending return. An explicit compounding
-                action can reserve gains as new principal.
-              </p>
-            </article>
-          </div>
-          <p className="earn-muted">
-            The account passed 39 checks against a local copy of the live vault and NVIDIA pool,
-            including gains-only purchases and withdrawals. Those tests used fake funds and advanced
-            local time; they are not live earnings or a return forecast. The account is not deployed
-            on mainnet. The Norway participant’s eligibility and a funded wallet are still required
-            for activation. Automated background trading and leveraged LP execution are not enabled.
-          </p>
-          <a
-            className="earn-link"
-            href={`${EXPLORER_URL}/address/${VAULT}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Inspect the underlying vault <ArrowUpRight size={16} />
-          </a>
-        </section>
+        {connected && selected && network === CHAIN_ID ? (
+          <PilotWorkspace
+            key={`${selected.info.uuid}-${connected}`}
+            owner={connected}
+            provider={selected.provider}
+          />
+        ) : (
+          <section className="earn-section">
+            <h2>Start the wallet pilot</h2>
+            <p>
+              Connect a wallet on Robinhood Chain to create or restore your stock-yield account. The
+              first participant has declared Norway residence and location and non-U.S.-person
+              status. Deposits are limited to 100 USDG principal. This uses real funds only after
+              explicit wallet approval.
+            </p>
+          </section>
+        )}
       </div>
     </EarnShell>
   );
