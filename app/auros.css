@@ -1,0 +1,1071 @@
+/* Auros reference supplied by the user. Inter substitutes for licensed Matter. */
+@font-face {
+  font-family: Inter;
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  color-scheme: dark;
+  --color-liquid-abyss: #012624;
+  --color-liquid-deep: #011d1c;
+  --color-liquid-kelp: #003734;
+  --color-liquid-mist: #edfffe;
+  --color-silver-mist: #bbc7c6;
+  --color-lavender-phosphor: #fde9ff;
+  --gradient-aurora: linear-gradient(90deg, #cbfffc 0%, #edfffe 26%, #fffdfa 48%, #fad1ff 100%);
+  --paper: #012624;
+  --linen: #011d1c;
+  --fog: #003734;
+  --carbon: #fff;
+  --muted: #bbc7c6;
+  --accent: #cbfffc;
+  --lavender: #cbfffc;
+  --background: #012624;
+  --foreground: #edfffe;
+  --border: #ffffff1a;
+  --color-background: #012624;
+  --color-foreground: #edfffe;
+  --color-primary: #cbfffc;
+  --color-primary-foreground: #012624;
+  --color-muted-foreground: #bbc7c6;
+  --color-popover: #003734;
+  --color-popover-foreground: #edfffe;
+  --glass-fill: #003734;
+  --glass-line: #ffffff1a;
+  --glass-shadow: none;
+  --radius: 6px;
+}
+body {
+  background: #012624;
+  background-image: none;
+  color: #edfffe;
+  font-family: Inter, Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+::selection {
+  background: #cbfffc;
+  color: #012624;
+}
+h1,
+h2,
+h3,
+.wordmark {
+  color: #fff;
+  font-weight: 500;
+}
+strong {
+  font-weight: 500;
+}
+button:hover:not(:disabled) {
+  background: #003734;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline-color: #cbfffc;
+}
+.site-header,
+.workspace {
+  max-width: 1440px;
+}
+.site-header {
+  height: 88px;
+  padding-inline: 48px;
+}
+.workspace {
+  padding: 40px 48px 32px;
+}
+.wordmark {
+  font-size: 27px;
+  letter-spacing: -0.05em;
+}
+.wordmark > svg {
+  color: #edfffe;
+  filter: none;
+}
+.wordmark > span {
+  color: #edfffe;
+}
+.main-nav {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  width: 370px;
+}
+.nav-glider {
+  display: none;
+}
+.main-nav button,
+.main-nav .nav-item {
+  color: #bbc7c6;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  border-radius: 6px;
+}
+.main-nav .nav-item[data-active],
+.main-nav button.nav-active {
+  background: #003734;
+  color: #fff;
+  box-shadow: none;
+}
+.main-nav .nav-item:hover {
+  background: #003734;
+  color: #fff;
+}
+.nav-count {
+  background: #edfffe;
+  color: #012624;
+  border-radius: 6px;
+}
+.account-pill,
+.pill,
+.page-heading .pill {
+  border-radius: 6px;
+  background: #003734;
+  color: #bbc7c6;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.account-pill {
+  padding: 8px 12px;
+}
+.avatar {
+  background: #011d1c;
+  color: #edfffe;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.preview-strip {
+  background: #011d1c;
+  border-color: #ffffff10;
+  color: #bbc7c6;
+  padding: 11px max(48px, calc((100vw - 1344px) /2));
+  font-size: 11px;
+}
+.small-label,
+.story-step-label,
+.story-example {
+  color: #bbc7c6;
+  font-weight: 400;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+.page-heading h1 {
+  font-size: clamp(36px, 4.5vw, 61px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.page-heading p:last-child,
+.caption,
+.footnote,
+footer,
+.savings-bottom strong span,
+.amount-input > span:last-child,
+.deposit-explainer > div,
+.pool-line,
+.pool-panel > p:last-child,
+.savings-graph > span,
+.prize-copy p,
+.simulation-controls p > span,
+.withdrawal-banner p span,
+.draw-feature p,
+.draw-stats span,
+.draw-stats small,
+.stock-picker > p,
+.stock-picker small,
+.empty-state p,
+.draw-identity h3 > span,
+.draw-identity p,
+.draw-result > span,
+.draw-proof,
+.portfolio-empty,
+.holding-list small,
+.activity-list p,
+.activity-amount small,
+.modal-description,
+.modal-copy,
+.confirmation-amount > span,
+.about-content p,
+.design-credits,
+.readiness-intro,
+.readiness-item p,
+.readiness-footnote,
+.loading-line {
+  color: #bbc7c6;
+}
+.panel,
+.draw-list,
+.empty-state {
+  border: 0;
+  border-radius: 16px;
+  background: #003734;
+  box-shadow: none;
+}
+.panel::before {
+  display: none;
+}
+.savings-panel {
+  background: #011d1c;
+  padding: 32px 36px 0;
+}
+.deposit-panel,
+.pool-panel,
+.draw-feature,
+.stock-picker {
+  padding: 36px;
+  background: #003734;
+}
+.deposit-panel,
+.prize-panel,
+.stock-ticket,
+.secondary,
+.amount-input,
+.simulation-controls,
+.withdrawal-banner {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+.prize-panel {
+  background: #003734;
+  padding: 36px;
+}
+.section-top h2,
+.stock-picker h2,
+.money-story-heading h2 {
+  font-weight: 500;
+}
+.section-top > svg,
+.simulation-controls > div > svg,
+.empty-state > svg {
+  color: #bbc7c6;
+}
+.balance,
+.balance > span,
+.pool-amount,
+.ticket-value,
+.draw-stats strong,
+.confirmation-amount {
+  color: #fde9ff;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.balance {
+  font-size: 61px;
+  line-height: 1;
+}
+.savings-bottom strong,
+.holding-list strong {
+  color: #fde9ff;
+  font-weight: 500;
+}
+.savings-bottom,
+.savings-bottom > div + div,
+.pool-divider,
+.how-strip,
+.portfolio-section,
+.design-credits {
+  border-color: #ffffff1a;
+}
+.deposit-explainer strong,
+.pool-line > span:last-child {
+  color: #edfffe;
+}
+.graph-grid {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 38px,
+    #ffffff0c 38px,
+    #ffffff0c 39px
+  );
+}
+.amount-input {
+  border-radius: 6px;
+  background: #011d1c;
+  border: 1px solid #ffffff1a;
+}
+.amount-input:focus-within {
+  outline-color: #cbfffc;
+}
+.amount-input input {
+  color: #edfffe;
+  caret-color: #cbfffc;
+}
+.amount-input input::placeholder {
+  color: #bbc7c6;
+}
+.quick-amounts button,
+.money-mode button,
+.filter-buttons button {
+  background: #011d1c;
+  color: #bbc7c6;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.quick-amounts button:hover:not(:disabled),
+.money-mode button:hover:not(:disabled) {
+  background: #003734;
+  border-color: #bbc7c666;
+  color: #edfffe;
+}
+.money-mode button[aria-pressed="true"],
+.filter-buttons button[aria-pressed="true"] {
+  background: #012624;
+  border-color: #bbc7c6;
+  color: #edfffe;
+  box-shadow: none;
+}
+.primary,
+.home-cta {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--gradient-aurora);
+  border: 0;
+  border-radius: 6px;
+  min-height: 52px;
+  color: #012624;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 12px;
+  box-shadow: none;
+}
+.primary:hover:not(:disabled),
+.home-cta:hover {
+  background: var(--gradient-aurora);
+  color: #012624;
+  box-shadow: none;
+  filter: brightness(0.95);
+}
+.arrow-capsule {
+  border-radius: 6px;
+  background: #012624;
+  color: #edfffe;
+  box-shadow: none;
+}
+.secondary {
+  background: #003734;
+  border: 1px solid #ffffff24;
+  border-radius: 6px;
+  color: #edfffe;
+  font-weight: 400;
+  box-shadow: none;
+}
+.secondary:hover:not(:disabled) {
+  background: #012624;
+  color: #fff;
+}
+.text-button {
+  color: #edfffe;
+  font-weight: 400;
+}
+.text-button:hover {
+  color: #fff;
+  background: transparent;
+}
+.stock-ticket {
+  background: #011d1c;
+  border: 1px solid #ffffff1a;
+  border-radius: 16px;
+  box-shadow: none;
+  transform: rotate(0deg);
+}
+.stock-ticket:hover {
+  transform: translateY(-3px);
+}
+.ticket-top small,
+.ticket-top > svg,
+.ticket-value > span,
+.ticket-bottom {
+  color: #bbc7c6;
+}
+.ticket-bottom {
+  border-color: #ffffff1a;
+}
+.ticket-value > span {
+  letter-spacing: 0;
+}
+.prize-copy > .pill {
+  background: #011d1c;
+  color: #bbc7c6;
+  border: 0;
+}
+.prize-copy h2,
+.draw-feature h2 {
+  color: #fff;
+  font-weight: 500;
+  line-height: 1.1;
+}
+img.stock-logo {
+  background: #edfffe;
+  border: 0;
+  border-radius: 6px;
+}
+.spy-mark {
+  color: #edfffe;
+  background: #003734;
+  border: 1px solid #ffffff24;
+  border-radius: 6px;
+}
+.step-icon,
+.money-step-icon {
+  background: #011d1c;
+  color: #edfffe;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.simulation-controls,
+.withdrawal-banner {
+  background: #011d1c;
+  border: 1px solid #ffffff1a;
+  border-radius: 16px;
+  padding: 24px 28px;
+}
+.stock-picker button {
+  background: #012624;
+  color: #edfffe;
+  border-color: transparent;
+  border-radius: 6px;
+}
+.stock-picker button[aria-pressed="true"] {
+  border-color: #cbfffc;
+  background: #011d1c;
+  color: #edfffe;
+  box-shadow: none;
+}
+.draw-row + .draw-row,
+.draw-proof[open],
+.activity-toolbar,
+.activity-list li + li {
+  border-color: #ffffff1a;
+}
+.holding-list > div {
+  background: #003734;
+  border: 0;
+  border-radius: 16px;
+  box-shadow: none;
+}
+.activity-icon {
+  background: #011d1c;
+  color: #edfffe;
+  border: 0;
+  border-radius: 6px;
+}
+.activity-section .empty-state {
+  background: none;
+  box-shadow: none;
+}
+.freestock-dialog {
+  background: #003734 !important;
+  color: #edfffe !important;
+  border: 1px solid #ffffff24 !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.freestock-dialog [data-slot="dialog-close"] {
+  background: #011d1c;
+  color: #edfffe;
+  border-radius: 6px;
+}
+[data-slot="dialog-overlay"] {
+  background: #011d1ccc;
+  backdrop-filter: none;
+}
+.modal-note {
+  background: #011d1c;
+  border: 0;
+  border-radius: 6px;
+  color: #bbc7c6;
+}
+.modal-title {
+  font-weight: 500 !important;
+}
+.message-banner,
+.message-banner.success,
+.message-banner.error {
+  background: #003734;
+  color: #edfffe;
+  border: 1px solid #bbc7c666;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.message-banner.error {
+  border-style: dashed;
+}
+.success-icon {
+  stroke: #cbfffc;
+}
+.dismiss,
+.questions-list summary:focus-visible {
+  border-radius: 6px;
+}
+.skip-link {
+  background: #cbfffc;
+  color: #012624;
+  border-radius: 6px;
+}
+.home-intro {
+  display: block;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-bottom: 68px;
+}
+.home-intro-copy {
+  position: relative;
+  z-index: 1;
+  padding: 68px 0 76px;
+  max-width: 810px;
+  margin-inline: auto;
+  text-align: center;
+}
+.home-intro-copy > .small-label {
+  color: #bbc7c6;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  margin-bottom: 28px;
+}
+.home-intro h1 {
+  max-width: 18ch;
+  margin-inline: auto;
+  color: #fff;
+  font-size: clamp(42px, 6.4vw, 86px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.046em;
+}
+.home-intro h1 em {
+  color: #fff;
+}
+.home-description {
+  color: #bbc7c6;
+  font-size: 17px;
+  line-height: 1.5;
+  max-width: 53ch;
+  margin: 28px auto 0;
+}
+.home-tradeoff {
+  color: #bbc7c6;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 62ch;
+  margin: 15px auto 0;
+}
+.home-cta {
+  margin-top: 30px;
+  padding: 16px 62px 16px 22px;
+}
+.home-demo-note {
+  color: #bbc7c6;
+  font-size: 11px;
+  margin-top: 16px;
+}
+.particle-orb {
+  position: absolute;
+  right: -170px;
+  top: -35px;
+  width: min(62vw, 740px);
+  opacity: 0.34;
+  pointer-events: none;
+  z-index: 0;
+}
+.particle-orb img {
+  width: 100%;
+  height: auto;
+  display: block;
+  animation: orb-drift 80s linear infinite;
+}
+@keyframes orb-drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.money-story {
+  position: relative;
+  z-index: 1;
+  background: #011d1c;
+  padding: 32px 36px;
+}
+.money-story-heading {
+  margin-bottom: 28px;
+}
+.money-story-heading h2 {
+  font-size: 20px;
+  color: #fff;
+}
+.story-example,
+.story-step-label {
+  color: #bbc7c6;
+}
+.money-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+}
+.money-steps li {
+  padding: 0;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+}
+.money-steps li:not(:last-child)::after {
+  display: none;
+}
+.money-step-icon {
+  background: #003734;
+  width: 36px;
+  height: 36px;
+}
+.money-steps h3 {
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+.money-steps p {
+  font-size: 13px;
+  color: #bbc7c6;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+.story-outcomes {
+  border-color: #ffffff1a;
+  max-width: 590px;
+  gap: 28px;
+  margin-top: 30px;
+}
+.story-outcomes > div + div {
+  border-color: #ffffff1a;
+  padding-left: 28px;
+}
+.story-outcomes span,
+.story-note,
+.home-risk-note {
+  color: #bbc7c6;
+}
+.story-outcomes strong,
+.story-outcomes small {
+  color: #fde9ff;
+  font-weight: 500;
+}
+.story-outcomes strong {
+  font-size: 24px;
+}
+.story-outcomes small {
+  font-size: 18px;
+}
+.story-note {
+  font-size: 11px;
+}
+.home-risk-note {
+  margin-top: 18px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.demo-heading {
+  border-color: #ffffff1a;
+  padding-top: 32px;
+  margin-bottom: 28px;
+}
+.demo-heading h2 {
+  font-size: 32px;
+  font-weight: 500;
+}
+.demo-heading p,
+.simulation-guide {
+  color: #bbc7c6;
+}
+.home-questions {
+  margin-top: 68px;
+  padding-top: 44px;
+  border-color: #ffffff1a;
+}
+.questions-heading h2 {
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.questions-list details {
+  border-color: #ffffff1a;
+}
+.questions-list summary {
+  color: #edfffe;
+  font-weight: 400;
+}
+.questions-list summary > span,
+.questions-list summary:hover {
+  color: #cbfffc;
+}
+.questions-list details > p {
+  color: #bbc7c6;
+}
+#try-demo:target {
+  outline: 1px solid #cbfffc;
+  outline-offset: 4px;
+}
+footer {
+  margin-top: 68px;
+  background: #011d1c;
+  padding: 36px;
+  border: 0;
+  border-radius: 16px;
+}
+.readiness-main h1 {
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.readiness-item {
+  border-color: #ffffff1a;
+}
+.readiness-item h2,
+.readiness-item strong {
+  font-weight: 500;
+}
+.prize-overview {
+  padding: 30px 36px;
+  margin-bottom: 40px;
+  background: #011d1c;
+}
+.prize-overview-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.prize-overview-heading h2 {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.prize-overview-heading > svg {
+  color: #bbc7c6;
+}
+.account-prize-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 26px 0 0;
+  padding: 0;
+  gap: 24px;
+}
+.account-prize-totals dt {
+  color: #bbc7c6;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.account-prize-totals dd {
+  margin: 10px 0 0;
+  font-size: clamp(25px, 3.8vw, 48px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+  color: #fde9ff;
+}
+.prize-inbox {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #003734;
+}
+.prize-inbox h3 {
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+.prize-inbox-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.prize-inbox-row + .prize-inbox-row {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff1a;
+}
+.prize-inbox-row > div {
+  flex: 1;
+}
+.prize-inbox-row strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+.prize-inbox-row > div > span {
+  display: block;
+  font-size: 12px;
+  color: #bbc7c6;
+  margin-top: 5px;
+}
+.prize-inbox-row .primary {
+  flex-shrink: 0;
+  padding-left: 18px;
+  padding-right: 58px;
+}
+.claimed-stock-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.claimed-stock-list > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #003734;
+  border-radius: 6px;
+}
+.claimed-stock-list > div > span:not(.stock-logo) {
+  font-size: 14px;
+  flex: 1;
+}
+.claimed-stock-list small {
+  display: block;
+  color: #bbc7c6;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.claimed-stock-list strong {
+  color: #fde9ff;
+}
+.prize-account-note {
+  margin-top: 22px;
+  color: #bbc7c6;
+  font-size: 12px;
+  line-height: 1.5;
+}
+@media (max-width: 1000px) {
+  .site-header,
+  .workspace {
+    padding-inline: 28px;
+  }
+  .home-intro-copy {
+    padding-top: 48px;
+  }
+  .money-steps {
+    gap: 24px;
+  }
+  .money-steps li {
+    grid-template-columns: 1fr;
+  }
+  .money-story {
+    padding: 28px;
+  }
+  .deposit-panel,
+  .pool-panel,
+  .draw-feature,
+  .stock-picker,
+  .prize-panel {
+    padding: 28px;
+  }
+  .claimed-stock-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .preview-strip {
+    padding-inline: 28px;
+  }
+}
+@media (max-width: 760px) {
+  .home-intro-copy {
+    padding: 40px 0 52px;
+  }
+  .home-intro h1 {
+    font-size: clamp(42px, 8vw, 61px);
+  }
+  .home-description {
+    font-size: 16px;
+  }
+  .particle-orb {
+    width: 520px;
+    right: -245px;
+    top: 10px;
+    opacity: 0.2;
+  }
+  .money-steps {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+  .money-steps li {
+    grid-template-columns: 36px 1fr;
+  }
+  .money-story-heading {
+    flex-direction: row;
+  }
+  .account-prize-totals {
+    gap: 14px;
+  }
+  .account-prize-totals dt {
+    font-size: 9px;
+    line-height: 1.5;
+  }
+  .prize-inbox-row {
+    flex-wrap: wrap;
+  }
+  .prize-inbox-row .primary {
+    width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  .site-header {
+    height: auto;
+    padding: 20px;
+    gap: 16px;
+  }
+  .workspace {
+    padding: 24px 20px;
+  }
+  .preview-strip {
+    padding-inline: 20px;
+  }
+  .main-nav {
+    width: 100%;
+    height: 44px;
+  }
+  .account-pill {
+    font-size: 11px;
+  }
+  .home-intro {
+    margin-bottom: 44px;
+  }
+  .home-intro-copy > .small-label {
+    font-size: 9px;
+  }
+  .money-story,
+  .prize-overview {
+    padding: 24px 20px;
+  }
+  .money-story-heading {
+    align-items: flex-start;
+  }
+  .money-story-heading h2 {
+    font-size: 17px;
+  }
+  .story-example {
+    font-size: 8px;
+  }
+  .story-outcomes {
+    gap: 14px;
+  }
+  .story-outcomes > div + div {
+    padding-left: 14px;
+  }
+  .story-outcomes strong {
+    font-size: 20px;
+  }
+  .story-outcomes small {
+    font-size: 14px;
+  }
+  .savings-panel {
+    padding: 28px 24px 0;
+  }
+  .balance {
+    font-size: 48px;
+  }
+  .deposit-panel,
+  .pool-panel,
+  .draw-feature,
+  .stock-picker,
+  .prize-panel {
+    padding: 24px;
+    border-radius: 16px;
+  }
+  .prize-overview-heading h2 {
+    font-size: 21px;
+  }
+  .account-prize-totals {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .account-prize-totals > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .account-prize-totals dd {
+    margin: 0;
+    font-size: 30px;
+  }
+  .account-prize-totals dt {
+    font-size: 10px;
+  }
+  .prize-inbox {
+    padding: 20px 16px;
+  }
+  .claimed-stock-list {
+    grid-template-columns: 1fr;
+  }
+  .home-questions {
+    margin-top: 44px;
+  }
+  footer {
+    margin-top: 44px;
+    padding: 28px 24px;
+  }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  body {
+    background: #012624;
+  }
+  .main-nav,
+  .panel,
+  .stock-ticket,
+  .freestock-dialog,
+  .secondary,
+  .message-banner,
+  .amount-input,
+  .simulation-controls,
+  .withdrawal-banner,
+  .money-story,
+  .money-step-icon {
+    background: #011d1c !important;
+    color: #edfffe;
+    border-color: #bbc7c6 !important;
+    box-shadow: none !important;
+  }
+  .primary,
+  .home-cta {
+    background: #cbfffc !important;
+    color: #012624;
+  }
+  .caption,
+  .footnote,
+  footer,
+  .small-label,
+  .home-tradeoff,
+  .money-steps p,
+  .home-risk-note,
+  .story-note,
+  .questions-list details > p {
+    color: #edfffe;
+  }
+  .particle-orb {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .particle-orb img {
+    animation: none;
+  }
+  .stock-ticket:hover {
+    transform: none;
+  }
+}

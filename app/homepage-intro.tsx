@@ -1,8 +1,12 @@
+/* oxlint-disable next/no-img-element -- Locally generated decorative SVG; fixed dimensions prevent layout shift. */
 import { ArrowRight, Clock3, Gift, Wallet } from "lucide-react";
 
 export function HomepageIntro() {
   return (
     <section className="home-intro" aria-labelledby="home-title">
+      <div className="particle-orb" aria-hidden="true">
+        <img src="/particle-orb.svg" alt="" width="640" height="640" />
+      </div>
       <div className="home-intro-copy">
         <p className="small-label">SAVINGS WITH A CHANCE TO WIN</p>
         <h1 id="home-title">

@@ -29,6 +29,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HomepageIntro, HomepageQuestions } from "./homepage-intro";
+import { prizeSummary } from "@/lib/prizes";
 import {
   initialState,
   parseAmount,
@@ -140,7 +141,7 @@ function SavingsChart({ state }: { state: State }) {
       >
         <path
           d={points.length === 1 ? "M0 102 L600 102" : path}
-          stroke="var(--accent, #ccff00)"
+          stroke="var(--accent, #cbfffc)"
           strokeWidth="2.4"
           fill="none"
           vectorEffect="non-scaling-stroke"
@@ -148,6 +149,83 @@ function SavingsChart({ state }: { state: State }) {
       </svg>
       {state.events.length === 0 && <span>Your next chapter starts with your first deposit.</span>}
     </div>
+  );
+}
+function PrizeOverview({
+  state,
+  locked,
+  onClaim,
+}: {
+  state: State;
+  locked: boolean;
+  onClaim: (id: number) => void;
+}) {
+  const prizes = prizeSummary(state);
+  return (
+    <section className="prize-overview panel" aria-labelledby="prize-overview-title">
+      <div className="prize-overview-heading">
+        <div>
+          <p className="small-label">YOUR SAVED PRACTICE ACCOUNT</p>
+          <h2 id="prize-overview-title">Your savings and stock prizes</h2>
+        </div>
+        <Gift size={23} aria-hidden="true" />
+      </div>
+      <dl className="account-prize-totals">
+        <div>
+          <dt>Savings deposited</dt>
+          <dd>{money(state.balance)}</dd>
+        </div>
+        <div>
+          <dt>Stock prizes claimed</dt>
+          <dd>{money(prizes.claimed)}</dd>
+        </div>
+        <div>
+          <dt>Ready to claim</dt>
+          <dd>{money(prizes.readyToClaim)}</dd>
+        </div>
+      </dl>
+      {prizes.claimable.length > 0 && (
+        <div className="prize-inbox">
+          <h3>You won! One step left: claim your prize.</h3>
+          {prizes.claimable.map((draw) => (
+            <div className="prize-inbox-row" key={draw.id}>
+              <StockLogo symbol={draw.stock} />
+              <div>
+                <strong>
+                  {money(draw.amount)} {names[draw.stock]} prize
+                </strong>
+                <span>Draw #{draw.id} · Ready, but not claimed yet</span>
+              </div>
+              <ActionButton
+                disabled={locked}
+                onClick={() => onClaim(draw.id)}
+                aria-label={`Claim ${money(draw.amount)} ${names[draw.stock]} prize from draw ${draw.id}`}
+              >
+                {locked ? "Please wait…" : "Claim prize"}
+              </ActionButton>
+            </div>
+          ))}
+        </div>
+      )}
+      {prizes.claimed > 0n && (
+        <div className="claimed-stock-list" aria-label="Claimed practice stock prizes">
+          {Object.entries(state.holdings).map(([symbol, amount]) => (
+            <div key={symbol}>
+              <StockLogo symbol={symbol as Stock} />
+              <span>
+                {names[symbol as Stock]}
+                <small>Claimed practice prize</small>
+              </span>
+              <strong>{money(amount!)}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+      <p className="prize-account-note">
+        Stock prizes appear separately from savings, so claiming does not increase your savings
+        balance or its chart. All amounts are simulated.
+      </p>
+    </section>
   );
 }
 export default function Freestock() {
@@ -176,26 +254,47 @@ export default function Freestock() {
       setReady(true);
     }
   }, []);
-  const load = useCallback(async () => {
-    try {
-      const r = await fetch("/api/account", { cache: "no-store" });
-      const data = (await r.json()) as { state: State; version: number; error?: string };
-      if (r.status === 401) {
-        setSignedOut(true);
-        return;
+  const load = useCallback(
+    async (background = false) => {
+      try {
+        const r = await fetch("/api/account", { cache: "no-store" });
+        const data = (await r.json()) as { state: State; version: number; error?: string };
+        if (r.status === 401) {
+          setSignedOut(true);
+          return;
+        }
+        if (!r.ok) throw Error(data.error);
+        accept(data);
+        if (!background) setError("");
+        setSignedOut(false);
+      } catch (e) {
+        if (!background)
+          setError(e instanceof Error ? e.message : "Your preview could not be loaded.");
       }
-      if (!r.ok) throw Error(data.error);
-      accept(data);
-      setError("");
-      setSignedOut(false);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Your preview could not be loaded.");
-    }
-  }, [accept]);
+    },
+    [accept],
+  );
   useEffect(() => {
     // oxlint-disable-next-line react/react-compiler -- All load state updates follow the awaited network response.
     void load();
   }, [load]);
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible" && !running.current) void load(true);
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [load]);
+  useEffect(() => {
+    if (pane === "overview" && version.current >= 0 && !running.current) {
+      // oxlint-disable-next-line react/react-compiler -- Refresh follows navigation and awaits the API response.
+      void load(true);
+    }
+  }, [pane, load]);
   const run = useCallback(
     async (command: Command, key?: string) => {
       if (running.current) return false;
@@ -222,6 +321,10 @@ export default function Freestock() {
         accept(data);
         setRetry(null);
         setModal(null);
+        const resultDraw =
+          "drawId" in command
+            ? data.state.draws.find((draw) => draw.id === command.drawId)
+            : undefined;
         setNotice(
           command.type === "deposit"
             ? "Practice money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner."
@@ -230,8 +333,12 @@ export default function Freestock() {
               : command.type === "advance"
                 ? `${command.days} simulated day${command.days === 1 ? "" : "s"} completed.`
                 : command.type === "claim"
-                  ? "Your simulated allocation is in your portfolio."
-                  : "Saved to your preview.",
+                  ? `${resultDraw ? `${money(resultDraw.amount)} ${names[resultDraw.stock]}` : "Your prize"} claimed. See Stock prizes claimed on Home. Your savings balance stays separate.`
+                  : command.type === "settle_prize" && resultDraw
+                    ? resultDraw.winner === 0
+                      ? `You won ${money(resultDraw.amount)} of ${names[resultDraw.stock]}! One step left: use Claim prize to add it to your account.`
+                      : `Example saver ${resultDraw.winner} won draw #${resultDraw.id}. This prize belongs to that saver.`
+                    : "Saved to your preview.",
         );
         return true;
       } catch (e) {
@@ -312,7 +419,7 @@ export default function Freestock() {
     : 0;
   const nextDraw = Math.floor(state.day / 7) + 1,
     daysLeft = 7 - (state.day % 7);
-  const won = Object.values(state.holdings).reduce((n, x) => n + bigint(x!), 0n);
+  const won = prizeSummary(state).claimed;
   const drawWork = state.draws.filter((d) =>
     ["closed", "randomness_ready", "claimable"].includes(d.status),
   ).length;
@@ -360,7 +467,10 @@ export default function Freestock() {
       Record<Draw["status"], { label: string; type: "resolve" | "settle_prize" | "claim" }>
     > = {
       closed: { label: "Reveal example result", type: "resolve" },
-      randomness_ready: { label: "Finish the draw", type: "settle_prize" },
+      randomness_ready: {
+        label: draw.winner === 0 ? "Prepare my prize" : "Complete draw for winner",
+        type: "settle_prize",
+      },
       claimable: { label: "Claim practice prize", type: "claim" },
     };
     const action = actions[draw.status];
@@ -379,7 +489,7 @@ export default function Freestock() {
           ? "Not funded"
           : draw.status === "claimed"
             ? "Claimed"
-            : "Completed"}
+            : "Awarded to another saver"}
         <Check size={13} />
       </span>
     );
@@ -428,16 +538,14 @@ export default function Freestock() {
         </span>
       </div>
       <main className="workspace" id="main-content">
-        {pane === "overview" ? (
-          <HomepageIntro />
-        ) : (
+        {pane !== "overview" && (
           <div className="page-heading">
             <div>
               <p className="small-label">YOUR PRACTICE ACCOUNT</p>
               <h1>{pane === "draws" ? "Your stock prize draws." : "Every step, accounted for."}</h1>
               <p>
                 {pane === "draws"
-                  ? "Reveal a winner, finish the draw, then claim if you win. All prizes are pretend."
+                  ? "Reveal the winner. If it’s you, prepare and claim your prize. All prizes are pretend."
                   : "Your deposits, withdrawals, entries, and prizes in one place."}
               </p>
             </div>
@@ -495,7 +603,15 @@ export default function Freestock() {
             Loading your saved preview…
           </div>
         )}
+        {ready && !signedOut && state.draws.length > 0 && pane !== "activity" && (
+          <PrizeOverview
+            state={state}
+            locked={locked}
+            onClaim={(id) => void run({ type: "claim", drawId: id })}
+          />
+        )}
         <TabsContent value="overview" className="pane-content">
+          <HomepageIntro />
           <div className="demo-heading">
             <div>
               <h2>Give it a try.</h2>
@@ -804,7 +920,7 @@ export default function Freestock() {
                         {draw.status === "closed"
                           ? "Reveal the result to find out who won"
                           : draw.status === "randomness_ready"
-                            ? "Winner picked. Select Finish the draw to award the practice prize."
+                            ? "Winner picked. Use the next action to prepare the winner’s prize."
                             : draw.status === "claimable"
                               ? "Ready for you to claim"
                               : draw.status === "unfunded"

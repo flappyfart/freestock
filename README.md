@@ -1,6 +1,6 @@
 # freestock
 
-Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. Apple Liquid Glass-inspired web materials use a dark forest-green palette with vivid lime actions, following the user’s Robinhood-inspired theme request. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
+Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. The interface follows the supplied Auros theme: deep teal surfaces, medium-weight typography, pale-pink statistics, aurora action buttons, and a decorative particle orb. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
 
 ## Use the product
 
@@ -43,9 +43,9 @@ Each private preview is an independent scenario. Accounts do not share a real po
 
 ## Design
 
-The dark-green palette is isolated in `app/dark-green.css`, with semantic color tokens, dark dialog and status treatments, and dark accessibility fallbacks. The strongest glass material sits on floating navigation and controls, with quieter translucent content surfaces. Native Liquid Glass optics are approximated with CSS blur, saturation and edge highlights. Contrast and reduced-transparency preferences switch to opaque surfaces; reduced-motion preferences disable animation. OpenRunde is self-hosted. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/OFL.txt`.
+The active theme is `app/auros.css`, loaded after structural and homepage styles. It uses the exact Liquid Abyss, Deep, and Kelp surface stack, 16px cards, 6px controls, no elevation shadows, and a self-hosted Inter substitute for Matter. The original decorative SVG orb animates slowly and stops for reduced-motion preferences; stronger-contrast settings remove it and simplify gradients. The earlier forest theme remains archived but is not imported. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/`.
 
-The homepage introduces the savings-to-prizes model before the account dashboard. `app/homepage-intro.tsx` explains the earnings tradeoff, follows a $100 deposit through 700 entries and a sample draw, and shows both winning and nonwinning outcomes. An anchor leads into the existing deposit flow; plain-language FAQs explain funding, odds, withdrawals, simulated assets, and the limits of the example. `app/homepage.css` provides responsive layout and preserves the forest glass theme.
+The homepage introduces the savings-to-prizes model with `app/homepage-intro.tsx`: the earnings tradeoff, a $100 deposit through 700 entries, and both winning and nonwinning outcomes. After a user's first draw, an account summary appears above that fixed example. Waiting prizes have direct claim buttons; claimed stocks are listed separately from deposited savings. Account state refreshes on Home navigation and when the tab regains focus. `lib/prizes.ts` derives user-only totals, excluding awards to other savers; regression tests cover pending claims, repeated claims, reload serialization, and separate savings accounting.
 
 ## Production activation remains blocked
 

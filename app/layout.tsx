@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./dark-green.css";
 import "./homepage.css";
+import "./auros.css";
 export const metadata: Metadata = {
   title: "freestock | Save for a chance to win stock prizes",
   description:
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-theme="forest">
+    <html lang="en" data-theme="auros">
       <body>{children}</body>
     </html>
   );

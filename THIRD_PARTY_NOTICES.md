@@ -50,4 +50,9 @@ Source and CC0: https://github.com/simple-icons/simple-icons
 Visitors style guide supplied by the user: https://styles.refero.design/style/e7876363-181a-44a9-9e5c-2255cf98aea5
 Apple material guidance: https://developer.apple.com/design/human-interface-guidelines/materials
 
-The visual system is a web interpretation, not a native Apple renderer.
+The Visitors and Apple references informed earlier versions. The current theme follows the Auros style reference supplied by the user, retained in docs/AUROS-REFERENCE.md. The decorative particle sphere is original SVG geometry generated for freestock.
+
+## Inter
+
+Copyright (c) 2016 The Inter Project Authors. SIL Open Font License 1.1 retained in public/fonts/INTER-LICENSE.txt. Inter is used as the permitted substitute for Matter in the supplied reference.
+Source: https://github.com/rsms/inter
