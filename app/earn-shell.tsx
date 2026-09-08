@@ -25,6 +25,7 @@ export function EarnShell({
         <nav aria-label="Main navigation">
           {[
             ["Earn", "/"],
+            ["Live integration", "/live"],
             ["Learn", "/learn"],
             ["Docs", "/docs"],
             ["Transparency", "/transparency"],

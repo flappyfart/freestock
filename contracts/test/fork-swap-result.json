@@ -1,0 +1,516 @@
+{
+  "at": "2026-09-08T22:43:26.147Z",
+  "localOnly": true,
+  "publicTransactionsSubmitted": 0,
+  "localChainId": 31337,
+  "sourceChainId": 4663,
+  "pinnedSourceBlock": 58051564,
+  "privilegedImpersonation": false,
+  "gateOverrides": false,
+  "addresses": {
+    "USDG": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "FACTORY": "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
+    "QUOTER": "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+    "ROUTER": "0xcaf681a66d020601342297493863e78c959e5cb2"
+  },
+  "sources": [
+    "https://api.robinhood.com/rhj/assets",
+    "https://github.com/Uniswap/sdks/blob/main/sdks/sdk-core/src/addresses.ts",
+    "https://developers.uniswap.org/deployments"
+  ],
+  "checks": [
+    "Fresh sender signed and mined exact10USDG router approval",
+    "Fresh sender signed and mined deadline-protected fee500 swap; exact10USDG debited; quotedNVDA credited; exact allowance consumed",
+    "Fresh sender signed and mined onwardNVDA transfer to second fresh address; balances reconcile"
+  ],
+  "forkInfo": {
+    "currentBlockNumber": "0x375cbec",
+    "currentBlockTimestamp": 1788906940,
+    "currentBlockHash": "0x1d402c216a49470d2c8dfe856e16846cc333b4da912fc2917f64fa87f9cd3cdc",
+    "hardFork": "Cancun",
+    "transactionOrder": "fees",
+    "environment": {
+      "baseFee": "0xc5d4e5d",
+      "chainId": 31337,
+      "gasLimit": "0x4000000000000",
+      "gasPrice": "0x47f8185d"
+    },
+    "forkConfig": {
+      "forkUrl": "https://rpc.mainnet.chain.robinhood.com",
+      "forkBlockNumber": 58051564,
+      "forkRetryBackoff": 1000
+    },
+    "network": "ethereum"
+  },
+  "pinnedSourceHash": "0x1d402c216a49470d2c8dfe856e16846cc333b4da912fc2917f64fa87f9cd3cdc",
+  "issuerAssets": [
+    {
+      "symbol": "NVDA",
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE"
+    },
+    {
+      "symbol": "AAPL",
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "decimals": 18,
+      "multiplier": "1.000566080061092436",
+      "status": "ASSET_STATUS_ACTIVE"
+    },
+    {
+      "symbol": "MSFT",
+      "address": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE"
+    },
+    {
+      "symbol": "TSLA",
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE"
+    },
+    {
+      "symbol": "GOOGL",
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE"
+    },
+    {
+      "symbol": "SPY",
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE"
+    }
+  ],
+  "routes": [
+    {
+      "symbol": "NVDA",
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [
+        {
+          "inputUSDG": "1",
+          "inputRaw": "1000000",
+          "outputRaw": "4424527939861638",
+          "outputTokens": "0.004424527939861638",
+          "sqrtPriceAfter": "5271347589257014608146570425282102",
+          "ticksCrossed": "1",
+          "gasEstimate": "111047"
+        },
+        {
+          "inputUSDG": "10",
+          "inputRaw": "10000000",
+          "outputRaw": "44245277168941167",
+          "outputTokens": "0.044245277168941167",
+          "sqrtPriceAfter": "5271347323615273393427833996189024",
+          "ticksCrossed": "1",
+          "gasEstimate": "111047"
+        },
+        {
+          "inputUSDG": "100",
+          "inputRaw": "100000000",
+          "outputRaw": "442452548722013953",
+          "outputTokens": "0.442452548722013953",
+          "sqrtPriceAfter": "5271344667199333773857219163701006",
+          "ticksCrossed": "1",
+          "gasEstimate": "111047"
+        }
+      ],
+      "pool": "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3",
+      "activeLiquidity": "11876615387832243815",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "slot0": [
+        "5271347618772765284673614381925640",
+        "222120",
+        "2246",
+        "6000",
+        "6000",
+        "68",
+        true
+      ],
+      "usdgReserve": "4272742170938",
+      "stockReserve": "14000608464614399803366",
+      "tenVsOnePerUnitRatio": 0.9999999496064835,
+      "hundredVsOnePerUnitRatio": 0.9999994456715989,
+      "sampleQuotesSensible": true
+    },
+    {
+      "symbol": "AAPL",
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "decimals": 18,
+      "multiplier": "1.000566080061092436",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [
+        {
+          "inputUSDG": "1",
+          "inputRaw": "1000000",
+          "outputRaw": "3154961533070726",
+          "outputTokens": "0.003154961533070726",
+          "sqrtPriceAfter": "4451282876840558858933029669782672",
+          "ticksCrossed": "1",
+          "gasEstimate": "108029"
+        },
+        {
+          "inputUSDG": "10",
+          "inputRaw": "10000000",
+          "outputRaw": "31549583439291885",
+          "outputTokens": "0.031549583439291885",
+          "sqrtPriceAfter": "4451278377333680007072938168199977",
+          "ticksCrossed": "1",
+          "gasEstimate": "108029"
+        },
+        {
+          "inputUSDG": "100",
+          "inputRaw": "100000000",
+          "outputRaw": "315492645286840963",
+          "outputTokens": "0.315492645286840963",
+          "sqrtPriceAfter": "4451233382765194297183487710590545",
+          "ticksCrossed": "1",
+          "gasEstimate": "108029"
+        }
+      ],
+      "pool": "0xAae0d815EE56e4092a5E5C2911E676Fea50B2d6D",
+      "activeLiquidity": "499977837458318260",
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "slot0": [
+        "4451283376786329133637867803370039",
+        "218738",
+        "1020",
+        "1801",
+        "1801",
+        "68",
+        true
+      ],
+      "usdgReserve": "139850633906",
+      "stockReserve": "582205034359752567413",
+      "tenVsOnePerUnitRatio": 0.9999989891662691,
+      "hundredVsOnePerUnitRatio": 0.9999888809413527,
+      "sampleQuotesSensible": true
+    },
+    {
+      "symbol": "MSFT",
+      "address": "0xe93237C50D904957Cf27E7B1133b510C669c2e74",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [],
+      "pool": "0x0000000000000000000000000000000000000000",
+      "sampleQuotesSensible": false,
+      "rejection": "No fee500 pool"
+    },
+    {
+      "symbol": "TSLA",
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [
+        {
+          "inputUSDG": "1",
+          "inputRaw": "1000000",
+          "outputRaw": "2726167930293180",
+          "outputTokens": "0.00272616793029318",
+          "sqrtPriceAfter": "1517032162675397411816329",
+          "ticksCrossed": "0",
+          "gasEstimate": "110527"
+        },
+        {
+          "inputUSDG": "10",
+          "inputRaw": "10000000",
+          "outputRaw": "27261557597094717",
+          "outputTokens": "0.027261557597094717",
+          "sqrtPriceAfter": "1517038935277021164185561",
+          "ticksCrossed": "0",
+          "gasEstimate": "110527"
+        },
+        {
+          "inputUSDG": "100",
+          "inputRaw": "100000000",
+          "outputRaw": "272603405984883651",
+          "outputTokens": "0.272603405984883651",
+          "sqrtPriceAfter": "1517106661293258687877883",
+          "ticksCrossed": "0",
+          "gasEstimate": "119214"
+        }
+      ],
+      "pool": "0xc4f0172D6ac8DD294Dd1137D047d5E1893760236",
+      "activeLiquidity": "105232372357108188",
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "slot0": [
+        "1517031410164105883775304",
+        "-217278",
+        "2",
+        "8",
+        "8",
+        "68",
+        true
+      ],
+      "usdgReserve": "49184887892",
+      "stockReserve": "68749685502481658512",
+      "tenVsOnePerUnitRatio": 0.9999955356441644,
+      "hundredVsOnePerUnitRatio": 0.9999508942780612,
+      "sampleQuotesSensible": true
+    },
+    {
+      "symbol": "GOOGL",
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [
+        {
+          "inputUSDG": "1",
+          "inputRaw": "1000000",
+          "outputRaw": "2952421228208356",
+          "outputTokens": "0.002952421228208356",
+          "sqrtPriceAfter": "1457745930636008836925247",
+          "ticksCrossed": "1",
+          "gasEstimate": "110599"
+        },
+        {
+          "inputUSDG": "10",
+          "inputRaw": "10000000",
+          "outputRaw": "29524194640789393",
+          "outputTokens": "0.029524194640789393",
+          "sqrtPriceAfter": "1457746801668228562271269",
+          "ticksCrossed": "1",
+          "gasEstimate": "110599"
+        },
+        {
+          "inputUSDG": "100",
+          "inputRaw": "100000000",
+          "outputRaw": "295240182290071563",
+          "outputTokens": "0.295240182290071563",
+          "sqrtPriceAfter": "1457755511990425815731493",
+          "ticksCrossed": "1",
+          "gasEstimate": "110625"
+        }
+      ],
+      "pool": "0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7",
+      "activeLiquidity": "818221094188447503",
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "slot0": [
+        "1457745833854651089664578",
+        "-218075",
+        "1207",
+        "1801",
+        "1801",
+        "68",
+        true
+      ],
+      "usdgReserve": "282896203824",
+      "stockReserve": "731487344485863982856",
+      "tenVsOnePerUnitRatio": 0.9999994024804456,
+      "hundredVsOnePerUnitRatio": 0.9999934273241722,
+      "sampleQuotesSensible": true
+    },
+    {
+      "symbol": "SPY",
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "decimals": 18,
+      "multiplier": "1.000000000000000000",
+      "status": "ASSET_STATUS_ACTIVE",
+      "fee": 500,
+      "quotes": [
+        {
+          "inputUSDG": "1",
+          "inputRaw": "1000000",
+          "outputRaw": "1302613345831835",
+          "outputTokens": "0.001302613345831835",
+          "sqrtPriceAfter": "2194639682506141812746706",
+          "ticksCrossed": "1",
+          "gasEstimate": "110591"
+        },
+        {
+          "inputUSDG": "10",
+          "inputRaw": "10000000",
+          "outputRaw": "13026130011925093",
+          "outputTokens": "0.013026130011925093",
+          "sqrtPriceAfter": "2194640263153764308610081",
+          "ticksCrossed": "1",
+          "gasEstimate": "110591"
+        },
+        {
+          "inputUSDG": "100",
+          "inputRaw": "100000000",
+          "outputRaw": "130260955480927404",
+          "outputTokens": "0.130260955480927404",
+          "sqrtPriceAfter": "2194646069629989267243822",
+          "ticksCrossed": "1",
+          "gasEstimate": "110591"
+        }
+      ],
+      "pool": "0xa7Bb1AC63BBaB0C44316E6c8C455213441689167",
+      "activeLiquidity": "1227417298005284117",
+      "token0": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "slot0": [
+        "2194639617989739313206332",
+        "-209892",
+        "1724",
+        "1801",
+        "1801",
+        "68",
+        true
+      ],
+      "usdgReserve": "122086211138",
+      "stockReserve": "258944931148738867251",
+      "tenVsOnePerUnitRatio": 0.999999735424693,
+      "hundredVsOnePerUnitRatio": 0.999997089679318,
+      "sampleQuotesSensible": true
+    }
+  ],
+  "funding": {
+    "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "amount": "100000000",
+    "baseSlot": 1,
+    "storageSlot": "0x0d2080fd5443b3aec018069fc0427c7469feea7b8029e433da84d61c247faa2d",
+    "fakeFunds": true,
+    "method": "LOCAL anvil_setBalance for ETH and LOCAL anvil_setStorageAt for fresh wallet USDG balance only; no allowance or gate storage modified"
+  },
+  "sender": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+  "transferRecipient": "0xa822F45D80E3b40b55Ee76BDD13977c1E6CB2897",
+  "before": {
+    "usdg": "100000000",
+    "stock": "0",
+    "allowance": "0"
+  },
+  "approval": {
+    "hash": "0x2c6c58c3d4508366e07fc918d76afa3c4cfd8981b13ee0b5d696d51ddd9b366e",
+    "blockNumber": 58051566,
+    "status": 1,
+    "from": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+    "to": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "gasUsed": "57976",
+    "fee": "68499299940464",
+    "logs": [
+      {
+        "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "topics": [
+          "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7",
+          "0x000000000000000000000000caf681a66d020601342297493863e78c959e5cb2"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000000000989680"
+      }
+    ]
+  },
+  "actualSenderSimulation": {
+    "from": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+    "params": {
+      "tokenIn": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "tokenOut": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "fee": 500,
+      "recipient": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+      "amountIn": "10000000",
+      "amountOutMinimum": "44024050783096461",
+      "sqrtPriceLimitX96": 0
+    },
+    "deadline": 1788907335,
+    "quotedOutput": "44245277168941167",
+    "simulatedOutput": "44245277168941167"
+  },
+  "swap": {
+    "hash": "0x368d8482f3a0e80ab52322b1008b2bf11a269ace05e3b24bf5b32251ef21235c",
+    "blockNumber": 58051567,
+    "status": 1,
+    "from": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+    "to": "0xCaf681a66D020601342297493863E78C959E5cb2",
+    "gasUsed": "168451",
+    "fee": "195204792102400",
+    "logs": [
+      {
+        "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000d4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000009d30d85ca4b86f"
+      },
+      {
+        "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "topics": [
+          "0x37e7f0db430edc9dd31bc66f25f8449353aa0818f503b906747dd8f286cd3802",
+          "0x000000000000000000000000d4eb21209c4d6093f80b5b84f5c45cc093ea14a3",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000009d30d85ca4b86f000000000000000000000000000000000000000000000000009d30d85ca4b86f"
+      },
+      {
+        "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7",
+          "0x000000000000000000000000d4eb21209c4d6093f80b5b84f5c45cc093ea14a3"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000000000989680"
+      },
+      {
+        "address": "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3",
+        "topics": [
+          "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+          "0x000000000000000000000000caf681a66d020601342297493863e78c959e5cb2",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000000000989680ffffffffffffffffffffffffffffffffffffffffffffffffff62cf27a35b479100000000000000000000000000000000000103e5c1d420ba70b20d03811c1d60000000000000000000000000000000000000000000000000a4d236c52dadd66700000000000000000000000000000000000000000000000000000000000363a8"
+      }
+    ]
+  },
+  "afterSwap": {
+    "usdg": "90000000",
+    "stock": "44245277168941167",
+    "allowance": "0"
+  },
+  "transfer": {
+    "hash": "0x325c666f10672780436097a98f09e7b69ba081cde806b04eb4cc84e02fa9ab59",
+    "blockNumber": 58051568,
+    "status": 1,
+    "from": "0xC742B0BF88d45f870C12fb3e00E13c7B281945E7",
+    "to": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+    "gasUsed": "77683",
+    "fee": "88478575514483",
+    "logs": [
+      {
+        "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7",
+          "0x000000000000000000000000a822f45d80e3b40b55ee76bdd13977c1e6cb2897"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000004e986c2e525c37"
+      },
+      {
+        "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "topics": [
+          "0x37e7f0db430edc9dd31bc66f25f8449353aa0818f503b906747dd8f286cd3802",
+          "0x000000000000000000000000c742b0bf88d45f870c12fb3e00e13c7b281945e7",
+          "0x000000000000000000000000a822f45d80e3b40b55ee76bdd13977c1e6cb2897"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000004e986c2e525c37000000000000000000000000000000000000000000000000004e986c2e525c37"
+      }
+    ]
+  },
+  "afterTransfer": {
+    "senderStock": "22122638584470584",
+    "recipientStock": "22122638584470583",
+    "transferred": "22122638584470583"
+  },
+  "passed": true
+}

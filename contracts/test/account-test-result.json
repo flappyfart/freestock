@@ -1,0 +1,362 @@
+{
+  "executedAt": "2026-09-08T22:43:47.244Z",
+  "sourceHash": "0xb43bec67f7266c27c1da0fc40b35775496f2ee5c0a8f31218500bd1ea7352656",
+  "compiler": "0.8.30+commit.73712a01.Emscripten.clang",
+  "settings": {
+    "viaIR": true,
+    "optimizerRuns": 200,
+    "evmVersion": "cancun"
+  },
+  "pinnedBlock": 58051564,
+  "localOnly": true,
+  "fakeFunds": true,
+  "gateOverrides": false,
+  "privilegedImpersonation": false,
+  "checks": [
+    {
+      "name": "fresh contract owner",
+      "passed": true
+    },
+    {
+      "name": "fresh unprivileged contract allowed by actual gates",
+      "passed": true,
+      "details": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "name": "initial yield zero",
+      "passed": true
+    },
+    {
+      "name": "zero yield harvest rejects",
+      "passed": true,
+      "details": {
+        "reason": "YIELD_ONLY"
+      }
+    },
+    {
+      "name": "outsider deposit rejects",
+      "passed": true,
+      "details": {
+        "reason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "outsider withdrawal rejects",
+      "passed": true,
+      "details": {
+        "reason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "outsider compound rejects",
+      "passed": true,
+      "details": {
+        "reason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "outsider harvest rejects",
+      "passed": true,
+      "details": {
+        "reason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "deposit over100 cap rejects",
+      "passed": true,
+      "details": {
+        "reason": "DEPOSIT_CAP"
+      }
+    },
+    {
+      "name": "zero minShares rejects",
+      "passed": true,
+      "details": {
+        "reason": "MIN_SHARES"
+      }
+    },
+    {
+      "name": "approve account100USDG",
+      "passed": true
+    },
+    {
+      "name": "unreachable minShares rejects",
+      "passed": true,
+      "details": {
+        "reason": "SHARE_SLIPPAGE"
+      }
+    },
+    {
+      "name": "deposit100USDG",
+      "passed": true
+    },
+    {
+      "name": "principal recorded100",
+      "passed": true
+    },
+    {
+      "name": "vault allowance cleared",
+      "passed": true
+    },
+    {
+      "name": "cap afterdeposit rejects",
+      "passed": true,
+      "details": {
+        "reason": "DEPOSIT_CAP"
+      }
+    },
+    {
+      "name": "withdraw maxShares enforced",
+      "passed": true,
+      "details": {
+        "reason": "SHARE_SLIPPAGE"
+      }
+    },
+    {
+      "name": "partial withdraw25USDG",
+      "passed": true
+    },
+    {
+      "name": "partial withdrawal principal75",
+      "passed": true
+    },
+    {
+      "name": "full exit minAssets enforced",
+      "passed": true,
+      "details": {
+        "reason": "ASSET_SLIPPAGE"
+      }
+    },
+    {
+      "name": "first full principal exit",
+      "passed": true
+    },
+    {
+      "name": "first full exit shares andprincipal zero",
+      "passed": true
+    },
+    {
+      "name": "approve recreatedposition",
+      "passed": true
+    },
+    {
+      "name": "recreate vaultposition",
+      "passed": true
+    },
+    {
+      "name": "real adapters accruepositive yield afterlocaltime acceleration",
+      "passed": true
+    },
+    {
+      "name": "principalspend harvest rejected",
+      "passed": true,
+      "details": {
+        "reason": "YIELD_ONLY"
+      }
+    },
+    {
+      "name": "realNVDAquote nonzero",
+      "passed": true
+    },
+    {
+      "name": "unreachable swapminimum transaction reverts",
+      "passed": true,
+      "details": {
+        "hash": "0x16cc1c7d2b99c5a6bfd544a3800c8ff451bee2cd1ff8c745451b7baaef64b1d9"
+      }
+    },
+    {
+      "name": "failed swap rolls back shares principal balances spending",
+      "passed": true,
+      "details": {
+        "before": {
+          "principal": "99999999",
+          "shares": "99370505727803796782",
+          "idle": "0",
+          "ownerUsdG": "0",
+          "ownerNVDA": "0",
+          "spent": "0"
+        },
+        "after": {
+          "principal": "99999999",
+          "shares": "99370505727803796782",
+          "idle": "0",
+          "ownerUsdG": "0",
+          "ownerNVDA": "0",
+          "spent": "0"
+        }
+      }
+    },
+    {
+      "name": "harvestactualNVDA fromyieldonly",
+      "passed": true
+    },
+    {
+      "name": "stock output goes to owner",
+      "passed": true
+    },
+    {
+      "name": "principal unchanged byharvest",
+      "passed": true
+    },
+    {
+      "name": "harvest residual assets coverprincipal",
+      "passed": true
+    },
+    {
+      "name": "spend equals recordedyieldbudget",
+      "passed": true
+    },
+    {
+      "name": "router allowance reset",
+      "passed": true
+    },
+    {
+      "name": "vault allowance reset afterharvest",
+      "passed": true
+    },
+    {
+      "name": "final full principalexit",
+      "passed": true
+    },
+    {
+      "name": "final shares principal idle zero",
+      "passed": true
+    },
+    {
+      "name": "principal recovered andNVDA retained",
+      "passed": true
+    }
+  ],
+  "transactions": [
+    {
+      "name": "approve account100USDG",
+      "hash": "0x16d99421cc56e125857b34d332f7650d84c0db5e5709c617528e7fe364c7565e",
+      "status": 1,
+      "gasUsed": "57976"
+    },
+    {
+      "name": "deposit100USDG",
+      "hash": "0x573e1d9d9262ae1c0e10b9184b0b4d5fcb0a32c11bf9e639880641494d2cf4b7",
+      "status": 1,
+      "gasUsed": "398007"
+    },
+    {
+      "name": "partial withdraw25USDG",
+      "hash": "0x726c6eadc748dfab39c1c210c6f9d5e45eeb5496e7582bd96737fbf0020417ea",
+      "status": 1,
+      "gasUsed": "371982"
+    },
+    {
+      "name": "first full principal exit",
+      "hash": "0xae5ba040aadab7039b652fb3cd2e5e1662936eb4dc9bf3eb118a198f479d247f",
+      "status": 1,
+      "gasUsed": "304129"
+    },
+    {
+      "name": "approve recreatedposition",
+      "hash": "0xe32af5041f14e5266f0c218467ee5caca883afa306c1f7d73a9a47cf3c092447",
+      "status": 1,
+      "gasUsed": "57988"
+    },
+    {
+      "name": "recreate vaultposition",
+      "hash": "0x522422fea427cecf618704ed4e42b9d24f53f07b52ff4309d1b4a0955ad3e458",
+      "status": 1,
+      "gasUsed": "398019"
+    },
+    {
+      "name": "harvestactualNVDA fromyieldonly",
+      "hash": "0x9133e9b1e9ae9784f9cf61eaa8b4828afb1c614b0a24abd92d784f5c2070e6be",
+      "status": 1,
+      "gasUsed": "566154"
+    },
+    {
+      "name": "final full principalexit",
+      "hash": "0x61d1b69c128a7ab20de00ac0b957e9fd4802a3133621556c21afeb228f1e31d5",
+      "status": 1,
+      "gasUsed": "321241"
+    }
+  ],
+  "node": {
+    "currentBlockNumber": "0x375cbf2",
+    "currentBlockTimestamp": 1788906980,
+    "currentBlockHash": "0x51d74251a686611066f2af2adf26e162de08edf32e5ed6d320232e7c3607a5dc",
+    "hardFork": "Cancun",
+    "transactionOrder": "fees",
+    "environment": {
+      "baseFee": "0x58c9318",
+      "chainId": 31337,
+      "gasLimit": "0x4000000000000",
+      "gasPrice": "0x41275d18"
+    },
+    "forkConfig": {
+      "forkUrl": "https://rpc.mainnet.chain.robinhood.com",
+      "forkBlockNumber": 58051564,
+      "forkRetryBackoff": 1000
+    },
+    "network": "ethereum"
+  },
+  "owner": "0x9F2aa95dBec664B28C76289c381aF82f3a88a198",
+  "funding": {
+    "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "amount": "100000000",
+    "baseSlot": 1,
+    "storageSlot": "0xe2d8b3341a02a9cdaf7343a78ef18c4a4c4df14138c1cc9ab124485170d454b8",
+    "fakeFunds": true
+  },
+  "outsider": "0x9959346a46D9ca21108067Ed69f53bf485DB9ec9",
+  "account": "0x319a9aA11350218fe8939c3e70E9377b383880bd",
+  "deployHash": "0xc3c4a44a21a920f9e02e44de620f95a07e72e53729c8968432f548294597d5e5",
+  "initial": {
+    "principal": "0",
+    "shares": "0",
+    "idle": "0",
+    "ownerUsdG": "100000000",
+    "ownerNVDA": "0",
+    "spent": "0"
+  },
+  "firstExit": {
+    "principal": "0",
+    "shares": "0",
+    "idle": "0",
+    "ownerUsdG": "99999999",
+    "ownerNVDA": "0",
+    "spent": "0"
+  },
+  "secondDeposit": "99999999",
+  "timeAccelerationSeconds": 2592000,
+  "acceleratedAvailableYield": "336274",
+  "yieldBudget": "336272",
+  "quote": {
+    "amountIn": "336272",
+    "amountOut": "1487841040218078",
+    "fee": 500,
+    "sqrtPriceX96After": "5271347608847470250655876688115788",
+    "gasEstimate": "111047"
+  },
+  "failedSwapError": "transaction execution reverted",
+  "minimumOut": "1472962629815897",
+  "afterHarvest": {
+    "principal": "99999999",
+    "shares": "99037470451796862500",
+    "idle": "0",
+    "ownerUsdG": "0",
+    "ownerNVDA": "1487841040218078",
+    "spent": "336272"
+  },
+  "final": {
+    "principal": "0",
+    "shares": "0",
+    "idle": "0",
+    "ownerUsdG": "100000001",
+    "ownerNVDA": "1487841040218078",
+    "spent": "336272"
+  },
+  "completed": true
+}

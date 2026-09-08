@@ -66,6 +66,13 @@ export default function Page() {
                       <td>Explained in Learn; no connected strategy</td>
                     </tr>
                     <tr>
+                      <td>Wallet and route checks</td>
+                      <td>
+                        Real balances, live AMM quotes, deposit simulation and unsigned account
+                        setup on the Live integration page
+                      </td>
+                    </tr>
+                    <tr>
                       <td>Real deposits and trading</td>
                       <td>Disabled</td>
                     </tr>
@@ -272,9 +279,11 @@ export default function Page() {
                 unspent balance. Borrowed proceeds are never treated as earnings.
               </p>
               <p>
-                Uniswap has announced liquidity provision and Stock Token trading on Robinhood
-                Chain, but freestock has not connected an execution route. A complete leveraged
-                LP-to-stock strategy has not been verified here.{" "}
+                The first owner-controlled account has passed 39 checks against a local copy of the
+                actual vault, router and NVIDIA pool. The test deposited fake USDG, advanced local
+                time, bought NVIDIA tokens from gains and withdrew the remaining assets. No real
+                funds or public transactions were involved. The contract is not deployed on mainnet.
+                A complete leveraged LP-to-stock strategy has not been verified here.{" "}
                 <a
                   href="https://blog.uniswap.org/robinhood-chain-is-live"
                   target="_blank"
@@ -288,8 +297,22 @@ export default function Page() {
                 issuer restrictions and transaction eligibility still apply; no country has been
                 activated for real funds in this app.
               </p>
-              <Link href="/" className="earn-link">
-                Explore the working practice flow <ArrowUpRight size={17} />
+              <p>
+                The intended pilot starts in Norway with a 100 USDG deposit limit and NVIDIA only.
+                Eligibility review is pending. The account can reserve gains as principal or
+                purchase tokens, but it has no keeper or background spending permission. Vault
+                shares already accumulate the underlying return. Donations to an account also count
+                as gains; the balance model does not prove that every gain came from borrower
+                interest.
+              </p>
+              <p>
+                Basket purchases in this account would execute atomically: if any leg fails its
+                minimum output, all legs revert. Microsoft has no verified direct pool at the
+                selected fee. A quote alone does not authorize a trade, and withdrawal liquidity
+                must be checked again immediately before submission.
+              </p>
+              <Link href="/live" className="earn-link">
+                Open the live integration <ArrowUpRight size={17} />
               </Link>
             </section>
           </div>

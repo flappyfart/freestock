@@ -1,0 +1,11 @@
+# Freestock yield account
+
+Experimental per-user contract for an initial capped USDG pilot. Not deployed. Owner-only deposits, withdrawals, compounding and stock purchases. No operator or background spending authority. The owner's wallet must approve every transaction.
+
+The vault, asset, router, allowed stocks and 100 USDG maximum initial cap are immutable constructor inputs. The production client must additionally verify the chain and all exact addresses. The contract tracks principal separately from current vault value; losses must recover before available gains can be spent. Owner withdrawals reduce principal, and a full exit clears it. Explicit compounding increases the principal baseline; underlying vault returns already accumulate while shares are held.
+
+Harvest accepts typed basket swaps, approves only the selected amount to the fixed router, checks actual token receipts, resets allowances, enforces a short deadline and rechecks principal coverage before and after the swaps. The entire harvest reverts on any failed basket leg. Direct token or vault-share donations increase account value and are included in available gains; they are not distinguished from lending income. No principal, liquidity, return or stock-price guarantee is provided.
+
+Real automation requires a separately designed permission model. This contract deliberately has no keeper authorization. The exact source passed 39 assertions on a local fork at block 58051564. Full vault-to-NVIDIA conversion, rollback, ownership, approvals and exit evidence are in `test/`. Test time was accelerated 30 days, and funds were fake. These results are not return forecasts or mainnet deployment.
+
+Compiler: Solidity 0.8.30, optimizer 200, viaIR true, Cancun. `artifacts/account-standard-input.json` contains exact compiler input and `FreestockYieldAccount.artifact.json` contains ABI, bytecode and immutable offsets. Source keccak256 must match the artifact before preparing deployment. Mainnet activation requires a fresh actual-sender simulation and verified deployment/receipt handling; unsigned setup is the only exposed account action today.

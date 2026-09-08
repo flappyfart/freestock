@@ -1,0 +1,95 @@
+{
+  "executedAt": "2026-09-08T22:38:41.147Z",
+  "upstreamChainId": 4663,
+  "localChainId": 31337,
+  "pinnedBlock": 58051564,
+  "pinnedHash": "0x1d402c216a49470d2c8dfe856e16846cc333b4da912fc2917f64fa87f9cd3cdc",
+  "vault": "0xBeEff033F34C046626B8D0A041844C5d1A5409dd",
+  "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+  "rpc": "http://127.0.0.1:18546",
+  "publicTransactions": false,
+  "fakeFunds": true,
+  "gateOverrides": false,
+  "privilegedImpersonation": false,
+  "steps": [
+    {
+      "action": "approve",
+      "hash": "0x2f116fb13fac7b8e6e7fdf448723a09cb1141a010bc5c975a09ca5f9d797739c",
+      "status": 1,
+      "gasUsed": "57976"
+    },
+    {
+      "action": "deposit",
+      "hash": "0xb76d4bef41d407025cee8943a4c0176701812743be2afe388bc7ee7954eeb3dc",
+      "status": 1,
+      "gasUsed": "336427"
+    },
+    {
+      "action": "withdraw200USDG",
+      "hash": "0x2b57a52f810f9a41a5d8c369f430532479db7705676a6191133349b40d198aee",
+      "status": 1,
+      "gasUsed": "334920"
+    },
+    {
+      "action": "redeemRemainingShares",
+      "hash": "0x63245a8b5e993bee77b716b37c4765a3b16eabb290fd087efcc67cdff6645acd",
+      "status": 1,
+      "gasUsed": "283380"
+    }
+  ],
+  "nodeInfo": {
+    "currentBlockNumber": "0x375cbed",
+    "currentBlockTimestamp": 1788906961,
+    "currentBlockHash": "0x3b9dc0eae9d0888d1698c86ffc4c9ab5ba8f75725e653d7a3a8df2d8dfc3c80f",
+    "hardFork": "Cancun",
+    "transactionOrder": "fees",
+    "environment": {
+      "baseFee": "0xad1a492",
+      "chainId": 31337,
+      "gasLimit": "0x4000000000000",
+      "gasPrice": "0x466c6e92"
+    },
+    "forkConfig": {
+      "forkUrl": "https://rpc.mainnet.chain.robinhood.com",
+      "forkBlockNumber": 58051564,
+      "forkRetryBackoff": 1000
+    },
+    "network": "ethereum"
+  },
+  "fakeLocalAccount": "0x9a47dA7145d8fbafe0644aeA15ea36b3aCCd1f80",
+  "runtimeCodeHash": "0x3492098028b641c5949beebf8c56898f1ed846f42b59978ed7c75249603c1f6e",
+  "runtimeBytes": 21808,
+  "assetDecimals": "6",
+  "shareDecimals": "18",
+  "gates": {
+    "receiveSharesGate": "0x0000000000000000000000000000000000000000",
+    "sendSharesGate": "0x0000000000000000000000000000000000000000",
+    "receiveAssetsGate": "0x0000000000000000000000000000000000000000",
+    "sendAssetsGate": "0x0000000000000000000000000000000000000000"
+  },
+  "permissions": {
+    "canReceiveShares": true,
+    "canSendShares": true,
+    "canReceiveAssets": true,
+    "canSendAssets": true
+  },
+  "maxDeposit": "0",
+  "maxWithdraw": "0",
+  "fakeFunding": {
+    "baseSlot": 1,
+    "storageSlot": "0x5b4c43f90e0297e610e7d89a7f71a7b0ad3eee741e845343a215a2e0eb0e6db6"
+  },
+  "initialUsdG": "1000000000",
+  "previewDeposit": "993705432830626145667",
+  "simulatedDepositShares": "993705426914570663141",
+  "depositedShares": "993705424548148935700",
+  "afterDepositUsdG": "0",
+  "simulatedWithdrawShares": "198741084909629787141",
+  "afterWithdrawUsdG": "200000000",
+  "remainingShares": "794964339875148974728",
+  "previewRedeem": "800000001",
+  "simulatedRedeemAssets": "800000001",
+  "finalShares": "0",
+  "finalUsdG": "1000000001",
+  "completed": true
+}

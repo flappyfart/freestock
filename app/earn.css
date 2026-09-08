@@ -1190,3 +1190,53 @@ html[data-motion-paused="true"] .earn-bubble {
   font-weight: 650;
   flex-shrink: 0;
 }
+.live-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  align-items: start;
+  gap: 25px;
+  margin: 32px 0 50px;
+}
+.live-workspace .education-title {
+  padding-bottom: 38px;
+}
+.wallet-address {
+  font-size: 12px;
+  padding: 12px;
+  background: #f2f6fc;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.live-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.live-result {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  background: #edf4ff;
+  border: 1px solid #d0e0fa;
+  border-radius: 6px;
+}
+.live-result strong {
+  font-size: 22px;
+}
+.live-result p {
+  font-size: 14px;
+}
+.live-workspace .holdings-grid {
+  margin-block: 25px;
+}
+.live-workspace .learn-options {
+  margin-bottom: 22px;
+}
+@media (max-width: 760px) {
+  .live-grid {
+    grid-template-columns: 1fr;
+  }
+  .live-actions > .earn-button {
+    flex: 1;
+  }
+}

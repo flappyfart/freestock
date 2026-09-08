@@ -1,12 +1,13 @@
 # freestock
 
-Private DeFi practice product for a planned eligible non-US audience. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
+Private DeFi practice product with a real-chain integration workspace for a planned eligible non-US audience. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
 
 **No real deposits, lending, staking, LP transactions, borrowing or stock purchases are enabled.** Automation runs only when the user explicitly advances the simulation. The app is neither public financial infrastructure nor a background trading service.
 
 ## Working routes
 
 - `/`: persistent practice positions, allocation rules, simulation controls, holdings and read-only market catalogue.
+- `/live`: wallet connection, actual chain balances, Uniswap V3 quotes, direct deposit simulations and unsigned yield-account setup. Read-only; never requests a transaction signature.
 - `/learn`: plain-English explanations, earnings sources, timing, leverage, tokens and future possibilities.
 - `/docs`: current capability matrix, exact model mechanics, sources and execution boundaries.
 - `/transparency`: saved ledger and JSON export, including exact purchase allocations and modeled prices.
@@ -37,3 +38,7 @@ Node 22.13+ and npm are required. Run `npm ci`, `npm run dev`, `npm run lint`, `
 `TEST_ORIGIN=http://localhost:3011 npm run test:api` only accepts local origins, refuses redirects, and creates isolated test identities. Use the same local D1 persistence directory for migrations and the test Worker. Tests cover account isolation, request validation, duplicate/concurrent actions, compounding, baskets, loss recovery, closure and retired routes. No hosted accounts are mutated by these checks.
 
 Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. Real activation needs verified strategy adapters, authorized transaction execution, current executable quotes, eligibility, cost/debt limits and reconciliation; there is no switch that makes the practice engine handle real funds.
+
+## First live integration
+
+See `docs/LIVE-PILOT.md` for verified dependencies, account semantics, fork evidence and exact activation boundaries. `contracts/src/FreestockYieldAccount.sol` is compiled reproducibly in `contracts/artifacts`. It has not been deployed to mainnet. The first planned participant is in Norway; eligibility is not inferred from residence alone. No API key is required for the direct AMM route. Set `ROBINHOOD_RPC_URL` to an HTTPS production RPC for dedicated capacity; otherwise reads use the official public RPC and fail closed on provider errors. Runtime values belong in Sites configuration, never source.

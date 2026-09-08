@@ -254,9 +254,11 @@ export default function Page() {
                 net earnings can reach the same stock-purchase or compounding layer.
               </p>
               <p>
-                Today you can use live read-only Morpho data, saved lending scenarios, an LP model,
-                custom baskets and simulated automation. Real funds, background transactions and
-                supported staking remain future integrations.
+                Today you can use live wallet balances and stock-pool quotes on the Live integration
+                page, plus saved lending scenarios, an LP model, custom baskets and simulated
+                automation. The first real contract route has passed local execution tests with fake
+                funds. Real funds, background transactions and supported staking have not been
+                activated.
               </p>
               <Link href="/docs" className="earn-link">
                 See the exact current mechanics <ArrowUpRight size={17} />
