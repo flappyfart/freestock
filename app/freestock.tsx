@@ -614,7 +614,7 @@ export default function Freestock() {
           <HomepageIntro />
           <div className="demo-heading">
             <div>
-              <h2>Give it a try.</h2>
+              <h2>Try a $10 practice draw.</h2>
               <p>Add practice money. Skip ahead 7 days. Then reveal the draw.</p>
             </div>
             <span className="pill">You start with $10,000 of practice money</span>

@@ -1,16 +1,38 @@
+"use client";
 /* oxlint-disable next/no-img-element -- Locally generated decorative SVG; fixed dimensions prevent layout shift. */
+import { useState } from "react";
 import { ArrowRight, Clock3, Gift, Wallet } from "lucide-react";
+import { EXAMPLE_POOLS, prizeProjection, type ExamplePool } from "@/lib/prize-projection";
+
+const displayMoney = (amount: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+const poolLabels: Record<ExamplePool, string> = {
+  100000: "$100K",
+  1000000: "$1M",
+  10000000: "$10M",
+};
 
 export function HomepageIntro() {
+  const [examplePool, setExamplePool] = useState<ExamplePool>(1_000_000);
+  const projection = prizeProjection(examplePool);
+  const prize = displayMoney(projection.weeklyPrize);
   return (
     <section className="home-intro" aria-labelledby="home-title">
       <div className="particle-orb" aria-hidden="true">
         <img src="/particle-orb.svg" alt="" width="640" height="640" />
       </div>
       <div className="home-intro-copy">
-        <p className="small-label">SAVINGS WITH A CHANCE TO WIN</p>
+        <p className="small-label">
+          ILLUSTRATION · {poolLabels[examplePool]} SAVINGS POOL · ONE WEEKLY WINNER
+        </p>
         <h1 id="home-title">
-          Your savings could win you <em>stock prizes.</em>
+          Save $100.
+          <br />
+          Get a shot at <span className="projection-prize">~{prize}</span> in stocks.
         </h1>
         <p className="home-description">
           The idea: pool savings, earn interest from lending, and use that interest to fund stock
@@ -20,19 +42,37 @@ export function HomepageIntro() {
           The earnings go to prizes, instead of interest paid to every saver. Your deposit isn’t
           spent on the draw.
         </p>
+        <fieldset className="projection-controls">
+          <legend>Explore a bigger pool</legend>
+          {EXAMPLE_POOLS.map((pool) => (
+            <button
+              key={pool}
+              type="button"
+              aria-pressed={examplePool === pool}
+              onClick={() => setExamplePool(pool)}
+              aria-label={`Illustrate a ${displayMoney(pool)} savings pool`}
+            >
+              {poolLabels[pool]}
+            </button>
+          ))}
+        </fieldset>
+        <p className="projection-assumptions">
+          Assumes 4% annual earnings, with 10% of earnings covering costs. The remaining weekly
+          earnings go to one winner. Illustrative rates and rules, not promised returns.
+        </p>
         <a className="primary arrow-button home-cta" href="#try-demo">
-          Try with practice money
+          Try a practice draw
           <span className="arrow-capsule" aria-hidden="true">
             <ArrowRight size={17} />
           </span>
         </a>
-        <p className="home-demo-note">An interactive demo. No real money or stocks.</p>
+        <p className="home-demo-note">Practice draws use $10 prizes. No real money or stocks.</p>
       </div>
 
       <div className="money-story panel" aria-labelledby="money-story-title">
         <div className="money-story-heading">
-          <h2 id="money-story-title">Follow a $100 deposit</h2>
-          <span className="story-example">DEMO EXAMPLE</span>
+          <h2 id="money-story-title">Your $100. A much bigger possibility.</h2>
+          <span className="story-example">{poolLabels[examplePool]} POOL ILLUSTRATION</span>
         </div>
         <ol className="money-steps">
           <li>
@@ -42,7 +82,7 @@ export function HomepageIntro() {
             <div>
               <span className="story-step-label">01 · SAVE</span>
               <h3>You put $100 into savings</h3>
-              <p>It joins the pool alongside other savers’ deposits.</p>
+              <p>It joins an example pool with {poolLabels[examplePool]} in total deposits.</p>
             </div>
           </li>
           <li>
@@ -53,7 +93,8 @@ export function HomepageIntro() {
               <span className="story-step-label">02 · BUILD ENTRIES</span>
               <h3>$100 × 7 days = 700 entries</h3>
               <p>
-                Save more, or for longer, to build more entries. More entries mean a better chance.
+                Example chance: 1 in {projection.oneInOdds.toLocaleString("en-US")}, if everyone
+                keeps their balance for the full week.
               </p>
             </div>
           </li>
@@ -63,7 +104,7 @@ export function HomepageIntro() {
             </span>
             <div>
               <span className="story-step-label">03 · THE DRAW</span>
-              <h3>One saver wins a $10 stock prize</h3>
+              <h3>One saver wins about {prize} in stocks</h3>
               <p>The pool’s earnings after costs pay for it. Winning is never guaranteed.</p>
             </div>
           </li>
@@ -76,13 +117,14 @@ export function HomepageIntro() {
           <div>
             <span>If you win</span>
             <strong>
-              $100 <small>+ $10 prize</small>
+              $100 <small>+ ~{prize} in stocks</small>
             </strong>
           </div>
         </div>
         <p className="story-note">
-          Example only. Weekly demo draws need enough pool earnings. Prizes are pretend dollar
-          credits.
+          This illustration assumes a constant {poolLabels[examplePool]} pool and one winner
+          receiving the entire weekly prize budget. Your chance depends on your share of all
+          entries. It does not change the $10 practice draws in your account.
         </p>
       </div>
       <p className="home-risk-note">
@@ -94,6 +136,10 @@ export function HomepageIntro() {
 }
 
 const questions = [
+  [
+    "Why does the homepage show a bigger prize than my practice draw?",
+    "The headline illustrates what a larger pool could fund. At $1M in total deposits, a hypothetical 4% annual return generates $40,000 a year. Deducting 10% of those earnings as costs leaves $36,000, or about $690 per seven days. This example awards all of that weekly budget to one winner. Actual returns and future draw rules could differ. The interactive practice account still uses fixed $10 prizes.",
+  ],
   [
     "Where does the prize money come from?",
     "The proposed live product would lend the pooled digital dollars to earn interest. After costs, that interest would fund stock prizes instead of being paid to every saver. These earnings are often called yield. Deposits themselves are not the prize budget. Here, the demo only calculates pretend earnings; it does not lend real money.",

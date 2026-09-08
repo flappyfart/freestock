@@ -555,6 +555,54 @@ img.stock-logo {
 .home-intro h1 em {
   color: #fff;
 }
+.home-intro h1 .projection-prize {
+  color: #fde9ff;
+  white-space: nowrap;
+}
+.projection-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 0;
+  margin: 26px auto 0;
+  border: 0;
+  min-width: 0;
+}
+.projection-controls legend {
+  float: none;
+  width: 100%;
+  margin-bottom: 12px;
+  color: #bbc7c6;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.projection-controls button {
+  min-width: 74px;
+  min-height: 44px;
+  border: 1px solid #ffffff24;
+  border-radius: 6px;
+  background: #011d1c;
+  color: #bbc7c6;
+  font-size: 13px;
+}
+.projection-controls button[aria-pressed="true"] {
+  border-color: #cbfffc;
+  color: #edfffe;
+  background: #003734;
+}
+.projection-controls button:hover {
+  color: #fff;
+  background: #003734;
+}
+.projection-assumptions {
+  max-width: 64ch;
+  margin: 16px auto 0;
+  color: #bbc7c6;
+  font-size: 11px;
+  line-height: 1.5;
+}
 .home-description {
   color: #bbc7c6;
   font-size: 17px;
@@ -972,6 +1020,10 @@ footer {
   }
   .story-outcomes small {
     font-size: 14px;
+    display: block;
+    white-space: normal;
+    margin-top: 4px;
+    line-height: 1.4;
   }
   .savings-panel {
     padding: 28px 24px 0;

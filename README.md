@@ -47,6 +47,8 @@ The active theme is `app/auros.css`, loaded after structural and homepage styles
 
 The homepage introduces the savings-to-prizes model with `app/homepage-intro.tsx`: the earnings tradeoff, a $100 deposit through 700 entries, and both winning and nonwinning outcomes. After a user's first draw, an account summary appears above that fixed example. Waiting prizes have direct claim buttons; claimed stocks are listed separately from deposited savings. Account state refreshes on Home navigation and when the tab regains focus. `lib/prizes.ts` derives user-only totals, excluding awards to other savers; regression tests cover pending claims, repeated claims, reload serialization, and separate savings accounting.
 
+The homepage's separate pool-size illustration defaults to $1M, with $100K and $10M options. It models a constant pool earning 4% annually, deducts 10% of earnings as costs, and awards the weekly net budget to one winner: approximately $69 / $690 / $6,904. A fixed $100 held for the full week has odds of 1 in 1,000 / 10,000 / 100,000 respectively, assuming every participant holds for the full week. `lib/prize-projection.ts` contains this illustration; it does not alter the account engine's $10 practice prize. The headline, controls, odds, and disclaimer distinguish potential future scale from available practice awards.
+
 ## Production activation remains blocked
 
 This is a tested application foundation, not an audited or funded protocol. The implementation does not include live custody contracts, a VRF consumer, a CCIP sender/receiver, a stock execution adapter, or an indexer. There is deliberately no environment switch that enables real deposits.
