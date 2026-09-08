@@ -3,7 +3,7 @@ import { COUNTRIES } from "./countries.ts";
 // Product scope, not live authorization. No country has been approved for real funds.
 export const LAUNCH_POLICY = Object.freeze({
   audience: "eligible-non-us-users",
-  prizeAsset: "robinhood-stock-tokens",
+  payoutAsset: "robinhood-stock-tokens",
   phase: "prelaunch",
   realDepositsEnabled: false,
   realTradingEnabled: false,
@@ -101,6 +101,6 @@ export function assessAvailability(input: AvailabilityInput): AvailabilityResult
   return result(
     "pending",
     "Availability is not yet confirmed.",
-    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility. Real deposits and stock-token prizes are not available yet.",
+    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility. Real deposits and stock-token purchases are not available yet.",
   );
 }

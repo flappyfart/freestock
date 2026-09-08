@@ -86,10 +86,10 @@ export function LandingIntro() {
               <ArrowUpRight size={18} />
             </div>
             <div className="intro-card-symbol">NVDA</div>
-            <p>A stock worth saving for.</p>
+            <p>Put your earnings toward NVIDIA.</p>
             <div className="intro-card-bottom">
               <span>freestock</span>
-              <span>STOCK PRIZE</span>
+              <span>EARN IN STOCK</span>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@ export function LandingIntro() {
         freestock
       </div>
       <p className="intro-caption" aria-hidden="true">
-        Save. Get a chance to own more.
+        Your DeFi earnings. Your stock picks.
       </p>
       <button className="intro-skip" type="button" onClick={dismiss}>
         Skip intro <ArrowUpRight size={15} />

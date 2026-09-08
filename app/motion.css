@@ -438,16 +438,16 @@ html[data-motion-paused="true"] .particle-orb img {
     --bubble-rise: -10px;
     --bubble-turn: 2deg;
   }
-  .app-shell [data-scroll-reveal="pending"] {
+  :is(.app-shell, .earn) [data-scroll-reveal="pending"] {
     opacity: 0;
     transform: translateY(24px);
     animation: none;
   }
-  .app-shell [data-scroll-reveal="enter"] {
+  :is(.app-shell, .earn) [data-scroll-reveal="enter"] {
     opacity: 1;
     animation: scroll-arrive 700ms var(--motion-ease) backwards;
   }
-  .app-shell [data-scroll-reveal="done"] {
+  :is(.app-shell, .earn) [data-scroll-reveal="done"] {
     opacity: 1;
     animation: none;
   }
@@ -478,7 +478,7 @@ html[data-motion-paused="true"] .stock-bubble img {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  .app-shell [data-scroll-reveal] {
+  :is(.app-shell, .earn) [data-scroll-reveal] {
     opacity: 1;
     transform: none;
   }

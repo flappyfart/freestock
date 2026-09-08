@@ -1,4 +1,4 @@
-import Freestock from "./freestock";
+import EarnApp from "./earn-app";
 export default function Page() {
-  return <Freestock />;
+  return <EarnApp />;
 }

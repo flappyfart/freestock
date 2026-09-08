@@ -1,70 +1,39 @@
 # freestock
 
-Private product beta for a planned non-US savings pool where time-weighted entries compete for Robinhood Stock Token prizes funded from realized net yield. US persons, people in the US, and issuer-restricted regions are outside the launch scope. No country has yet been approved for live operation. The interface follows the requested Nexaris direction: white and cobalt surfaces, dimensional stock artwork, large rounded cards, and accessible motion. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
+Private DeFi practice product for a planned eligible non-US audience. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
 
-## Use the product
+**No real deposits, lending, staking, LP transactions, borrowing or stock purchases are enabled.** Automation runs only when the user explicitly advances the simulation. The app is neither public financial infrastructure nor a background trading service.
 
-Sign in, add simulated USDG, and advance the clock. Seven simulated days freeze an entry snapshot and reserve a prize from available simulated net yield. Reveal the result, settle the example prize, and claim if your entry wins. Withdrawals reserve funds first and return them to the practice wallet when completed. Activity and allocations persist per signed-in user.
+## Working routes
 
-The scenario starts each user with 10,000 practice USDG and four fixed example savers totaling 32,500. The 4% annual gross-yield assumption, 10% yield-cost assumption, $10 prize and weekly cadence are provisional scenario inputs, not promised returns, proposed fees, live balances or final product policy. A simulated stock allocation is a dollar credit, not a share or token quantity.
+- `/`: persistent practice positions, allocation rules, simulation controls, holdings and read-only market catalogue.
+- `/learn`: plain-English explanations, earnings sources, timing, leverage, tokens and future possibilities.
+- `/docs`: current capability matrix, exact model mechanics, sources and execution boundaries.
+- `/transparency`: saved ledger and JSON export, including exact purchase allocations and modeled prices.
+- `/fairness`: redirects to earnings transparency. The draw/prize concept has been retired.
 
-## Local development
+## Accounting and automation
 
-Node 22.13+ and npm are required.
+A new DeFi account starts with 10,000 practice USDG. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
 
-```sh
-npm ci
-npm run dev
-npm run typecheck
-npm run lint
-npm test
-npm run build
-```
+Lending converts the observed seven-day vault APY to an effective daily rate, then accrues linearly within each simulation step. Fractions below one micro-USDG carry into the next step. Compounding happens at step boundaries. The observed rate is fixed for that position, not treated as a forecast or live accrual.
 
-Sites supplies local sign-in at `/signin-with-chatgpt`. Production authentication is supplied by the Sites dispatcher; the Worker must only be reachable through its trusted dispatcher. No app-owned passwords or session tokens are stored. Never expose a raw public Worker origin that lets callers forge the dispatch identity headers.
+The LP model uses leverage, fee APR, borrowing APR, annual costs on exposure and an optional LP value shock. Leverage resets to the selected multiple each step without rebalancing costs. Liquidation thresholds, real collateral mechanics and withdrawal queues are not simulated. Stocks are purchased at disclosed fixed illustrative prices, assuming 1 USDG = $1 and zero gas/spread/trading fees. These are approximate practice token quantities, not real holdings or current valuations.
 
-D1 schema is managed by `db/schema.ts` and the committed Drizzle migrations. Sites applies these migrations on deployment. For isolated local testing, apply the migration with Wrangler to the same `--persist-to` directory used by the local Worker. The HTTP test runner deliberately refuses non-local origins:
+## Data
 
-```sh
-TEST_ORIGIN=http://localhost:3011 npm run test:api
-```
+`lib/markets.ts` reads current balances and seven-day rates for one tracked Steakhouse USDG vault and five previously verified listed Morpho USDG markets on Robinhood Chain 4663. Directory membership was checked September 8, 2026. This is an explicit subset; it does not claim all-chain pool coverage. Vault and market assets overlap and are never added together. Refresh failure returns the dated snapshot with a prominent status. Read-only observations do not establish an executable route. See the in-app Docs for direct source links.
 
-The generated `dist/server/wrangler.json` can run an isolated test Worker. Keep test persistence separate from `.wrangler/state` used by the visible development preview.
+## Persistence and requests
 
-## Architecture
+`lib/earn-store.ts` saves independent per-owner state in `earn_accounts` and permanent request receipts in `earn_commands`. A compare-and-swap update and receipt insertion share an atomic D1 batch. Duplicate retries return the original receipt and current state. Server routes obtain account identity from trusted Sites dispatch headers, validate same-origin requests, bound streamed bodies to 4 KB and return uncached private responses.
 
-`lib/launch-policy.ts` records the non-US scope, stock-token prize instrument, issuer restrictions checked September 8, 2026, and disabled real-funds flags used by the account and health APIs. The homepage availability dialog checks residence, current location and Regulation S US-person status without transmitting or persisting answers. Its only outcomes are unavailable, more information needed, or pending. It is informational and is not identity verification, geolocation enforcement or a production eligibility gate. See `docs/NON-US-LAUNCH.md` for the selected scope and implementation sequence.
+The original `accounts`/`commands` tables and old engine tests are retained for historical data compatibility. New accounts never borrow funds from retired prize accounts. `/api/commands` returns 410 and no longer changes old prize state. Never expose an untrusted raw Worker origin that accepts forged dispatcher identity headers.
 
-- `lib/engine.ts`: immutable pure state transitions, six-decimal integer USDG, exact asset-second entry weights, unbiased rejection sampling for simulated randomness, prize reservations and conservation invariants.
-- `lib/store.ts`: D1 account aggregate with optimistic concurrency and permanent idempotency receipts. The account CAS and receipt insert share one atomic D1 batch. A duplicate key cannot commit a second mutation. Replays return the original receipt and current state.
-- `app/api`: authenticated, per-user requests; same-origin mutations; strict command validation; 4 KB streaming body limit; uncached responses; real actions absent.
-- `app/freestock.tsx`: responsive product surface, accessible Base UI primitives, immutable draw record inspection, local JSON export, and optional WebMCP tools.
-- `scripts/verify-integrations.mjs`: allowlisted read-only RPC probe. Defaults to recorded blocks; `--latest` refreshes observations. No signing or transaction methods are allowed.
+## Local development and validation
 
-Each private preview is an independent scenario. Accounts do not share a real pool. All financial decisions are made server-side. Browser state is a rendering cache, not authoritative accounting.
+Node 22.13+ and npm are required. Run `npm ci`, `npm run dev`, `npm run lint`, `npm run typecheck`, `npm test` and `npm run build`. Sites supplies local sign-in. D1 schema comes from `db/schema.ts` and append-only Drizzle migrations in `drizzle/`; Sites applies them on deploy.
 
-## Design
+`TEST_ORIGIN=http://localhost:3011 npm run test:api` only accepts local origins, refuses redirects, and creates isolated test identities. Use the same local D1 persistence directory for migrations and the test Worker. Tests cover account isolation, request validation, duplicate/concurrent actions, compounding, baskets, loss recovery, closure and retired routes. No hosted accounts are mutated by these checks.
 
-The active theme is `app/nexaris.css`, followed by `app/motion.css`. It adapts the Nexaris reference with white surfaces, cobalt sections, rounded controls, and self-hosted Plus Jakarta Sans headings with Inter body text. The stock hero uses three transparent cobalt/chrome cutouts for AAPL, NVDA, and MSFT, generated from the original freestock artwork. Flexible grid sizing and contain sizing keep every rim visible; independent gentle bounce cycles replace the cropped ribbon banner. The earlier Auros and forest themes remain archived but are not imported. Uiverse attribution and font licenses are retained in `THIRD_PARTY_NOTICES.md` and `public/fonts/`.
-
-`app/landing-intro.tsx` presents the user-supplied reaching-hands clip with its central cross removed and an NVIDIA card rendered over it. The edited clip is silent, 3 seconds, and ends before the original flashing sequence. The intro dismisses within 3.5 seconds, supports Skip/Escape/Tab, skips repeat visits in the same tab session, and is hidden for reduced motion. Playback failure and deep links skip it. The real account loads independently beneath the intro.
-
-`app/motion-effects.tsx` plays an original 16-second, 24-fps blue-and-white dither video behind the page. The H.264 loop is silent and seamless, with a static WebP poster and a lighter center for readable content. Playback pauses in hidden tabs, on user pause, and when reduced motion or stronger-contrast preferences apply. The video source is not requested at all when initially disabled by those preferences; autoplay failure leaves a static background. The visible pause control also pauses the hero artwork. `app/scroll-motion.tsx` progressively reveals below-fold sections once, including newly mounted tabs, while keeping focused/deep-linked content immediately visible. Server-rendered content remains visible without the enhancement. Reduced-motion preferences disable all entrance/hover movement. The three stock-bubble bounces share the pause control. The hero has no crop, fade mask, or group parallax; the dither video remains visible behind its transparent artwork.
-
-The homepage introduces the savings-to-prizes model with `app/homepage-intro.tsx`: the earnings tradeoff, a $100 deposit through 700 entries, and both winning and nonwinning outcomes. After a user's first draw, an account summary appears above that fixed example. Waiting prizes have direct claim buttons; claimed stocks are listed separately from deposited savings. Account state refreshes on Home navigation and when the tab regains focus. `lib/prizes.ts` derives user-only totals, excluding awards to other savers; regression tests cover pending claims, repeated claims, reload serialization, and separate savings accounting.
-
-The homepage's separate pool-size illustration defaults to $1M, with $100K and $10M options. It models a constant pool earning 4% annually, deducts 10% of earnings as costs, and awards the weekly net budget to one winner: approximately $69 / $690 / $6,904. A fixed $100 held for the full week has odds of 1 in 1,000 / 10,000 / 100,000 respectively, assuming every participant holds for the full week. `lib/prize-projection.ts` contains this illustration; it does not alter the account engine's $10 practice prize. The headline, controls, odds, and disclaimer distinguish potential future scale from available practice awards.
-
-## Production activation remains blocked
-
-This is a tested application foundation with simulated funds. The implementation does not include live custody contracts, a VRF consumer, a CCIP sender/receiver, a stock execution adapter, or an indexer. There is deliberately no environment switch that enables real deposits.
-
-1. Approve the product rules, supported jurisdictions, eligibility, custody/asset model, fee policy and draw cadence.
-2. Build contracts from the reviewed invariants. Identify and reproduce the deployed vault source, then pass a fresh unprivileged contract deposit/share/redemption round trip on a pinned mainnet fork.
-3. Add vault-share NAV, loss/high-water accounting, partial liquidity, queued withdrawals, pause behavior and rounding tests. The paper model conserves nominal capital and assumes withdrawal liquidity; it cannot model a live guarantee.
-4. Implement storage-only VRF fulfillment; separately retry CCIP and stock execution. Bind immutable snapshots, request IDs, chain selectors, authenticated senders and duplicate-message protection. No rerolls on failures.
-5. Obtain and test an executable stock-token route, bounded allowance/spend, minimum received, deadline, price freshness and multiplier handling. Preserve actual token and USDG balance deltas. Awards are stock tokens, not underlying share ownership.
-6. Legal approval, production monitoring, incident recovery, indexing/reorg handling, admin access control, RPC failover, load tests, wallet onboarding and transaction UX.
-7. Complete browser interaction, mobile and assistive-technology QA before a public release. Automated code/API checks do not substitute for this.
-
-See `docs/INTEGRATION-READINESS.md` for September 8, 2026 live read evidence and sources, and `docs/PROTOCOL-DESIGN.md` for the contract acceptance criteria. Read-only network support does not prove a transaction succeeds.
+Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. Real activation needs verified strategy adapters, authorized transaction execution, current executable quotes, eligibility, cost/debt limits and reconciliation; there is no switch that makes the practice engine handle real funds.

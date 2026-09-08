@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 
 const TARGETS =
-  ".money-story, .dashboard-grid > .panel, .draw-layout > .panel, .simulation-controls, .questions-heading, .questions-list details, .draw-history, .portfolio-section, .activity-section";
+  ".money-story, .dashboard-grid > .panel, .draw-layout > .panel, .simulation-controls, .questions-heading, .questions-list details, .draw-history, .portfolio-section, .activity-section, .earn-section, .education-body section, .ledger article";
 
 /** Progressive enhancement: the server renders all content visible and usable. */
 export function ScrollMotion() {
   useEffect(() => {
-    const scope = document.querySelector(".app-shell");
+    const scope = document.querySelector(".earn, .app-shell");
     if (!scope || !("IntersectionObserver" in window)) return;
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const seen = new WeakSet<Element>();

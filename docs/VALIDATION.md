@@ -1,3 +1,5 @@
+> Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
+
 # Verification record
 
 September 8, 2026.

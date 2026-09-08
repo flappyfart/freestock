@@ -1,3 +1,5 @@
+> Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
+
 # Freestock integration readiness
 
 Verified 2026-09-08. This report treats the pasted conversation as background claims and separates them from current documentation and read-only network evidence. No transaction, deposit, token purchase, bridge, or deployment was submitted.

@@ -1,3 +1,5 @@
+> Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
+
 # Freestock: paper-beta accounting and draw review
 
 Date: 2026-09-08. This is an implementation design review, not an audit or a conclusion that live deposits can be enabled.

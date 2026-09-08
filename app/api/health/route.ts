@@ -8,7 +8,8 @@ export function GET() {
     realDepositsEnabled: LAUNCH_POLICY.realDepositsEnabled,
     realTradingEnabled: LAUNCH_POLICY.realTradingEnabled,
     launch: LAUNCH_POLICY,
-    randomness: "server-crypto-simulation",
+    earnings: "explicit-time-simulation",
+    automation: "simulation-step-only",
     schema: 1,
   });
 }

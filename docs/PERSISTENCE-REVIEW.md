@@ -1,3 +1,5 @@
+> Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
+
 # D1 paper-beta concurrency review
 
 The proposed versioned account update plus conditional command receipt insertion is sound for one-account paper mutations **if the insertion uses a normal uniqueness-enforcing INSERT and every mutation is in the same batch**. This is a design review, not a review of the finished implementation or deployed D1 behavior.
