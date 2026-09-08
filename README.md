@@ -1,6 +1,6 @@
 # freestock
 
-Private product beta for a savings pool where time-weighted entries compete for stock-token prizes funded from realized net yield. The interface follows the requested Nexaris direction: white and cobalt surfaces, dimensional stock artwork, large rounded cards, and accessible motion. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
+Private product beta for a planned non-US savings pool where time-weighted entries compete for Robinhood Stock Token prizes funded from realized net yield. US persons, people in the US, and issuer-restricted regions are outside the launch scope. No country has yet been approved for live operation. The interface follows the requested Nexaris direction: white and cobalt surfaces, dimensional stock artwork, large rounded cards, and accessible motion. No real deposits, wallet signatures, lending, trades, or Chainlink messages occur in this build.
 
 ## Use the product
 
@@ -32,6 +32,8 @@ TEST_ORIGIN=http://localhost:3011 npm run test:api
 The generated `dist/server/wrangler.json` can run an isolated test Worker. Keep test persistence separate from `.wrangler/state` used by the visible development preview.
 
 ## Architecture
+
+`lib/launch-policy.ts` records the non-US scope, stock-token prize instrument, issuer restrictions checked September 8, 2026, and disabled real-funds flags used by the account and health APIs. The homepage availability dialog checks residence, current location and Regulation S US-person status without transmitting or persisting answers. Its only outcomes are unavailable, more information needed, or pending. It is informational and is not identity verification, geolocation enforcement or a production eligibility gate. See `docs/NON-US-LAUNCH.md` for the selected scope and implementation sequence.
 
 - `lib/engine.ts`: immutable pure state transitions, six-decimal integer USDG, exact asset-second entry weights, unbiased rejection sampling for simulated randomness, prize reservations and conservation invariants.
 - `lib/store.ts`: D1 account aggregate with optimistic concurrency and permanent idempotency receipts. The account CAS and receipt insert share one atomic D1 batch. A duplicate key cannot commit a second mutation. Replays return the original receipt and current state.

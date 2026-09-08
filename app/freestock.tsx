@@ -536,7 +536,7 @@ export default function Freestock() {
       <div className="preview-strip">
         <span>
           <Sparkles size={14} />
-          Interactive demo. Try freestock with practice money.
+          Non-US launch planned. Explore with practice money.
         </span>
         <span>
           No real funds connected
@@ -1050,7 +1050,8 @@ export default function Freestock() {
         </TabsContent>
         <footer>
           <span>
-            Simulated preview. Live lending can lose principal and withdrawals depend on liquidity.
+            Planned for eligible non-US users. Practice only. Live lending can lose principal and
+            withdrawals depend on liquidity.
           </span>
           <button className="text-button" onClick={() => setModal("about")}>
             <CircleHelp size={15} />
@@ -1114,6 +1115,15 @@ export default function Freestock() {
             </>
           ) : (
             <div className="about-content">
+              <section>
+                <h3>Built for an eligible non-US audience.</h3>
+                <p>
+                  The planned product uses USDG on Robinhood Chain and awards Robinhood Stock
+                  Tokens. These tokens provide stock exposure without ownership of the underlying
+                  shares. US persons and people in the US are excluded. Other country restrictions
+                  apply, and live availability is still unconfirmed.
+                </p>
+              </section>
               <section>
                 <h3>Saving earns you chances to win.</h3>
                 <p>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, Clock3, Gift, Wallet } from "lucide-react";
 import { EXAMPLE_POOLS, prizeProjection, type ExamplePool } from "@/lib/prize-projection";
+import { AvailabilityCheck } from "./availability-check";
 
 const displayMoney = (amount: number) =>
   new Intl.NumberFormat("en-US", {
@@ -42,11 +43,11 @@ export function HomepageIntro() {
         <h1 id="home-title">
           Save $100.
           <br />
-          Get a shot at <span className="projection-prize">~{prize}</span> in stocks.
+          Get a shot at <span className="projection-prize">~{prize}</span> in stock tokens.
         </h1>
         <p className="home-description">
-          The idea: pool savings, earn interest from lending, and use that interest to fund stock
-          prizes. A random draw picks the winner.
+          The idea: pool digital dollars, earn interest from lending, and use that interest to fund
+          stock-token prizes. A random draw picks the winner.
         </p>
         <a className="primary arrow-button home-cta" href="#try-demo">
           Try a practice draw
@@ -55,6 +56,7 @@ export function HomepageIntro() {
           </span>
         </a>
         <p className="home-demo-note">Practice draws use $10 prizes. No real money or stocks.</p>
+        <AvailabilityCheck />
         <p className="home-tradeoff">
           The earnings go to prizes, instead of interest paid to every saver. Your deposit isn’t
           spent on the draw.
@@ -114,7 +116,7 @@ export function HomepageIntro() {
             </span>
             <div>
               <span className="story-step-label">03 · THE DRAW</span>
-              <h3>One saver wins about {prize} in stocks</h3>
+              <h3>One saver wins about {prize} in stock tokens</h3>
               <p>The pool’s earnings after costs pay for it. Winning is never guaranteed.</p>
             </div>
           </li>
@@ -127,7 +129,7 @@ export function HomepageIntro() {
           <div>
             <span>If you win</span>
             <strong>
-              $100 <small>+ ~{prize} in stocks</small>
+              $100 <small>+ ~{prize} in stock tokens</small>
             </strong>
           </div>
         </div>
@@ -147,12 +149,16 @@ export function HomepageIntro() {
 
 const questions = [
   [
+    "Who is freestock being built for?",
+    "The planned launch is for eligible users outside the United States. US persons and people in the US cannot participate in the planned stock-token product. Other country restrictions also apply. Being outside the US does not automatically establish eligibility. Live availability has not been confirmed for any country; the practice demo is available to explore now.",
+  ],
+  [
     "Why does the homepage show a bigger prize than my practice draw?",
     "The headline illustrates what a larger pool could fund. At $1M in total deposits, a hypothetical 4% annual return generates $40,000 a year. Deducting 10% of those earnings as costs leaves $36,000, or about $690 per seven days. This example awards all of that weekly budget to one winner. Actual returns and future draw rules could differ. The interactive practice account still uses fixed $10 prizes.",
   ],
   [
     "Where does the prize money come from?",
-    "The proposed live product would lend the pooled digital dollars to earn interest. After costs, that interest would fund stock prizes instead of being paid to every saver. These earnings are often called yield. Deposits themselves are not the prize budget. Here, the demo only calculates pretend earnings; it does not lend real money.",
+    "The proposed live product would lend pooled USDG, a digital dollar token, to earn interest. After costs, that interest would fund stock-token prizes instead of being paid to every saver. These earnings are often called yield. Deposits themselves are not the prize budget. Here, the demo only calculates pretend earnings; it does not lend real money.",
   ],
   [
     "What happens if I don’t win?",
@@ -168,7 +174,7 @@ const questions = [
   ],
   [
     "Are these real dollars or real stocks?",
-    "No. You start with $10,000 of practice money, labeled USDG, and four pretend savers share your example pool. USDG is a digital dollar token proposed for the live product; here it is only a simulated balance. A $10 stock prize is a pretend dollar credit, not a share or token. A future live version is intended to award stock tokens. Real deposits and stock purchases are disabled.",
+    "No. You start with $10,000 of practice money, labeled USDG, and four pretend savers share your example pool. A $10 stock prize is a pretend dollar credit, not a share or token. The planned non-US product would award Robinhood Stock Tokens, which provide economic exposure to a stock without ownership rights in the underlying shares. Real deposits and stock purchases are disabled.",
   ],
 ] as const;
 

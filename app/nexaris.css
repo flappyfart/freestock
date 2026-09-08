@@ -1301,6 +1301,95 @@ h3,
   font-size: 12px;
   margin-top: 12px;
 }
+.launch-availability {
+  margin: 16px auto 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #454c60;
+}
+.launch-availability p {
+  margin: 0;
+}
+.availability-trigger {
+  min-height: 44px;
+  justify-content: center;
+  color: #0055d6;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.freestock-dialog.availability-dialog {
+  width: min(600px, calc(100vw - 32px));
+  max-width: 600px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  text-align: left;
+}
+.availability-form {
+  display: grid;
+  gap: 18px;
+}
+.availability-countries {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.availability-form label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #010320;
+}
+.availability-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #b4becf;
+  border-radius: 12px;
+  background: #fff;
+  color: #010320;
+  font: inherit;
+  font-size: 16px;
+}
+.availability-form select:focus-visible {
+  outline: 2px solid #0055d6;
+  outline-offset: 3px;
+}
+.availability-detail {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #454c60;
+}
+.availability-detail a {
+  color: #0055d6;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.availability-result {
+  display: block;
+  padding-top: 18px;
+  border-top: 1px solid #d7dfeb;
+  color: #010320;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.availability-result strong {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+.availability-result span {
+  display: block;
+  margin: 0;
+  color: #454c60;
+}
+@media (max-width: 520px) {
+  .availability-countries {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .projection-assumptions {
   font-size: 12px;
 }
