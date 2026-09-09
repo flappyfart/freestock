@@ -23,9 +23,11 @@ The stack is React + TypeScript on Vinext/Vite, with a Worker backend and D1. [`
 | Setting             | Purpose                                                                   |
 | ------------------- | ------------------------------------------------------------------------- |
 | `DB`                | D1 binding used for simulation and saved live history                     |
-| `ROBINHOOD_RPC_URL` | Optional RPC override; defaults to the configured public mainnet endpoint |
+| `ROBINHOOD_RPC_URL` | Server-only provider endpoint; configure a dedicated provider for production. The public mainnet endpoint is the development fallback. |
 
 Use ignored local environment files or your host's secret/configuration facility for actual values. Do not commit provider credentials, user identities, wallet keys or local database state. The server needs no wallet private key: signing happens in the browser wallet.
+
+[Robinhood recommends Alchemy for production](https://docs.robinhood.com/chain/connecting/) and describes its public RPC as rate-limited. Create a Robinhood Chain **mainnet** app (chain ID 4663), store its full HTTPS endpoint as the secret `ROBINHOOD_RPC_URL`, and redeploy to apply the setting. Do not expose it through a `NEXT_PUBLIC_*` variable or commit a populated endpoint. Keep historical block access enabled for deployment verification and recovery. Check the provider's plan limits and usage before opening access broadly. The application uses this endpoint only for allowlisted reads and simulations; users still sign and submit transactions through their wallets.
 
 Application identity comes from the verified wallet session in [`lib/wallet-auth.ts`](../lib/wallet-auth.ts). Never trust browser-supplied `oai-*` identity headers. Deploy the wallet challenge/session migration before serving this release. Cookies are host-only, HttpOnly and Secure; local browser tests use a trustworthy localhost origin. Wallet sign-in authenticates an address, while live routes separately enforce exact owner matching and onchain account verification.
 

@@ -108,10 +108,12 @@ void test("only identical in-flight calls coalesce; completed responses are neve
   const a = reader(endpoint, "eth_call", [{ from: "ownerA", data: "0x01" }, "latest"]);
   const b = reader(endpoint, "eth_call", [{ from: "ownerA", data: "0x01" }, "latest"]);
   assert.equal(a, b);
+  await Promise.resolve();
   assert.equal(calls, 1);
   resolve(ok("first"));
   await a;
   const c = reader(endpoint, "eth_call", [{ from: "ownerA", data: "0x01" }, "latest"]);
+  await Promise.resolve();
   assert.equal(calls, 2);
   resolve(ok("fresh"));
   assert.equal(await c, "fresh");
@@ -149,4 +151,104 @@ void test("pending receipt null is valid, malformed response is not retried", as
   assert.equal(await f.reader(endpoint, "eth_getTransactionReceipt", ["0xhash"]), null);
   await assert.rejects(f.reader(endpoint, "eth_chainId", []), /Invalid response/);
   assert.equal(f.calls(), 2);
+});
+
+async function settle() {
+  // Drain promise continuations without real waiting or network requests.
+  for (let i = 0; i < 30; i++) await Promise.resolve();
+}
+function controlled() {
+  let time = 0;
+  const requests: { url: string; at: number; resolve: (r: Response) => void }[] = [];
+  const sleepers: { due: number; resolve: () => void }[] = [];
+  const reader = createRpcReader({
+    now: () => time,
+    random: () => 0,
+    sleep: (ms) => new Promise<void>((resolve) => sleepers.push({ due: time + ms, resolve })),
+    fetcher: ((url) => new Promise<Response>((resolve) => {
+      requests.push({ url: typeof url === 'string' ? url : url instanceof URL ? url.href : url.url, at: time, resolve });
+    })) as typeof fetch,
+  });
+  const advance = async (ms: number) => {
+    time += ms;
+    for (let i = sleepers.length - 1; i >= 0; i--) {
+      if (sleepers[i].due <= time) sleepers.splice(i, 1)[0].resolve();
+    }
+    await settle();
+  };
+  return { reader, requests, advance };
+}
+void test("twelve distinct reads never exceed three active requests and all complete", async () => {
+  const f = controlled();
+  const work = Array.from({ length: 12 }, (_, i) => f.reader(endpoint, "eth_getBalance", [i, "latest"]));
+  await settle();
+  assert.equal(f.requests.length, 3);
+  for (let i = 0; i < 12; i++) {
+    assert.equal(f.requests.length, Math.min(12, i + 3));
+    f.requests[i].resolve(ok(i));
+    await settle();
+  }
+  assert.deepEqual(await Promise.all(work), Array.from({ length: 12 }, (_, i) => i));
+});
+void test("429 cooldown blocks queued first attempts and concurrent retries until Retry-After", async () => {
+  const f = controlled();
+  const work = Array.from({ length: 4 }, (_, i) => f.reader(endpoint, "eth_getBalance", [i, "latest"]));
+  await settle();
+  f.requests[0].resolve(new Response(null, { status: 429, headers: { "retry-after": "1" } }));
+  f.requests[1].resolve(ok("b"));
+  f.requests[2].resolve(ok("c"));
+  await settle();
+  assert.equal(f.requests.length, 3);
+  await f.advance(999);
+  assert.equal(f.requests.length, 3);
+  await f.advance(1);
+  assert.equal(f.requests.length, 5);
+  assert.ok(f.requests.slice(3).every((r) => r.at >= 1000));
+  f.requests[3].resolve(ok("fresh"));
+  f.requests[4].resolve(ok("fresh"));
+  assert.deepEqual(await Promise.all(work), ["fresh", "b", "c", "fresh"]);
+});
+void test("persistent 429 rejects the whole twelve-read fanout after the first three responses", async () => {
+  const f = controlled();
+  const work = Promise.allSettled(Array.from({ length: 12 }, (_, i) =>
+    f.reader(endpoint, "eth_getBalance", [i, "latest"])));
+  await settle();
+  for (const request of f.requests) request.resolve(new Response(null, { status: 429 }));
+  await settle();
+  await f.advance(2000);
+  const results = await work;
+  assert.equal(f.requests.length, 3);
+  assert.ok(results.every((r) => r.status === "rejected" && r.reason instanceof RpcReadError && r.reason.upstreamStatus === 429));
+});
+void test("shared 429 retry budget remains exhausted even after an unrelated read succeeds", async () => {
+  const f = fake([
+    new Response(null, { status: 429 }), ok("first"),
+    new Response(null, { status: 429 }), ok("second"),
+    new Response(null, { status: 429 }),
+  ]);
+  assert.equal(await f.reader(endpoint, "eth_getBalance", [1]), "first");
+  assert.equal(await f.reader(endpoint, "eth_getBalance", [2]), "second");
+  await assert.rejects(f.reader(endpoint, "eth_getBalance", [3]), (e: unknown) => e instanceof RpcReadError && e.upstreamStatus === 429);
+  await assert.rejects(f.reader(endpoint, "eth_getBalance", [4]), (e: unknown) => e instanceof RpcReadError && e.upstreamStatus === 429);
+  assert.equal(f.calls(), 5);
+});
+void test("long cooldown stops later reads to that endpoint but not another endpoint or request scope", async () => {
+  const f = fake([new Response(null, { status: 429, headers: { "retry-after": "30" } }), ok("other")]);
+  await assert.rejects(f.reader(endpoint, "eth_chainId", []), RpcReadError);
+  await assert.rejects(f.reader(endpoint, "eth_getCode", ["owner", "latest"]), RpcReadError);
+  assert.equal(f.calls(), 1);
+  assert.equal(await f.reader("https://other.example/rpc", "eth_chainId", []), "other");
+  const next = fake([ok("new inbound request")]);
+  assert.equal(await next.reader(endpoint, "eth_chainId", []), "new inbound request");
+});
+void test("time spent queued counts toward the ten-second read budget", async () => {
+  const f = controlled();
+  const work = Promise.allSettled(Array.from({ length: 4 }, (_, i) =>
+    f.reader(endpoint, "eth_getBalance", [i, "latest"])));
+  await settle();
+  await f.advance(10000);
+  for (const request of f.requests) request.resolve(ok());
+  const results = await work;
+  assert.equal(f.requests.length, 3);
+  assert.equal(results[3].status, "rejected");
 });

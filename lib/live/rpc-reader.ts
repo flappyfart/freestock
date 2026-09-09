@@ -69,6 +69,37 @@ export function createRpcReader(options: Options = {}) {
   const sleep = options.sleep ?? ((ms) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   const random = options.random ?? Math.random;
   const inflight = new Map<string, Promise<unknown>>();
+  // These limits live only for this inbound request, never across Worker requests.
+  const endpoints = new Map<string, { cooldownUntil: number; limited: number; blocked: boolean }>();
+  let active = 0;
+  const waiting: (() => void)[] = [];
+  async function acquire(deadline: number) {
+    if (now() >= deadline) throw unavailable();
+    if (active < 3) {
+      active++;
+      return;
+    }
+    await new Promise<void>((resolve, reject) => {
+      const grant = () => {
+        clearTimeout(timer);
+        if (now() >= deadline) reject(unavailable());
+        else {
+          active++;
+          resolve();
+        }
+      };
+      const timer = setTimeout(() => {
+        const index = waiting.indexOf(grant);
+        if (index >= 0) waiting.splice(index, 1);
+        reject(unavailable());
+      }, Math.max(0, deadline - now()));
+      waiting.push(grant);
+    });
+  }
+  function release() {
+    active--;
+    while (active < 3 && waiting.length) waiting.shift()!();
+  }
   const report = (event: RpcDiagnostic) => {
     // Only fixed method/status metadata is reported: no URL, key, payload, response body, or wallet.
     try {
@@ -77,10 +108,22 @@ export function createRpcReader(options: Options = {}) {
       /* Diagnostics must not affect a read. */
     }
   };
-  async function perform(endpoint: string, method: string, body: string) {
-    const started = now();
+  async function perform(endpoint: string, method: string, body: string, deadline: number) {
+    let state = endpoints.get(endpoint);
+    if (!state) {
+      state = { cooldownUntil: 0, limited: 0, blocked: false };
+      endpoints.set(endpoint, state);
+    }
     for (let attempt = 1; attempt <= 3; attempt++) {
-      const remaining = 10000 - (now() - started);
+      // Every read (including queued first attempts) observes the same provider cooldown.
+      while (true) {
+        if (state.blocked) throw unavailable(429);
+        const delay = state.cooldownUntil - now();
+        if (delay <= 0) break;
+        if (now() + delay >= deadline) throw unavailable(429);
+        await sleep(delay);
+      }
+      const remaining = deadline - now();
       if (remaining <= 0) throw unavailable();
       const signal = AbortSignal.timeout(Math.min(4000, remaining));
       let response: Response;
@@ -96,7 +139,7 @@ export function createRpcReader(options: Options = {}) {
       } catch {
         report({ method, attempt, kind: "network" });
         const delay = 300 * 2 ** (attempt - 1) + Math.floor(random() * 150);
-        if (attempt === 3 || now() - started + delay >= 10000) throw unavailable();
+        if (attempt === 3 || now() + delay >= deadline) throw unavailable();
         await sleep(delay);
         continue;
       }
@@ -111,20 +154,29 @@ export function createRpcReader(options: Options = {}) {
           ...(delayHint === undefined ? {} : { retryAfterMs: delayHint }),
           ...(/^[a-zA-Z0-9-]{1,80}$/.test(rawRay ?? "") ? { ray: rawRay! } : {}),
         });
-        // Release the failed response body. Do not parse or expose gateway HTML or credentials.
-        await response.body?.cancel().catch(() => undefined);
         const delay = Math.max(
           delayHint ?? 0,
           300 * 2 ** (attempt - 1) + Math.floor(random() * 150),
         );
+        if (response.status === 429) {
+          state.limited++;
+          state.cooldownUntil = Math.max(state.cooldownUntil, now() + delay);
+          // Two retry opportunities for the endpoint, not two for every fan-out read.
+          // A long provider cooldown ends this inbound operation without retrying early.
+          if (state.limited >= 3 || delay > 2000) state.blocked = true;
+        }
+        // Release the failed response body. Do not parse or expose gateway HTML or credentials.
+        await response.body?.cancel().catch(() => undefined);
         if (
           !TRANSIENT_HTTP.has(response.status) ||
           attempt === 3 ||
           delay > 2000 ||
-          now() - started + delay >= 10000
+          state.blocked ||
+          now() + delay >= deadline
         )
           throw unavailable(response.status);
-        await sleep(delay);
+        // 429 retries wait at the shared gate, which can also extend while we sleep.
+        if (response.status !== 429) await sleep(delay);
         continue;
       }
       let data: { id?: unknown; error?: unknown; result?: unknown };
@@ -163,7 +215,15 @@ export function createRpcReader(options: Options = {}) {
     const key = endpoint + "\n" + body;
     const prior = inflight.get(key);
     if (prior) return prior;
-    const request = perform(endpoint, method, body);
+    const deadline = now() + 10000;
+    const request = (async () => {
+      await acquire(deadline);
+      try {
+        return await perform(endpoint, method, body, deadline);
+      } finally {
+        release();
+      }
+    })();
     inflight.set(key, request);
     // Both outcomes evict the request. No stale quote, balance or prepared transaction cache.
     void request.then(
