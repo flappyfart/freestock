@@ -20,10 +20,13 @@ The stack is React + TypeScript on Vinext/Vite, with a Worker backend and D1. [`
 
 ## Runtime configuration
 
-| Setting             | Purpose                                                                   |
-| ------------------- | ------------------------------------------------------------------------- |
-| `DB`                | D1 binding used for simulation and saved live history                     |
-| `ROBINHOOD_RPC_URL` | Server-only provider endpoint; configure a dedicated provider for production. The public mainnet endpoint is the development fallback. |
+| Setting                  | Purpose                                                                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `DB`                     | D1 binding used for simulation and saved live history                                                                                  |
+| `ROBINHOOD_RPC_URL`      | Server-only provider endpoint; configure a dedicated provider for production. The public mainnet endpoint is the development fallback. |
+| `AGENT_MONITOR_TOKEN`    | Secret used by the protected scheduled-monitor endpoint and its GitHub Actions caller.                                                 |
+| `PUSH_VAPID_PUBLIC_KEY`  | Stable public P-256 Web Push key, exposed only for browser subscription.                                                               |
+| `PUSH_VAPID_PRIVATE_KEY` | Secret corresponding Web Push signing key; server-only, never wallet authority.                                                        |
 
 Use ignored local environment files or your host's secret/configuration facility for actual values. Do not commit provider credentials, user identities, wallet keys or local database state. The server needs no wallet private key: signing happens in the browser wallet.
 

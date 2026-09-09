@@ -64,7 +64,7 @@ Plans and the latest 100 decisions per position are stored in D1 under the authe
 | D1 `live_transactions`              | Reconciled transaction records                                         | Saved history, not a custody ledger                                                |
 | D1 `accounts`, `commands`           | Legacy prize-model records                                             | Retained compatibility data; old command endpoint retired                          |
 | Browser local storage               | Account references, lending plans and transaction journal              | Device-local; not authoritative chain state                                        |
-| Browser memory                      | Current quotes and reviews                    | Temporary session state                                                            |
+| Browser memory                      | Current quotes and reviews                                             | Temporary session state                                                            |
 | Owner wallet                        | Keys and transaction authorization                                     | Never stored by the backend                                                        |
 
 The [D1 migrations](../drizzle) define the persisted schema. [`earn-engine.ts`](../lib/earn-engine.ts) uses integer/BigInt accounting for the simulation. [`earn-store.ts`](../lib/earn-store.ts) combines command idempotency and version checks to avoid duplicated or conflicting simulation updates. Simulation command bodies are limited to 4 KB. The model's rates, stock prices and leveraged-LP outcomes are illustrative; they do not execute transactions or model all real costs.
@@ -127,3 +127,9 @@ Migration `0004` adds `agent_plans`, `agent_decisions` and `service_checks`. Pla
 - `POST /api/internal/agent-monitor`: secret-authenticated read-only scheduler. Cannot prepare arbitrary caller-supplied actions or sign/send transactions.
 
 The application displays only completed saved decisions. An expired quote, changed allocation, stale source, excessive fees or changed plan stops the recommendation. Wallet approval remains separate from plan configuration.
+
+## Purchase-ready notifications
+
+The current application includes an opt-in, wallet-scoped alert inbox and optional browser Web Push. `purchase-alert-store.ts` creates durable alerts atomically with successfully applied recommendation decisions. `purchase-push.ts` manages versioned subscriptions and a leased, bounded outbox. The monitor sends encrypted, generic notifications to supported browser push services. These notifications do not authorize spending or carry executable quotes.
+
+The `/api/live/alerts` route uses the existing authenticated wallet and same-origin mutation checks. The browser polls inbox data separately from the plan editor, so alerts do not overwrite drafts or interrupt transaction review. `public/freestock-push.js` handles notifications and a fixed same-origin click destination; it does not cache pages or intercept financial API requests. Details, retry limits, privacy boundaries and deployment keys are in [Agentic Lending operations](AGENTIC-LENDING-OPERATIONS.md#purchase-ready-alerts-and-browser-push).

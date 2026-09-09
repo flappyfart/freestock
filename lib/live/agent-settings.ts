@@ -9,6 +9,7 @@ export type AgentSettings = {
   version: 1;
   plan: AgentPlan;
   monitoring: boolean;
+  purchaseAlerts: boolean;
   intervalMinutes: 15 | 60 | 360;
   maximumPurchase: string;
   maximumCostBps: number;
@@ -17,6 +18,7 @@ export const defaultAgentSettings: AgentSettings = {
   version: 1,
   plan: structuredClone(defaultAgentPlan),
   monitoring: false,
+  purchaseAlerts: false,
   intervalMinutes: 60,
   maximumPurchase: '25000000',
   maximumCostBps: 500,
@@ -28,6 +30,7 @@ export function validateAgentSettings(value: unknown): AgentSettings {
   if (
     s.version !== 1 ||
     typeof s.monitoring !== 'boolean' ||
+    (s.purchaseAlerts !== undefined && typeof s.purchaseAlerts !== 'boolean') ||
     ![15, 60, 360].includes(s.intervalMinutes) ||
     typeof s.maximumPurchase !== 'string' ||
     !/^\d{1,78}$/.test(s.maximumPurchase) ||
@@ -52,6 +55,7 @@ export function validateAgentSettings(value: unknown): AgentSettings {
     version: 1,
     plan,
     monitoring: s.monitoring,
+    purchaseAlerts: s.purchaseAlerts ?? false,
     intervalMinutes: s.intervalMinutes,
     maximumPurchase: BigInt(s.maximumPurchase).toString(),
     maximumCostBps: s.maximumCostBps,

@@ -6,6 +6,10 @@ import {
   validMonitorToken,
 } from '../../../../lib/live/agent-monitor';
 import { checkAgentPlan } from '../../../../lib/live/agent-service';
+import {
+  deliverPurchasePush,
+  pushConfig,
+} from '../../../../lib/live/purchase-push';
 export async function POST(request: Request) {
   if (
     !(await validMonitorToken(
@@ -19,7 +23,11 @@ export async function POST(request: Request) {
       result = await runMonitor(database, (s) =>
         checkAgentPlan(database, s, 'background'),
       );
-    return json(result, result.failed ? 503 : 200);
+    const push = await deliverPurchasePush(
+      database,
+      pushConfig(env as unknown as Record<string, unknown>),
+    );
+    return json({ ...result, push }, result.failed || push.failed ? 503 : 200);
   } catch {
     return json(
       { error: 'Monitoring could not complete. No transaction was sent.' },

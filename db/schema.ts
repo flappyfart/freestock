@@ -179,3 +179,58 @@ export const serviceChecks = sqliteTable('service_checks', {
   status: text('status').notNull(),
   details: text('details').notNull(),
 });
+
+// Alerts contain historical evidence, never executable quotes or spending permission.
+export const purchaseAlerts = sqliteTable(
+  'purchase_alerts',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    wallet: text('wallet').notNull(),
+    account: text('account').notNull(),
+    deployment: text('deployment').notNull(),
+    revision: integer('revision').notNull(),
+    assets: text('assets').notNull(),
+    allocations: text('allocations').notNull(),
+    createdAt: integer('created_at').notNull(),
+    confirmedAt: integer('confirmed_at').notNull(),
+    readAt: integer('read_at'),
+    closedAt: integer('closed_at'),
+  },
+  (t) => [
+    index('idx_purchase_alerts_owner_time').on(t.userId, t.wallet, t.createdAt),
+  ],
+);
+
+// Push endpoints and subscription keys are private capability data.
+export const pushSubscriptions = sqliteTable(
+  'push_subscriptions',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    wallet: text('wallet').notNull(),
+    subscription: text('subscription').notNull(),
+    version: text('version').notNull(),
+    createdAt: integer('created_at').notNull(),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (t) => [index('idx_push_subscriptions_owner').on(t.userId, t.wallet)],
+);
+
+export const pushDeliveries = sqliteTable(
+  'push_deliveries',
+  {
+    alertId: text('alert_id').notNull(),
+    subscriptionId: text('subscription_id').notNull(),
+    subscriptionVersion: text('subscription_version').notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    nextAttemptAt: integer('next_attempt_at').notNull(),
+    leaseToken: text('lease_token'),
+    leaseUntil: integer('lease_until').notNull().default(0),
+    status: text('status').notNull().default('pending'),
+  },
+  (t) => [
+    primaryKey({ columns: [t.alertId, t.subscriptionId] }),
+    index('idx_push_deliveries_due').on(t.status, t.nextAttemptAt),
+  ],
+);

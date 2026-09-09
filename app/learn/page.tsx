@@ -150,6 +150,21 @@ export default function Page() {
               </p>
             </section>
             <section id="timing">
+              <h2>Let your plan notify you.</h2>
+              <p>
+                Turn on Purchase-ready alerts in your saved Agentic Lending
+                plan. You’ll get an inbox alert when a check finds that your
+                purchase rules are met. Enable background checks to keep
+                checking while you’re away. In the dashboard’s Alerts popup, you
+                can also enable browser notifications, including when Freestock
+                is closed on supported browsers.
+              </p>
+              <p>
+                Checks run on a schedule and can be delayed. Open your alert,
+                check the plan again and review the purchase. Your wallet still
+                approves every transaction. On iPhone or iPad, add Freestock to
+                your Home Screen to enable browser notifications.
+              </p>
               <h2>Balances update. Purchases need your approval.</h2>
               <p>
                 The dashboard refreshes position balances while you are viewing

@@ -236,6 +236,7 @@ export function AgenticLending({
       if (currentKey.current !== captured || controller.signal.aborted) return;
       setSaved(data.saved);
       setHistory(data.history);
+      window.dispatchEvent(new Event('freestock:alerts-changed'));
       setQuote(data.quote ?? null);
       setNow(Date.now());
       if (kind === 'save') {
@@ -318,6 +319,20 @@ export function AgenticLending({
     }
   }
   const canManage = !!owner && !!account && enabled && loaded;
+  useEffect(() => {
+    const open = () => {
+      if (working) return;
+      if (dirty)
+        setMessage(
+          'Save your edits or reload the saved plan, then choose Check now for a fresh purchase review.',
+        );
+      else void loadPlan().catch((e) => setError(e.message));
+    };
+    window.addEventListener('freestock:open-agent-plan', open);
+    return () => window.removeEventListener('freestock:open-agent-plan', open);
+    // Explicit navigation refreshes saved evidence without overwriting unsaved settings.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, dirty, working]);
   return (
     <section className="agentic-workspace" aria-label="Agentic Lending">
       <div className="agentic-mode">
@@ -517,6 +532,31 @@ export function AgenticLending({
             Checks are queued and may run later than your preferred interval.
             They never move funds. Open this page for decisions and fresh
             purchase quotes.
+          </p>
+          <label>
+            Purchase-ready alerts
+            <select
+              disabled={working}
+              value={settings.purchaseAlerts ? 'on' : 'off'}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  purchaseAlerts: e.target.value === 'on',
+                })
+              }
+            >
+              <option value="off">Off</option>
+              <option value="on">
+                On · notify me when my purchase rules are met
+              </option>
+            </select>
+          </label>
+          <p className="agentic-note">
+            Alerts are saved in your dashboard inbox. Enable background checks
+            above to receive them while you’re away, and enable browser
+            notifications in Alerts for this device. A fresh check and wallet
+            approval are required before buying. Repeated ready checks won’t
+            send repeated alerts.
           </p>
           {formError && (
             <p className="agentic-error" role="alert">

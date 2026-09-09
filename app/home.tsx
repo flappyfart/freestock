@@ -84,7 +84,7 @@ export default function Home() {
               <dl>
                 <dt>Total deposits</dt>
                 <dd>
-                  <data value="4201.28">$4,201.28</data>
+                  <data value="6282.99">$6,282.99</data>
                 </dd>
               </dl>
               <p>
@@ -136,6 +136,11 @@ export default function Home() {
               Know when to wait, keep gains invested or review a stock purchase.
               Freestock checks your position against your plan and shows the
               reason for every recommendation.
+            </p>
+            <p>
+              Turn on purchase-ready alerts. Get a saved inbox alert and, if you
+              opt in, a browser notification when your plan meets its purchase
+              rules. Return for a fresh check and approve with your wallet.
             </p>
             <Link href="/dashboard?view=agentic" className="earn-button">
               Explore Agentic Lending <ArrowUpRight size={18} />

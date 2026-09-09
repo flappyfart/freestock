@@ -31,6 +31,7 @@ import { StockLendingMarkets } from '../stock-lending-markets';
 import { MarketDirectory } from '../market-directory';
 import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from '../../lib/live/config';
 import { AgenticLending } from './agentic-lending';
+import { PurchaseAlerts } from './purchase-alerts';
 import { PortfolioHistory } from './portfolio-history';
 import {
   type AgentIntent,
@@ -459,6 +460,28 @@ export default function LiveWorkspace({
         </div>
       </aside>
       <div className="dashboard-main" id={`${workspaceId}-content`}>
+        {walletReady && (
+          <PurchaseAlerts
+            key={pilotScope}
+            owner={connected!}
+            blocked={hasRecovery}
+            onPlan={(alert) => {
+              if (hasRecovery) return;
+              if (
+                alert &&
+                activePilot?.account?.account.toLowerCase() !==
+                  alert.account.toLowerCase()
+              ) {
+                window.location.assign(
+                  `/dashboard?view=agentic&deployment=${encodeURIComponent(alert.deployment)}`,
+                );
+              } else {
+                window.dispatchEvent(new Event('freestock:open-agent-plan'));
+                navigate('agentic');
+              }
+            }}
+          />
+        )}
         <button
           type="button"
           className="dashboard-mobile-menu"

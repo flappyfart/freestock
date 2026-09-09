@@ -28,7 +28,8 @@ Freestock brings USDG lending, stock selections, rule-based lending recommendati
 | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | USDG lending                                      | One configured vault through wallet-approved V2 accounts with no Freestock deposit cap                           |
 | Stock purchases                                   | NVDA, AAPL, TSLA, GOOGL and SPY; single stock or basket                                                          |
-| Agentic Lending                                   | Saved plans, scheduled monitoring, fee limits, durable decisions and wallet-approved purchases               |
+| Agentic Lending                                   | Saved plans, scheduled monitoring, fee limits, durable decisions and wallet-approved purchases                   |
+| Purchase-ready alerts                             | Opt-in durable inbox and browser Web Push; scheduled checks, fresh review and wallet approval required           |
 | Compounding                                       | Reserve available gains by increasing the principal baseline; vault returns already accrue while shares are held |
 | Withdrawal                                        | Full exit in the primary interface; the contract also supports partial withdrawal                                |
 | Portfolio Activity                                | Saved account references, pending/confirmed transaction tracking, bounded history import and exports             |

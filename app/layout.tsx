@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description:
     'Lend USDG on Robinhood Chain and put available gains toward stock tokens you choose. Get Agentic Lending recommendations and approve every transaction in your wallet.',
   applicationName: 'Freestock',
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: [
       { url: '/brand/fs-icon.png', type: 'image/png', sizes: '1254x1254' },

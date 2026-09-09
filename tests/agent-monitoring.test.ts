@@ -32,6 +32,12 @@ function fixture() {
       'utf8',
     ),
   );
+  sql.exec(
+    readFileSync(
+      new URL('../drizzle/0005_slimy_smiling_tiger.sql', import.meta.url),
+      'utf8',
+    ),
+  );
   function statement(
     query: string,
     values: unknown[] = [],

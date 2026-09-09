@@ -42,6 +42,7 @@ export default function Page() {
               ['pricing', 'Quotes and fees'],
               ['agentic-lending', 'Agentic Lending'],
               ['agent-monitoring', 'Monitoring and limits'],
+              ['purchase-alerts', 'Purchase-ready alerts'],
               ['storage', 'Activity and recovery'],
               ['market-data', 'Lending market data'],
               ['stock-lending', 'Stock lending'],
@@ -317,6 +318,47 @@ export default function Page() {
                 position. Manual checks are limited to one completed check per
                 30 seconds. Failed checks retry with a delay. Monitoring neither
                 signs transactions nor switches lending pools.
+              </p>
+            </section>
+            <section id="purchase-alerts">
+              <h2>Purchase-ready alerts</h2>
+              <p>
+                In Agentic Lending, turn on Purchase-ready alerts and save the
+                plan. Turn on Check while you’re away for scheduled checks when
+                the site is closed. A successful purchase recommendation adds a
+                private, dated alert to your dashboard inbox. Consecutive ready
+                checks update that alert without repeatedly notifying you. A
+                later successful check that no longer meets the rules ends that
+                alert; readiness can then create a new one. Temporary read
+                failures do not generate new alerts.
+              </p>
+              <p>
+                Open Alerts in your dashboard and choose Enable browser alerts
+                to opt in on a supported browser. Allow the browser’s permission
+                prompt. The notification contains no balances, stock picks or
+                wallet addresses. This browser is linked to the connected
+                wallet; explicitly enabling another wallet replaces that link.
+                You can turn notifications off in Alerts or browser settings. Up
+                to five browsers can be linked to one wallet.
+              </p>
+              <p>
+                On iPhone and iPad, add Freestock to your Home Screen and open
+                it there before enabling notifications. Browser settings,
+                operating-system delivery and the scheduled checking queue can
+                delay or suppress notifications. This is not an instant price
+                alert or guaranteed delivery service. Enabling browser
+                notifications applies to future ready alerts, not earlier inbox
+                entries.
+              </p>
+              <p>
+                An alert is historical evidence, not an order or reusable quote.
+                Open the plan, select Check now, then Review purchase if its
+                current rules still pass. Every purchase needs wallet approval.
+                Editing, pausing, disabling alerts or removing a plan
+                invalidates its outstanding alerts and queued notifications. A
+                notification already accepted by a browser provider may still
+                arrive. The inbox displays the latest 50 alerts across the
+                wallet and retains up to 100 per position.
               </p>
             </section>
             <section id="storage">

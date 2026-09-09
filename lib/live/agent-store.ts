@@ -5,6 +5,7 @@ import {
   type CostEstimate,
 } from './agent-settings.ts';
 import type { AgentDecision } from './agentic-lending.ts';
+import { alertFinishStatements } from './purchase-alert-store.ts';
 
 type Statement = {
   bind(...values: unknown[]): Statement;
@@ -119,6 +120,12 @@ export function createAgentStore(
       throw new AgentStoreError(
         'This plan changed on another device. Reload it before saving again.',
       );
+    await db
+      .prepare(
+        `UPDATE purchase_alerts SET closed_at=? WHERE ${where} AND revision<? AND closed_at IS NULL AND EXISTS(SELECT 1 FROM agent_plans WHERE ${where} AND revision=?)`,
+      )
+      .bind(now, ...values(s), result.revision, ...values(s), result.revision)
+      .run();
     return get(s);
   }
   async function history(s: AgentScope) {
@@ -174,6 +181,7 @@ export function createAgentStore(
       ? Math.min(3600, 60 * 2 ** failures)
       : s.settings.intervalMinutes * 60;
     await db.batch([
+      ...alertFinishStatements(db, s, token, decision, id, now),
       db
         .prepare(
           `INSERT INTO agent_decisions(id,user_id,wallet,account,revision,source,decision,created_at) SELECT ?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM agent_plans WHERE ${where} AND revision=? AND lease_token=?)`,
@@ -236,6 +244,16 @@ export function createAgentStore(
       db
         .prepare(
           `DELETE FROM agent_decisions WHERE ${where} AND EXISTS(SELECT 1 FROM agent_plans WHERE ${where} AND lease_token=?)`,
+        )
+        .bind(...values(s), ...values(s), token),
+      db
+        .prepare(
+          `DELETE FROM push_deliveries WHERE alert_id IN (SELECT id FROM purchase_alerts WHERE ${where}) AND EXISTS(SELECT 1 FROM agent_plans WHERE ${where} AND lease_token=?)`,
+        )
+        .bind(...values(s), ...values(s), token),
+      db
+        .prepare(
+          `DELETE FROM purchase_alerts WHERE ${where} AND EXISTS(SELECT 1 FROM agent_plans WHERE ${where} AND lease_token=?)`,
         )
         .bind(...values(s), ...values(s), token),
       db

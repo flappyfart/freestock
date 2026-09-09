@@ -26,10 +26,10 @@ The dashboard shows Running only with a recent successful heartbeat (45 minutes)
 
 Read-only Chainlink proxy inputs on Robinhood Chain, chain ID 4663:
 
-| Feed | Address | Published heartbeat |
-| --- | --- | --- |
-| ETH / USD | `0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9` | 86,400 seconds |
-| USDG / USD | `0x61B7e5650328764B076A108EFF5fa7282a1B9aD2` | 86,400 seconds |
+| Feed       | Address                                      | Published heartbeat |
+| ---------- | -------------------------------------------- | ------------------- |
+| ETH / USD  | `0x78F3556b67E17Df817D51Ef5a990cDaF09E8d3A9` | 86,400 seconds      |
+| USDG / USD | `0x61B7e5650328764B076A108EFF5fa7282a1B9aD2` | 86,400 seconds      |
 
 Configuration was checked against the [Chainlink directory](https://reference-data-directory.vercel.app/feeds-robinhood-mainnet.json) on 9 September 2026. [Robinhood oracle documentation](https://docs.robinhood.com/chain/oracles-and-price-feeds/) describes feed handling.
 
@@ -51,3 +51,19 @@ Managed D1 backup retention and restore access have **not been verified for this
 - An owner-approved account creation, 1 USDG deposit and full withdrawal were verified onchain on 9 September 2026. A funded stock conversion is still unverified.
 - Validate a small number of real users before expanding: wallet connection, account restoration, saving/reloading a plan, understanding wait decisions, actual fee comparison, and withdrawal recovery. No participants have been contacted.
 - Fully unattended purchases require a new opt-in contract permission design, independently bounded stock pricing, a funded executor, revocation/expiry and a separately verified funded lifecycle.
+
+## Purchase-ready alerts and browser push
+
+Alerts are opt-in per saved plan (`purchaseAlerts`, default false for existing plans). `purchase-alert-store.ts` adds an alert inside the same D1 batch that accepts a decision and releases its plan lease. Only a successful stock `review` decision creates an alert. Consecutive ready checks update its evidence time without resetting read state or creating additional notifications. Unavailable/stale/expired-quote checks do not rearm the episode. A confirmed not-ready state ends it. A saved plan revision change invalidates older alerts.
+
+`purchase_alerts` stores dated evidence and read state, never a reusable quote. The inbox displays 50 recent entries across the wallet, retaining up to 100 per position. `GET /api/live/alerts?owner=...` uses the existing wallet session; POST actions also require the same origin. Inbox polling does not change plan inputs or transaction quotes.
+
+Browser notifications need two opt-ins: purchase alerts in the plan, then Enable browser alerts in the dashboard Alerts popup. `push_subscriptions` stores private provider endpoints and keys, bound to the verified wallet. Explicitly enabling a different wallet replaces the browser binding and invalidates older queued deliveries. Subscription consent can outlive the seven-day wallet session; users can unsubscribe in Alerts or revoke browser permission. Endpoints and keys must never be logged, exposed by listing APIs or committed to Git. Up to five browsers are supported per wallet.
+
+Production uses `PUSH_VAPID_PUBLIC_KEY` and secret `PUSH_VAPID_PRIVATE_KEY` in Sites runtime settings. The private key is server-only and has no wallet authority. Keep the pair stable; rotation requires users to resubscribe. The contact URI is the public company website. `@block65/webcrypto-web-push` creates RFC 8291 encrypted payloads with RFC 8292 authentication. Only supported push-provider HTTPS endpoints are accepted; redirects are refused and each request has an eight-second timeout.
+
+The protected monitor endpoint drains at most six queued deliveries after each scheduled check batch. Manual-check alerts are visible immediately in the inbox, with browser delivery handled by a later monitor run. Each delivery has a lease and attempt token. Before sending, it rechecks the current plan revision, pause/alert settings, current readiness, browser binding and subscription version. Queued alerts expire after six hours; an accepted message has a 15-minute provider TTL. Temporary errors and HTTP 429 retry up to four attempts with bounded backoff. Expired subscriptions (404/410) are removed; configuration errors stop that delivery. A provider's successful HTTP response means accepted, not confirmed displayed.
+
+The network send cannot be atomic with a database update: a request accepted just before a timeout can be retried. Stable notification tags and Web Push topics reduce duplicate presentation; exactly-once delivery is not promised. A pause or unsubscribe cannot recall a message already accepted by a push provider. Lock-screen content is generic and includes no stock picks, amounts or wallet addresses. The push-only service worker opens a fixed same-origin dashboard inbox and never intercepts or caches wallet/API requests. Alerts never execute financial transactions.
+
+On iOS/iPadOS, users must add Freestock to the Home Screen and open it there before requesting push permission. Browser, OS and network settings can delay or prevent delivery. See [Apple Web Push](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/) and [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API).
