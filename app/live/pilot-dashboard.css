@@ -144,6 +144,61 @@
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
+.pd-budget {
+  margin-bottom: 24px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f2f6fc;
+  border: 1px solid var(--pd-border);
+}
+.pd-budget h4,
+.pd-quote-list h4 {
+  margin: 0 0 16px;
+  font-size: 15px;
+}
+.pd-budget dl,
+.pd-quote dl {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.pd-budget dl > div,
+.pd-quote dl > div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13px;
+}
+.pd-budget dt,
+.pd-quote dt {
+  color: var(--pd-muted);
+}
+.pd-budget dd,
+.pd-quote dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.pd-budget dl > div:last-child {
+  padding-top: 12px;
+  border-top: 1px solid var(--pd-border);
+  font-weight: 550;
+}
+.pd-quote-list {
+  margin-block: 24px;
+}
+.pd-quote {
+  padding-block: 16px;
+  border-top: 1px solid var(--pd-border);
+}
+.pd-quote > strong {
+  display: block;
+  margin-bottom: 12px;
+}
+.pd-confirmed > a {
+  margin-right: 20px;
+}
 .pd-position-actions,
 .pd-panel-actions {
   display: flex;

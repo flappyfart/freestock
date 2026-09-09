@@ -34,13 +34,13 @@ export default function Home() {
           <div className="home-hero-copy">
             <span className="earn-eyebrow">DEFI EARNINGS. YOUR STOCK PICKS.</span>
             <h1>
-              Your yield.
+              Keep lending.
               <br />
-              Your next <em>stock.</em>
+              Grow your <em>stocks.</em>
             </h1>
             <p>
-              Lend USDG. Let returns accumulate. Put available earnings toward NVIDIA, Apple, Tesla,
-              Alphabet or SPY Stock Tokens.
+              Put available USDG lending gains toward the stock tokens you choose. Build a portfolio
+              from your earnings.
             </p>
             <div className="home-hero-actions">
               {owner ? (
@@ -84,12 +84,10 @@ export default function Home() {
             <span className="home-stock-caption">Earnings, meet your stock picks.</span>
           </div>
         </section>
-        <HomePools />
         <section className="home-how" aria-labelledby="how-title">
           <div className="home-how-heading">
             <div>
-              <span className="earn-eyebrow">A CLEAR PATH</span>
-              <h2 id="how-title">One account. Three steps.</h2>
+              <h2 id="how-title">Your lending. Your stock picks. One clear flow.</h2>
             </div>
             <Link href="/learn" className="earn-link">
               How it works <ArrowUpRight size={17} />
@@ -98,42 +96,43 @@ export default function Home() {
           <ol>
             <li>
               <span className="home-step-number">01</span>
-              <h3>Connect & create</h3>
+              <h3>Put USDG to work</h3>
               <p>
-                Connect your wallet, then create or restore your lending account in the dashboard.
+                Connect your wallet and create a lending position. The pilot uses the Steakhouse
+                USDG vault on Robinhood Chain.
               </p>
             </li>
             <li>
               <span className="home-step-number">02</span>
-              <h3>Deposit & earn</h3>
+              <h3>Choose where gains go</h3>
               <p>
-                Supply USDG to the configured lending vault. Follow your position and available
-                gains in one place.
+                Pick NVIDIA, Apple, Tesla, Alphabet or SPY tokens. Split a purchase across a basket,
+                or keep gains in your lending position.
               </p>
             </li>
             <li>
               <span className="home-step-number">03</span>
-              <h3>Choose your stocks</h3>
+              <h3>Follow every purchase</h3>
               <p>
-                Use available gains for one stock or a basket, or reinvest them. Review each
-                transaction in your wallet.
+                See the available budget, estimated gas and minimum tokens before you approve.
+                Confirmed purchases link to their onchain receipt.
               </p>
             </li>
           </ol>
         </section>
         <section className="home-demo-invitation">
           <div>
-            <span className="earn-eyebrow">EXPLORE FIRST</span>
-            <h2>Get a feel for it.</h2>
+            <h2>Build your earnings plan.</h2>
             <p>
-              Try lending, model leveraged LPs, and see stock conversions or compounding with
-              simulated money.
+              Choose a lending scenario, pick your stocks and decide how much to reinvest. Explore
+              the results with simulated money before connecting a wallet.
             </p>
           </div>
           <DemoLink className="earn-button">
             Try it yourself <ArrowRight size={18} />
           </DemoLink>
         </section>
+        <HomePools />
       </div>
     </EarnShell>
   );

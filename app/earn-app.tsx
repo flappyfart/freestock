@@ -47,24 +47,49 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
   const total = value.allocation.reduce((n, a) => n + a.bps, 0);
   return (
     <div className="payout-picker">
-      <MechanicalSwitch
-        label="Auto-compound"
-        description={
-          value.compoundBps > 0
-            ? "Reinvest available earnings in this simulated position."
-            : "Send available earnings toward your stock picks."
-        }
-        checked={value.compoundBps > 0}
-        onChange={(checked) => change({ ...value, compoundBps: checked ? 10000 : 0 })}
-      />
-      {value.compoundBps > 0 && (
-        <MechanicalSwitch
-          label="Buy stocks too"
-          description="Split new earnings between compounding and stock purchases."
-          checked={split}
-          onChange={(checked) => change({ ...value, compoundBps: checked ? 5000 : 10000 })}
-        />
-      )}
+      <fieldset className="earn-destination">
+        <legend>Where should your earnings go?</legend>
+        {[
+          {
+            label: "Buy stocks",
+            description: "Build your stock portfolio",
+            bps: 0,
+            selected: value.compoundBps === 0,
+          },
+          {
+            label: "Reinvest",
+            description: "Grow this DeFi position",
+            bps: 10000,
+            selected: value.compoundBps === 10000,
+          },
+          {
+            label: "Split both",
+            description: "Stocks plus reinvestment",
+            bps: split ? value.compoundBps : 5000,
+            selected: split,
+          },
+        ].map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            aria-pressed={option.selected}
+            onClick={() =>
+              change({
+                ...value,
+                compoundBps: option.bps,
+                // Keep valid stock picks, but do not hide an unfinished basket that prevents saving.
+                allocation:
+                  option.bps === 10000 && total !== 10000
+                    ? [{ symbol: value.allocation[0]?.symbol ?? "NVDA", bps: 10000 }]
+                    : value.allocation,
+              })
+            }
+          >
+            <strong>{option.label}</strong>
+            <small>{option.description}</small>
+          </button>
+        ))}
+      </fieldset>
       {split && (
         <label>
           Reinvest into this position (%)
@@ -124,7 +149,7 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             </label>
           ) : (
             <fieldset className="basket-weights">
-              <legend>Split each stock purchase · {total / 100}% of 100%</legend>
+              <legend>Share of the stock-purchase budget · {total / 100}% of 100%</legend>
               {STOCKS.map((s) => (
                 <label key={s.symbol}>
                   <StockMark symbol={s.symbol} size={24} />
@@ -155,6 +180,8 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
               ))}
             </fieldset>
           )}
+          <EarningsPlan value={value} />
+          <h3 className="earn-setting-title">When should stocks be bought?</h3>
           <MechanicalSwitch
             label="Auto-convert"
             description={
@@ -176,14 +203,74 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                 value={value.threshold / 1e6}
                 onChange={(e) => change({ ...value, threshold: Number(e.target.value) * 1e6 })}
               />
+              <small>Wait until the earnings reserved for stocks reach this amount.</small>
             </label>
           )}
+          <details className="earn-cost-note">
+            <summary>Why wait before converting?</summary>
+            <p className="earn-small">
+              Larger, less frequent purchases can reduce fees as a share of your earnings. More
+              stocks can require more swaps. This simulation excludes gas, spread and trading fees;
+              its minimum is an amount threshold, not a cost check. Live purchases show a fresh
+              quote and ETH gas estimate for you to review.
+            </p>
+          </details>
+        </>
+      )}
+      {value.compoundBps === 10000 && (
+        <>
+          <EarningsPlan value={value} />
+          <p className="earn-small">
+            New earnings reinvest when you advance time. Any earnings already waiting from an
+            earlier plan stay available for a separate manual conversion or reinvestment.
+          </p>
         </>
       )}
       <p className="earn-small">
         Rules run when you advance the simulation. Compounding reinvests in DeFi; stock purchases
         use fixed illustrative prices. No background trading.
       </p>
+    </div>
+  );
+}
+function EarningsPlan({ value }: { value: Pick<Preferences, "allocation" | "compoundBps"> }) {
+  const valid =
+    value.compoundBps === 10000 || value.allocation.reduce((sum, a) => sum + a.bps, 0) === 10000;
+  return (
+    <div className="earn-plan-summary" aria-live="polite">
+      <strong>Your earnings plan</strong>
+      {valid ? (
+        <>
+          <dl>
+            {value.compoundBps < 10000 &&
+              value.allocation.map((a) => (
+                <div key={a.symbol}>
+                  <dt>{a.symbol} tokens</dt>
+                  <dd>
+                    {(((10000 - value.compoundBps) * a.bps) / 1e6).toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}
+                    %
+                  </dd>
+                </div>
+              ))}
+            {value.compoundBps > 0 && (
+              <div>
+                <dt>Reinvest in this position</dt>
+                <dd>{value.compoundBps / 100}%</dd>
+              </div>
+            )}
+          </dl>
+          <small>
+            Share of new simulated earnings after loss recovery, before conversion costs. These
+            percentages do not allocate your deposit.
+          </small>
+        </>
+      ) : (
+        <p className="earn-small">
+          Set your stock-purchase weights to a total of 100% to complete this plan.
+        </p>
+      )}
     </div>
   );
 }
@@ -228,12 +315,14 @@ function PositionCard({
           </strong>
         </div>
       </div>
+      <EarningsPlan value={p} />
       <p className="earn-small">
-        {p.compoundBps / 100}% reinvested · {100 - p.compoundBps / 100}% toward{" "}
-        {p.allocation.map((a) => `${a.symbol} ${a.bps / 100}%`).join(" / ")}
-        <br />
-        {p.auto ? `Auto-convert at ${money(p.threshold)} USDG` : "Manual stock conversion"} ·{" "}
-        {money(p.compounded)} USDG compounded
+        {p.compoundBps === 10000
+          ? "New earnings reinvest; previous pending earnings stay available"
+          : p.auto
+            ? `Auto-convert at ${money(p.threshold)} USDG`
+            : "Manual stock conversion"}{" "}
+        · {money(p.compounded)} USDG compounded
       </p>
       {p.lossCarry > 0 && (
         <p className="earn-warning">
@@ -636,6 +725,7 @@ export default function DemoWorkspace({
                   wallet. Auto-convert and leveraged LP options here are simulations.
                 </p>
 
+                <h3 className="earn-setting-title">How should your capital earn?</h3>
                 <fieldset className="earn-segment" aria-label="Position type" data-kind={kind}>
                   <button
                     type="button"
@@ -692,6 +782,14 @@ export default function DemoWorkspace({
                       <small>modeled net APR before price changes</small>
                     </div>
                   </>
+                )}
+                {kind === "lend" && market && (
+                  <p className="earn-small">
+                    {market.status === "live" ? "Live Morpho data" : "Saved Morpho snapshot"} ·
+                    observed{" "}
+                    {new Date(market.vault.asOf).toLocaleString("en-US", { timeZone: "UTC" })} UTC.
+                    This historical rate is held constant in your scenario.
+                  </p>
                 )}
                 <label>
                   Deposit amount (simulated USDG)

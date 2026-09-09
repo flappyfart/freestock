@@ -16,6 +16,7 @@ export type Prepared = {
     symbol: string;
     tokenOut: string;
     amountIn: string;
+    amountOut: string;
     minimumOut: string;
     fee: number;
     weightBps: number;
@@ -136,10 +137,13 @@ export function validatePrepared(
         !same(p.tokenOut, stock.address) ||
         !same(a[0][i], stock.address) ||
         a[1][i] !== 500n ||
+        p.fee !== Number(a[1][i]) ||
         a[2][i] !== BigInt(p.amountIn) ||
         a[2][i] <= 0n ||
         a[3][i] !== BigInt(p.minimumOut) ||
-        a[3][i] <= 0n
+        a[3][i] <= 0n ||
+        BigInt(p.amountOut) <= 0n ||
+        (BigInt(p.amountOut) * 9900n) / 10000n !== a[3][i]
       )
         throw Error("A basket leg differs from its reviewed amount, stock or minimum.");
       seen.add(stock.symbol);

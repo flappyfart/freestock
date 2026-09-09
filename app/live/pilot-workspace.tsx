@@ -21,6 +21,7 @@ import {
 } from "../../lib/live/account-reference";
 import { MechanicalSwitch } from "../mechanical-switch";
 import { EXPLORER_URL } from "../../lib/live/config";
+import { positionBudget } from "../../lib/live/position-budget";
 import "./pilot-dashboard.css";
 type Account = {
   account: string;
@@ -40,6 +41,8 @@ type Receipt = {
   hash: string;
   deployment?: string;
   account?: string;
+  block?: number;
+  confirmedAt?: string;
   events?: {
     name: string;
     assetAmount: string;
@@ -360,7 +363,11 @@ export default function PilotWorkspace({
     }
   })();
   const needsApproval = !!account && depositAmount > toInteger(account.allowance);
-  const hasPosition = !!account && toInteger(account.assetValue) > 0n;
+  const budget = account
+    ? positionBudget(toInteger(account.principal), toInteger(account.assetValue))
+    : null;
+  const hasPosition =
+    !!account && (toInteger(account.assetValue) > 0n || toInteger(account.principal) > 0n);
   const activeView = hasPosition ? actionView : "deposit";
   const actionBlocked = busy || !!pending || !!journal;
   const newActionBlocked = actionBlocked || !enabled;
@@ -443,13 +450,13 @@ export default function PilotWorkspace({
           </div>
           <div className="pd-balances">
             <div>
-              <span>Lending balance</span>
+              <span>Position balance</span>
               <strong>
                 {fmt(account.assetValue)} <small>USDG</small>
               </strong>
             </div>
             <div>
-              <span>Available gains</span>
+              <span>Available to convert</span>
               <strong>
                 {fmt(account.spendableWithRoundingBuffer)} <small>USDG</small>
               </strong>
@@ -465,6 +472,36 @@ export default function PilotWorkspace({
               <dd>{fmt(account.walletUsdg)} USDG</dd>
             </div>
           </dl>
+          {budget && (
+            <div className="pd-budget">
+              <h4>Your conversion budget</h4>
+              <dl>
+                <div>
+                  <dt>Value above your baseline</dt>
+                  <dd>{fmt(budget.surplus.toString())} USDG</dd>
+                </div>
+                <div>
+                  <dt>Rounding reserve</dt>
+                  <dd>−{fmt(budget.reserve.toString())} USDG</dd>
+                </div>
+                <div>
+                  <dt>Available for stock purchases</dt>
+                  <dd>{fmt(account.spendableWithRoundingBuffer)} USDG</dd>
+                </div>
+              </dl>
+              {budget.shortfall > 0n && (
+                <p className="pd-notice">
+                  Your position is {fmt(budget.shortfall.toString())} USDG below its baseline. This
+                  shortfall must recover before new gains become available to convert.
+                </p>
+              )}
+              <p className="pd-meta">
+                The position includes vault value and idle USDG. Direct transfers into this account
+                also count toward surplus. This is not a total of interest earned, and the baseline
+                does not guarantee your capital.
+              </p>
+            </div>
+          )}
           {hasPosition && (
             <div className="pd-position-actions">
               <button
@@ -716,12 +753,34 @@ export default function PilotWorkspace({
             <span className="pd-network">Your wallet approves</span>
           </div>
           <p>{plan.summary}</p>
-          {plan.purchases?.map((purchase) => (
-            <p key={purchase.symbol}>
-              {fmt(purchase.amountIn)} USDG → at least {fmt(purchase.minimumOut, 18)}{" "}
-              {purchase.symbol} tokens.
-            </p>
-          ))}
+          {!!plan.purchases?.length && (
+            <div className="pd-quote-list">
+              <h4>What your gains could buy</h4>
+              {plan.purchases.map((purchase) => (
+                <div className="pd-quote" key={purchase.symbol}>
+                  <strong>{purchase.symbol}</strong>
+                  <dl>
+                    <div>
+                      <dt>USDG spent</dt>
+                      <dd>{fmt(purchase.amountIn)}</dd>
+                    </div>
+                    <div>
+                      <dt>Estimated tokens received</dt>
+                      <dd>{fmt(purchase.amountOut, 18)}</dd>
+                    </div>
+                    <div>
+                      <dt>Minimum tokens received</dt>
+                      <dd>{fmt(purchase.minimumOut, 18)}</dd>
+                    </div>
+                  </dl>
+                  <p className="pd-meta">
+                    {purchase.fee / 10000}% pool fee included in the estimate. Minimum allows 1%
+                    less than the quote, rounded down.
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
           <p className="pd-meta">
             Estimated network fee: {fmt(plan.estimatedGasCostWei, 18)} ETH. Includes a 20% gas-limit
             buffer; your wallet shows the final fee. Gas is separate from USDG gains.
@@ -803,16 +862,32 @@ export default function PilotWorkspace({
       {receipt?.status === "confirmed" && (
         <div className="pd-confirmed" aria-live="polite">
           <strong>Confirmed on Robinhood Chain</strong>
+          {receipt.block && (
+            <p className="pd-meta">
+              Block {receipt.block.toLocaleString()}
+              {receipt.confirmedAt ? ` · ${new Date(receipt.confirmedAt).toLocaleString()}` : ""}
+            </p>
+          )}
           {receipt.events?.map((event, i) => (
             <p key={i}>
               {event.name === "StockPurchased"
-                ? `${fmt(event.assetAmount)} USDG bought ${fmt(event.tokenAmount!, 18)} ${ENABLED_STOCKS.find((stock) => stock.address.toLowerCase() === event.token?.toLowerCase())?.symbol ?? "Stock"} tokens.`
+                ? `Received from this conversion: ${fmt(event.tokenAmount!, 18)} ${ENABLED_STOCKS.find((stock) => stock.address.toLowerCase() === event.token?.toLowerCase())?.symbol ?? "Stock"} tokens for ${fmt(event.assetAmount)} USDG.`
                 : `${event.name}: ${fmt(event.assetAmount)} USDG.`}
             </p>
           ))}
           <a href={`${EXPLORER_URL}/tx/${receipt.hash}`} target="_blank" rel="noreferrer">
             View confirmed transaction <ArrowUpRight size={14} />
           </a>
+          <a
+            href={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify({ hash: receipt.hash, account: receipt.account, block: receipt.block, confirmedAt: receipt.confirmedAt, events: receipt.events }, null, 2))}`}
+            download={`freestock-receipt-${receipt.hash}.json`}
+          >
+            Save receipt
+          </a>
+          <p className="pd-meta">
+            Save this receipt before leaving. The dashboard shows your latest confirmation in this
+            session; the explorer retains the onchain record.
+          </p>
         </div>
       )}
       {busy && (
@@ -828,7 +903,11 @@ export default function PilotWorkspace({
 
       {account && (
         <section className="pd-holdings">
-          <h3>Your stock tokens</h3>
+          <h3>Stock tokens in your wallet</h3>
+          <p className="pd-meta">
+            Includes tokens acquired elsewhere. Conversion receipts identify the stocks bought
+            through this account.
+          </p>
           {holdings.length > 0 ? (
             <dl>
               {holdings.map((stock) => (

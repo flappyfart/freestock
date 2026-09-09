@@ -25,6 +25,7 @@ export default function Page() {
           <aside>
             <strong>Contents</strong>
             <a href="#status">Feature status</a>
+            <a href="#earnings-plan">Your earnings plan</a>
             <a href="#market-data">Pool coverage</a>
             <a href="#stock-lending">Stock lending</a>
             <a href="#accounting">Demo accounting</a>
@@ -116,6 +117,27 @@ export default function Page() {
                   </tbody>
                 </table>
               </div>
+            </section>
+            <section id="earnings-plan">
+              <h2>Two separate decisions</h2>
+              <p>
+                Choose an earning source, then a destination for its available earnings. The demo
+                offers Buy stocks, Reinvest and Split both. Stock basket weights divide only the
+                stock-purchase budget. The earnings-plan summary translates them into shares of all
+                new earnings after loss recovery, rounded to two decimal places for display.
+              </p>
+              <p>
+                For example, reinvest 20% and allocate the remaining stock budget 75% to NVDA and
+                25% to SPY. Of 100 simulated USDG in new earnings, 20 reinvests, 60 goes toward NVDA
+                and 20 toward SPY, before conversion costs. This is an allocation example, not a
+                return forecast. The simulation excludes conversion costs.
+              </p>
+              <p>
+                The current live pilot creates a Freestock account in one supported USDG vault. It
+                cannot attach to an arbitrary existing lending position. Real conversions and
+                reserving gains are separate wallet-approved actions. Additional lending adapters,
+                automatic fee limits and revocable background conversion rules are future work.
+              </p>
             </section>
             <section id="market-data">
               <h2>Pool coverage and rate meaning</h2>
@@ -355,8 +377,8 @@ export default function Page() {
                 </li>
                 <li>Leave the rest as available earnings for stock purchases.</li>
                 <li>
-                  If auto-convert is enabled and the minimum is reached, convert the available
-                  balance into the selected stock allocation.
+                  If the destination includes stocks, auto-convert is enabled and the minimum is
+                  reached, convert the available balance into the selected stock allocation.
                 </li>
               </ol>
               <p>
@@ -369,7 +391,9 @@ export default function Page() {
                 The minimum is a per-position USDG threshold, not a guaranteed time interval. In
                 demo mode, closing the page runs no jobs and advancing time is always explicit. A
                 100% compounding rule sends modeled surplus back into the simulated position; it
-                does not buy stocks.
+                does not buy stocks. Previously pending earnings stay available for a manual
+                conversion or reinvestment. Switching back to a stock destination allows its
+                auto-convert rule to use that pending balance on the next advance.
               </p>
               <p>
                 Live vault shares reflect the underlying return without a new wallet signature. The
@@ -467,6 +491,22 @@ export default function Page() {
                 prices. Basket purchases execute atomically: if any leg fails its minimum output,
                 the whole purchase reverts. Confirmed purchases record actual USDG spent and tokens
                 received. A quote alone does not authorize a trade.
+              </p>
+              <p>
+                Your conversion budget shows value above the principal baseline, a reserve of up to
+                0.000002 USDG and the remaining spendable amount. A below-baseline position shows
+                the shortfall that must recover. Quotes show estimated and minimum token output; the
+                0.05% pool fee is already included in the estimate, with a 1% minimum-output
+                allowance rounded down. ETH gas is shown separately, including a 20% gas-limit
+                buffer. The review does not calculate an all-in USDG cost or enforce a fee-to-gains
+                limit; the owner decides whether to proceed.
+              </p>
+              <p>
+                A confirmed conversion shows actual tokens received, USDG spent, block and time,
+                with an explorer link and a downloadable JSON receipt. Only the latest confirmation
+                is displayed during that session; this is not a persistent receipt history. Wallet
+                holdings include tokens acquired elsewhere. Refreshed position balances are current
+                reads, not a reconstruction of balances at the receipt block.
               </p>
               <p>
                 Live balances refresh while the page is visible. This is read-only monitoring, not

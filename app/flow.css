@@ -519,6 +519,105 @@
   border-radius: 12px;
   color: #fff;
 }
+.earn.demo-modal .earn-setting-title {
+  margin: 4px 0 0;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.earn.demo-modal .earn-destination {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.earn-destination legend {
+  margin-bottom: 14px;
+  font-size: 17px;
+  font-weight: 550;
+}
+.earn.demo-modal .earn-destination button {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  padding: 15px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--flow-line);
+  background: #0b1627;
+  text-align: left;
+  color: var(--flow-ink);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+.earn-destination button strong {
+  font-size: 14px;
+}
+.earn-destination button small {
+  font-size: 12px;
+  line-height: 1.45;
+}
+.earn.demo-modal .earn-destination button:hover {
+  border-color: #6d91c1;
+}
+.earn.demo-modal .earn-destination button[aria-pressed="true"] {
+  border-color: #8cbdff;
+  background: #213c61;
+  box-shadow: inset 0 0 0 1px #8cbdff;
+}
+.earn-plan-summary {
+  border-left: 2px solid var(--demo-accent);
+  padding: 4px 0 4px 16px;
+  margin-block: 8px;
+  color: var(--flow-ink);
+}
+.earn-plan-summary > strong {
+  font-size: 14px;
+}
+.earn-plan-summary dl {
+  display: grid;
+  gap: 8px;
+  margin-block: 13px;
+}
+.earn-plan-summary dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+}
+.earn-plan-summary dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.earn-plan-summary small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.earn-cost-note summary {
+  cursor: pointer;
+  color: var(--demo-accent);
+  font-size: 13px;
+}
+.earn-cost-note p {
+  margin-top: 10px;
+}
+@media (max-width: 480px) {
+  .earn.demo-modal .earn-destination {
+    grid-template-columns: 1fr;
+  }
+  .earn.demo-modal .earn-destination button {
+    padding: 12px 14px;
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .earn.demo-modal .earn-destination button {
+    transition: none;
+  }
+}
 .earn.demo-modal .earn-button:hover:not(:disabled) {
   background: #245ac3;
   border-color: #77a8ff;

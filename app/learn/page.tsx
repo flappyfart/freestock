@@ -56,8 +56,8 @@ export default function Page() {
                 <ArrowRight size={20} />
                 <div>
                   <b>2</b>
-                  <strong>Earn after costs</strong>
-                  <span>Cover borrowing costs, fees and losses first.</span>
+                  <strong>Check available gains</strong>
+                  <span>Recover losses, then review conversion costs.</span>
                 </div>
                 <ArrowRight size={20} />
                 <div>
@@ -164,6 +164,11 @@ export default function Page() {
                 saved scenario in its <DemoLink view="results">results view</DemoLink>. The rules
                 run only when you advance a scenario and do not authorize real transactions.
               </p>
+              <p>
+                First choose how your capital earns, then choose Buy stocks, Reinvest or Split both.
+                Your earnings plan shows each destination as a share of new earnings. Your deposit
+                stays allocated to the earning strategy; the stock percentages apply to earnings.
+              </p>
               <div className="learn-options">
                 <article>
                   <h3>Demo auto-convert</h3>
@@ -197,6 +202,13 @@ export default function Page() {
               <p className="earn-small">
                 Example amounts are illustrative, not a return forecast. The live pilot has no
                 background auto-conversion or automatic split rule.
+              </p>
+              <p>
+                The demo’s conversion minimum waits for a stock budget of your chosen size. It does
+                not check whether a purchase is economical, and the simulation excludes conversion
+                fees. In the live flow, compare the quoted stock amount and minimum received with
+                the separately displayed ETH gas estimate. A small purchase can cost too much
+                relative to the gains you are converting.
               </p>
               <p>
                 In your live account, vault shares already reflect the underlying return without a

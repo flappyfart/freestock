@@ -147,6 +147,7 @@ void test("basket signing verifies every stock, spend amount, minimum and deadli
       symbol: s.symbol,
       tokenOut: s.address,
       amountIn: "10000",
+      amountOut: "11",
       minimumOut: "10",
       fee: 500,
       weightBps: 2000,
@@ -162,6 +163,12 @@ void test("basket signing verifies every stock, spend amount, minimum and deadli
     deadline,
   ]);
   validatePrepared(p, owner, account);
+  p.purchases![0].fee = 3000;
+  assert.throws(() => validatePrepared(p, owner, account));
+  p.purchases![0].fee = 500;
+  p.purchases![0].amountOut = "100";
+  assert.throws(() => validatePrepared(p, owner, account));
+  p.purchases![0].amountOut = "11";
   p.purchases![0].minimumOut = "0";
   assert.throws(() => validatePrepared(p, owner, account));
   p.purchases![0].minimumOut = "10";

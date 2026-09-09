@@ -108,6 +108,27 @@ void test("split allocates each micro unit once across compounding and stocks", 
   assert.equal(s.positions[0].pending, 0);
   assert.equal(s.positions[0].earned, s.positions[0].compounded + s.positions[0].converted);
 });
+void test("reinvest-only preserves previously pending earnings until a manual action or stock plan", () => {
+  let s = apply(apply(initialEarnState(), open), step);
+  const pending = s.positions[0].pending;
+  const preferences = {
+    allocation: open.allocation,
+    auto: true,
+    threshold: 1e6,
+    compoundBps: 10000,
+  };
+  s = apply(s, { type: "configure", positionId: "p1", ...preferences });
+  s = apply(s, step);
+  assert.equal(s.positions[0].pending, pending);
+  assert.ok(s.positions[0].compounded > 0);
+  assert.deepEqual(s.holdings, {});
+  const manual = apply(s, { type: "convert", positionId: "p1" });
+  assert.equal(manual.positions[0].converted, pending);
+  s = apply(s, { type: "configure", positionId: "p1", ...preferences, compoundBps: 0 });
+  s = apply(s, step);
+  assert.ok(s.positions[0].converted > pending);
+  assert.equal(s.positions[0].pending, 0);
+});
 void test("manual compounding transfers pending earnings without new income", () => {
   let s = apply(apply(initialEarnState(), open), step);
   const earned = s.positions[0].earned;

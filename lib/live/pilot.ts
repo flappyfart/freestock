@@ -13,6 +13,7 @@ import { VAULT, USDG, ERC20_ABI, VAULT_ABI, LiveError } from "./config";
 import { stockQuote } from "./quote";
 import { allocateBasket } from "./basket";
 import { pilotPolicy } from "./pilot-policy";
+import { positionBudget } from "./position-budget";
 const accountAbi = new Interface(artifact.abi),
   tokenAbi = new Interface(ERC20_ABI),
   vaultAbi = new Interface(VAULT_ABI);
@@ -56,7 +57,7 @@ async function mined(hash: string) {
   const block = object(await rpc("eth_getBlockByNumber", [receipt.blockNumber, false]));
   if (!same(block.hash, String(receipt.blockHash)))
     throw new LiveError("The transaction block changed. Refresh its confirmation.", 409);
-  return { receipt, transaction };
+  return { receipt, transaction, block };
 }
 export async function verifiedAccount(ownerInput: string, deploymentInput: string, block: string) {
   const owner = address(ownerInput),
@@ -109,11 +110,14 @@ async function balances(owner: string, account: string, block: string) {
     ),
   ]);
   const available = BigInt(String(gains[0]));
+  const budget = positionBudget(BigInt(String(principal[0])), BigInt(String(value[0])));
+  if (budget.surplus !== available)
+    throw new LiveError("Position balances are inconsistent. Refresh before continuing.", 503);
   return {
     principal: String(principal[0]),
     assetValue: String(value[0]),
     availableGains: available.toString(),
-    spendableWithRoundingBuffer: (available > 2n ? available - 2n : 0n).toString(),
+    spendableWithRoundingBuffer: budget.convertible.toString(),
     walletUsdg: String(usd[0]),
     walletNvda: String(stock[0]),
     stocks,
@@ -413,6 +417,8 @@ export async function pilotReceipt(
     return {
       status: "confirmed",
       hash,
+      block: Number(hex(receipt.blockNumber)),
+      confirmedAt: new Date(Number(hex(result.block.timestamp)) * 1000).toISOString(),
       deployment: deploymentHash,
       account: verified.account,
       events,

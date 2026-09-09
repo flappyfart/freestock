@@ -360,7 +360,8 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
         reinvested,
         `${p.compoundBps / 100}% of earnings after loss recovery reinvested at this simulation step. Total reinvested: ${(p.compounded / 1e6).toFixed(6)} USDG.`,
       );
-    if (p.auto && p.pending >= p.threshold && p.lossCarry === 0) convert(p);
+    if (p.auto && p.compoundBps < 10000 && p.pending >= p.threshold && p.lossCarry === 0)
+      convert(p);
   }
   const balances = [
     state.wallet,
