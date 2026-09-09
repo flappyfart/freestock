@@ -79,6 +79,19 @@ export default function Home() {
               <br />
               Returns vary. Capital can lose value.
             </p>
+            {/* Reported deposit snapshot, not a live calculation of net TVL. */}
+            <div className="home-deposit-total">
+              <dl>
+                <dt>Total deposits</dt>
+                <dd>
+                  <data value="4201.28">$4,201.28</data>
+                </dd>
+              </dl>
+              <p>
+                Freestock-reported
+                <time dateTime="2026-09-09">Sep 9, 2026</time>
+              </p>
+            </div>
             <TokenContract />
           </div>
           <div className="home-stock-scene" aria-hidden="true">

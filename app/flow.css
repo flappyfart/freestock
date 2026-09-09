@@ -96,6 +96,45 @@
   flex-wrap: wrap;
   margin-top: 28px;
 }
+.home-deposit-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  max-width: 510px;
+  margin-top: 24px;
+  padding: 18px 22px;
+  border: 1px solid var(--flow-line);
+  border-radius: 20px;
+  background: #fafcffed;
+}
+.home-deposit-total dl {
+  margin: 0;
+}
+.home-deposit-total dt {
+  color: var(--flow-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.home-deposit-total dd {
+  margin: 4px 0 0;
+  color: var(--flow-blue);
+  font-size: clamp(1.875rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.home-deposit-total p {
+  margin: 0;
+  color: var(--flow-muted);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+.home-deposit-total time {
+  display: block;
+}
 .earn .token-contract {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
