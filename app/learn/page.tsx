@@ -266,11 +266,11 @@ export default function Page() {
               <span className="earn-eyebrow">07 / CURRENT ACCESS</span>
               <h2>What you can use today.</h2>
               <p>
-                The private pilot is enabled for the configured signed-in participant, who declared
-                Norway residence and location and non-US-person status. Connecting a wallet does not
-                grant access, and these declarations do not verify identity or issuer eligibility.
-                The pilot uses one USDG lending vault with a 100 USDG deposit limit. Available
-                stock-token routes are NVDA, AAPL, TSLA, GOOGL and SPY.
+                The private pilot is enabled for the configured signed-in account. Connecting a
+                wallet does not grant private access. There is no separate eligibility form; stock
+                provider terms and restrictions still apply. The pilot uses one USDG lending vault
+                with a 100 USDG deposit limit. Available stock-token routes are NVDA, AAPL, TSLA,
+                GOOGL and SPY.
               </p>
               <p>
                 The owner can create an account, deposit, buy selected tokens with available gains,

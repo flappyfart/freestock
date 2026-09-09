@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { ScrollMotion } from "./scroll-motion";
 import { MotionEffects } from "./motion-effects";
-import { AvailabilityCheck } from "./availability-check";
 import { DemoLink } from "./demo/demo-link";
 import { HeaderWalletButton } from "./live/header-wallet-button";
 export function EarnShell({
@@ -82,7 +81,7 @@ export function EarnShell({
           </DemoLink>
         </div>
         <div>
-          <AvailabilityCheck />
+          <p>For non-US users. Stock provider restrictions apply.</p>
           <p className="earn-small">
             Your live account uses real funds. “Try it yourself” uses simulated money. Stock Tokens
             provide economic exposure, not ownership of underlying shares. Independent product; no

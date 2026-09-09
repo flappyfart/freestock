@@ -207,7 +207,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
         </strong>
         <p>
           {availability === "enabled"
-            ? "Configured for the declared Norway participant. Each transaction needs your wallet approval."
+            ? "Your private account is ready. Each transaction needs your wallet approval."
             : availability === "loading"
               ? "Wallet connection is available while access is checked."
               : "New actions require the configured participant’s signed-in account. Existing accounts can still be restored for withdrawal."}

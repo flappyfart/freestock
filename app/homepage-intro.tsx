@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ArrowRight, Clock3, Gift, Wallet } from "lucide-react";
 import { EXAMPLE_POOLS, prizeProjection, type ExamplePool } from "@/lib/prize-projection";
-import { AvailabilityCheck } from "./availability-check";
 
 const displayMoney = (amount: number) =>
   new Intl.NumberFormat("en-US", {
@@ -56,7 +55,7 @@ export function HomepageIntro() {
           </span>
         </a>
         <p className="home-demo-note">Simulated draws use $10 prizes. No real money or stocks.</p>
-        <AvailabilityCheck />
+        <p>For non-US users. Stock provider restrictions apply.</p>
         <p className="home-tradeoff">
           The earnings go to prizes, instead of interest paid to every saver. Your deposit isn’t
           spent on the draw.

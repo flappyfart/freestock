@@ -217,6 +217,14 @@
   z-index: 91;
 }
 .earn.demo-modal {
+  color-scheme: dark;
+  --flow-ink: #f1f5ff;
+  --flow-muted: #a6b5ce;
+  --flow-line: #2a3b56;
+  --demo-surface: #142238;
+  --demo-raised: #213752;
+  --demo-accent: #8cbdff;
+  color: var(--flow-ink);
   position: fixed;
   width: min(1120px, calc(100vw - 48px));
   max-width: 1120px;
@@ -226,9 +234,9 @@
   padding: 0;
   gap: 0;
   border-radius: 28px;
-  border: 1px solid #ffffffc9;
-  background: #fff;
-  box-shadow: 0 32px 120px #07183b42;
+  border: 1px solid #3b5070;
+  background: #0f1b2d;
+  box-shadow: 0 32px 120px #02081399;
   overflow: hidden;
 }
 .demo-modal-heading {
@@ -258,7 +266,7 @@
   display: inline-flex;
   padding: 4px;
   border-radius: 999px;
-  background: #edf2fa;
+  background: #081322;
   gap: 3px;
 }
 .earn .demo-tabs button {
@@ -266,14 +274,16 @@
   padding: 9px 17px;
   font-size: 14px;
   min-height: 40px;
-  color: #53627b;
+  color: var(--flow-muted);
   border: 0;
   background: transparent;
 }
 .earn .demo-tabs button[aria-current="page"] {
-  color: #0755d9;
-  background: #fff;
-  box-shadow: 0 2px 7px #0b2f6812;
+  color: #ecf5ff;
+  background: var(--demo-raised);
+  box-shadow:
+    inset 0 0 0 1px #42628a,
+    0 2px 7px #0003;
 }
 .demo-balance {
   font-size: 16px;
@@ -292,7 +302,8 @@
   overscroll-behavior: contain;
   padding: 26px 34px 34px;
   min-height: 180px;
-  background: #f7f9fd;
+  background: #0b1525;
+  scrollbar-color: #455e80 #0b1525;
 }
 .demo-setup-layout {
   display: grid;
@@ -314,7 +325,7 @@
   gap: 18px;
   padding-left: 20px;
   font-size: 14px;
-  color: #34455f;
+  color: #c1cde0;
 }
 .demo-guide li {
   padding-left: 6px;
@@ -364,7 +375,7 @@
 }
 .demo-modal .earn-stats {
   margin-top: 20px;
-  background: #fff;
+  background: var(--demo-surface);
   border: 1px solid var(--flow-line);
   border-radius: 18px;
   overflow: hidden;
@@ -393,7 +404,7 @@
 .demo-modal .holdings-grid article,
 .demo-modal .ledger article {
   border-radius: 18px;
-  background: #fff;
+  background: var(--demo-surface);
 }
 .demo-modal .transparency-equation {
   margin-top: 20px;
@@ -407,9 +418,9 @@
 .demo-modal .earn-feedback > p {
   padding: 10px 14px;
   margin-bottom: 16px;
-  border: 1px solid #d7e3f5;
+  border: 1px solid var(--flow-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--demo-surface);
 }
 .demo-modal [data-slot="dialog-close"] {
   top: 20px;
@@ -418,7 +429,134 @@
   border-radius: 999px;
   min-width: 36px;
   min-height: 36px;
-  background: #f8faff;
+  background: var(--demo-surface);
+  color: var(--flow-ink);
+}
+/* Keep every simulator view on the same dark palette, including editable results. */
+.demo-modal :is(h1, h2, h3),
+.demo-modal .mechanical-label label {
+  color: var(--flow-ink);
+}
+.demo-modal :is(small, .earn-small, .earn-muted, .earn-eyebrow),
+.demo-modal .mechanical-label small,
+.demo-modal .earn-stats span,
+.demo-modal .position-metrics span,
+.demo-modal .position-assumptions,
+.demo-modal .ledger :is(p, li) {
+  color: var(--flow-muted);
+}
+.demo-modal :is(.earn-builder, .position-card) {
+  background: var(--demo-surface);
+  border-color: var(--flow-line);
+  box-shadow: 0 8px 26px #0002;
+}
+.demo-modal .position-card:hover {
+  border-color: #496585;
+  box-shadow: 0 12px 32px #0003;
+}
+.demo-modal
+  :is(
+    .earn-section,
+    .earn-stats > div,
+    .position-edit,
+    .position-assumptions,
+    .holdings-grid article,
+    .ledger article
+  ),
+.earn.demo-modal .selected-vault {
+  border-color: var(--flow-line);
+}
+.demo-modal .earn-pill {
+  color: #c7dcfb;
+  background: #192e49;
+  border-color: #385371;
+}
+.earn.demo-modal :is(input, select) {
+  color: var(--flow-ink);
+  background: #0b1627;
+  border-color: #425674;
+  border-radius: 10px;
+  caret-color: var(--demo-accent);
+}
+.demo-modal input::placeholder {
+  color: var(--flow-muted);
+}
+.demo-modal select option {
+  background: #0b1627;
+  color: var(--flow-ink);
+}
+.earn.demo-modal .earn-segment {
+  background: #0b1627;
+  border-color: var(--flow-line);
+  box-shadow: inset 0 1px 3px #0003;
+}
+.earn.demo-modal .earn-segment::before {
+  background: var(--demo-raised);
+  border-color: #42628a;
+  box-shadow: 0 3px 9px #0003;
+}
+.earn.demo-modal .earn-segment button {
+  color: var(--flow-muted);
+}
+.earn.demo-modal .earn-segment button:hover:not(:disabled) {
+  color: var(--flow-ink);
+  background: #96beff0d;
+}
+.earn.demo-modal .earn-segment button[aria-pressed="true"],
+.earn.demo-modal .earn-segment button[aria-pressed="true"]:hover:not(:disabled) {
+  color: #e3f0ff;
+  background: transparent;
+}
+.earn.demo-modal :is(.earn-link, .earn-model-return, .earn-divider),
+.earn.demo-modal .position-actions button,
+.demo-modal .earn-empty svg {
+  color: var(--demo-accent);
+}
+.earn.demo-modal .earn-button {
+  background: #1d60da;
+  border-color: #4788f4;
+  border-radius: 12px;
+  color: #fff;
+}
+.earn.demo-modal .earn-button:hover:not(:disabled) {
+  background: #245ac3;
+  border-color: #77a8ff;
+  box-shadow: 0 6px 18px #075df333;
+}
+.earn.demo-modal
+  :is(.earn-link, .position-actions button, .earn-feedback button):hover:not(:disabled) {
+  color: #c6e1ff;
+  background: transparent;
+}
+.earn.demo-modal .demo-tabs button:not([aria-current="page"]):hover:not(:disabled),
+.demo-modal [data-slot="dialog-close"]:hover {
+  color: var(--flow-ink);
+  background: var(--demo-raised);
+}
+.demo-modal .transparency-equation {
+  color: #c3ddff;
+  background: #172e4b;
+  border-color: #355778;
+}
+.demo-modal .earn-empty {
+  color: var(--flow-muted);
+  border-color: #48617f;
+  background: #111e31;
+}
+.demo-modal .earn-warning,
+.demo-modal .earn-feedback [role="alert"] {
+  color: #ffd398;
+  background: #35291c;
+  border-color: #705132;
+}
+.demo-modal .earn-feedback .earn-success {
+  color: #8de0b7;
+  background: #16342a;
+  border-color: #376752;
+}
+.earn.demo-modal :is(input, select, button, a, summary):focus-visible {
+  outline: 2px solid #8cbdff;
+  outline-offset: 3px;
 }
 .earn .market-directory {
   margin-top: 24px;

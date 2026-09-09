@@ -2,11 +2,11 @@
 
 ## What works now
 
-The homepage live account area and `/live` connect an injected wallet using EIP-6963. The homepage keeps a separately labeled “Try it yourself” practice box. Participant availability is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
+Connect Wallet uses EIP-6963 and leads to `/dashboard`; `/live` redirects there for compatibility. “Try it yourself” opens a separate simulation popup. Private account access is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
 
 Preparation verifies chain 4663, exact deployment calldata, canonical deployment receipt/block, CREATE address, runtime bytes, constructor ownership and fixed dependencies. Deposits apply a 0.1% share minimum; stock legs have a 1% minimum-output allowance and a 120-second onchain deadline. A fresh actual-sender simulation and gas estimate precede each wallet prompt. Plans expire after 45 seconds and bind the nonce. Client validation repeats route, amount, recipient, expiry, sender and network checks. Receipts and token purchase events are reconciled against the verified account.
 
-Only the exact signed-in participant configured by `FREESTOCK_PILOT_USER_ID`, with country `NO` and non-US-person declaration `no`, receives entry/trading preparation. This is product authorization based on the participant's declarations, not issuer identity verification. Withdrawal preparation remains available for an existing verified account even if new pilot actions are disabled. Public availability self-checks do not grant access. All routes require Sites identity and return private, uncached responses.
+Only the exact signed-in account configured by `FREESTOCK_PILOT_USER_ID` receives entry/trading preparation. This is private product authorization, not issuer eligibility verification. The country questionnaire and declaration checkbox have been removed; country and US-person environment values no longer control product authorization. Withdrawal preparation remains available for an existing verified account even if new pilot actions are disabled. All routes require Sites identity and return private, uncached responses.
 
 Pending wallet requests use a device-only owner/chain journal with unique request IDs, nonces and transaction/account references. Web Locks serialize updates across tabs. Unknown submission outcomes stay locked against automatic retries; late replies cannot replace successor requests. Recovery checks original sender/nonce and canonical receipts, including wallet cancellation or another transaction consuming that nonce. Journal state is not a balance ledger. No background trading runs.
 
@@ -36,9 +36,9 @@ Available gains equal account asset value above the recorded principal baseline.
 
 Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifacts/account-standard-input.json` permits exact recompilation. The source/artifact hash is tested automatically. No public transaction was submitted by the builder. Mainnet deployment occurs only when the participant creates an account in their own wallet.
 
-## Norway pilot and boundaries
+## Private access and provider boundaries
 
-The participant declared residence and physical location in Norway and that they are not a US person or acting for one. Norway is explicitly included in the Final Terms for all five selected tokens. This is a country-level finding, not approval of freestock or identity verification. Investor representations and applicable issuer restrictions still apply.
+The product is intended for non-US users and currently retains its configured private account access. Freestock has no separate eligibility questionnaire and makes no eligibility determination. Investor representations and applicable stock-provider restrictions still apply; non-US location alone does not establish unrestricted availability.
 
 The prospectus distinguishes direct secondary blockchain purchases from purchases through an Authorised Participant, while also containing broader KYC/AML wording. This work does not assert that self-attestation alone is a completed verification. No issuer API key is required for the verified direct AMM route, and no mandatory AMM provider-preapproval workflow was established.
 
@@ -63,10 +63,10 @@ The user must connect a funded EOA wallet, review issuer terms, create their acc
 - [Uniswap deployments](https://developers.uniswap.org/deployments)
 - [Issuer token registry](https://api.robinhood.com/rhj/assets)
 - [Building with Stock Tokens](https://docs.robinhood.com/chain/building-with-stock-tokens/)
-- [NVIDIA Final Terms, Norway on page 8](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_nvidia.pdf#page=8)
+- [NVIDIA Final Terms](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_nvidia.pdf#page=8)
 - [Base Prospectus](https://cdn.robinhood.com/assets/robinhood/legal/rhj_base_prospectus.pdf): pages 72, 119, 131 and 150–151 for purchaser, secondary-market and eligibility provisions.
 
-Additional Final Terms with Norway included: [AAPL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_apple.pdf#page=8), [TSLA](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_tesla.pdf#page=8), [GOOGL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_alphabet_class_a.pdf#page=8), [SPY](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_spdr_s_p_500_etf_trust.pdf#page=9).
+Additional selected-token Final Terms: [AAPL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_apple.pdf#page=8), [TSLA](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_tesla.pdf#page=8), [GOOGL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_alphabet_class_a.pdf#page=8), [SPY](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_spdr_s_p_500_etf_trust.pdf#page=9).
 
 ## Homepage launch readiness check
 

@@ -111,7 +111,7 @@
 
 .header-wallet-control {
   flex: 0 0 auto;
-  width: 194px;
+  width: 172px;
   max-width: 100%;
 }
 .wallet-connect-option-compact {
@@ -119,12 +119,12 @@
   border-radius: 9px;
 }
 .earn .wallet-connect-option-compact .wallet-connect-button {
-  min-height: 50px;
+  min-height: 44px;
   gap: 4px;
-  padding: 8px 12px;
+  padding: 6px 10px;
 }
 .wallet-connect-option-compact .wallet-connect-text {
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 .wallet-connect-option-compact .wallet-connect-provider {
@@ -140,7 +140,7 @@
 }
 @media (max-width: 760px) {
   .header-wallet-control {
-    width: 172px;
+    width: 160px;
     margin-left: auto;
   }
   .wallet-connect-option-compact .wallet-connect-text {

@@ -82,7 +82,6 @@ export default function PilotWorkspace({
     [restoreCandidate, setRestoreCandidate] = useState<AccountReferenceCandidate | null>(null),
     [lastChecked, setLastChecked] = useState<number | null>(null),
     [refreshWarning, setRefreshWarning] = useState<string | null>(null),
-    [acknowledged, setAcknowledged] = useState(false),
     [now, setNow] = useState(0),
     [journal, setJournal] = useState<Journal | null>(null),
     [recoveryHash, setRecoveryHash] = useState(""),
@@ -335,7 +334,7 @@ export default function PilotWorkspace({
     }
   }
   async function send() {
-    if (!plan || (!acknowledged && plan.action !== "withdraw")) return;
+    if (!plan || (plan.action !== "withdraw" && !enabled)) return;
     const reviewed = plan;
     // Clear before requesting a signature so a submitted action is never retried as the same preview.
     setPlan(null);
@@ -364,7 +363,7 @@ export default function PilotWorkspace({
   const hasPosition = !!account && toInteger(account.assetValue) > 0n;
   const activeView = hasPosition ? actionView : "deposit";
   const actionBlocked = busy || !!pending || !!journal;
-  const newActionBlocked = actionBlocked || !enabled || !acknowledged;
+  const newActionBlocked = actionBlocked || !enabled;
   const holdings = account?.stocks.filter((stock) => toInteger(stock.balance) > 0n) ?? [];
   const changeView = (view: "deposit" | "harvest" | "compound" | "withdraw" | null) => {
     setActionView(view);
@@ -519,34 +518,12 @@ export default function PilotWorkspace({
         </div>
       )}
 
-      <details className="pd-eligibility" open={!acknowledged}>
-        <summary>
-          {acknowledged ? "Participant declaration reviewed" : "Review before using real funds"}
-        </summary>
-        <label className="pilot-ack">
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            onChange={(e) => {
-              setAcknowledged(e.target.checked);
-              setPlan(null);
-            }}
-            disabled={busy}
-          />
-          <span>
-            I am the declared participant, the issuer restrictions do not exclude me, and I
-            understand this uses real funds. Capital can lose value; withdrawals depend on
-            liquidity. I have reviewed the issuer terms.
-          </span>
-        </label>
-        <p>
-          Access is based on Norway residence and non-U.S.-person declarations, not identity
-          verification or legal approval.{" "}
-          <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
-            Issuer terms and restrictions <ArrowUpRight size={13} />
-          </a>
-        </p>
-      </details>
+      <p className="pd-meta">
+        Real funds. Capital can lose value; withdrawals depend on liquidity.{" "}
+        <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
+          Stock Token terms <ArrowUpRight size={13} />
+        </a>
+      </p>
 
       {!account ? (
         <div className="pd-setup">
@@ -763,7 +740,7 @@ export default function PilotWorkspace({
               !!journal ||
               !plan.canSubmit ||
               now >= Date.parse(plan.expiresAt) ||
-              (plan.action !== "withdraw" && (!enabled || !acknowledged))
+              (plan.action !== "withdraw" && !enabled)
             }
             onClick={() => void act(send)}
           >

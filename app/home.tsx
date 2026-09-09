@@ -8,6 +8,7 @@ import { LandingIntro } from "./landing-intro";
 import { useDemo, type DemoView } from "./demo/demo-provider";
 import { DemoLink } from "./demo/demo-link";
 import { useWalletConnection } from "./live/wallet-provider";
+import { HomePools } from "./home-pools";
 export default function Home() {
   const { openDemo } = useDemo();
   const { requestConnect, owner } = useWalletConnection();
@@ -56,7 +57,7 @@ export default function Home() {
               </DemoLink>
             </div>
             <p className="home-hero-note">
-              Private Norway pilot · Up to 100 USDG deposited
+              Private wallet pilot · Up to 100 USDG deposited
               <br />
               Returns vary. Capital can lose value.
             </p>
@@ -86,6 +87,7 @@ export default function Home() {
             <span className="home-stock-caption">Earnings, meet your stock picks.</span>
           </div>
         </section>
+        <HomePools />
         <section className="home-how" aria-labelledby="how-title">
           <div className="home-how-heading">
             <div>

@@ -99,8 +99,8 @@ export default function Page() {
                     <tr>
                       <td>Access</td>
                       <td>
-                        Private pilot for the configured signed-in Norway participant; connecting a
-                        wallet does not grant access
+                        Private pilot for the configured signed-in account; connecting a wallet does
+                        not grant access
                       </td>
                     </tr>
                   </tbody>
@@ -308,8 +308,8 @@ export default function Page() {
                 owner reviews and signs transactions in their connected wallet. Transaction recovery
                 references are saved in this browser. You can restore a live account from its
                 creation transaction reference, which is checked against the connected owner and
-                supported route. Live balances and receipts are read from chain. The availability
-                self-check is informational and does not grant pilot access.
+                supported route. Live balances and receipts are read from chain. Freestock has no
+                separate country questionnaire. Stock provider terms and restrictions still apply.
               </p>
             </section>
             <section id="execution">
@@ -317,9 +317,9 @@ export default function Page() {
               <p>
                 Choose Connect Wallet on Home, then create or manage your live position in{" "}
                 <Link href="/dashboard">Dashboard</Link>. New deposits and stock purchases are
-                limited to the configured signed-in participant, who declared Norway residence and
-                location and non-US-person status. These declarations are not identity verification
-                or legal approval. General registration for live actions is not enabled.
+                limited to the configured signed-in account. This private access does not verify
+                eligibility for the stock provider’s services. General registration for live actions
+                is not enabled.
               </p>
               <p>
                 The pilot supports one USDG lending vault, a 100 USDG deposit limit and purchases of
