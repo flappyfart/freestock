@@ -15,6 +15,7 @@ import {
   ScanLine,
   History,
 } from "lucide-react";
+import { requiresSessionReset } from "../../lib/live/pilot-access";
 import { readJournal, JOURNAL_EVENT } from "../../lib/live/wallet-journal";
 import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
 import { WalletConnectButton } from "./wallet-connect-button";
@@ -110,6 +111,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     [chainHealth, setChainHealth] = useState<{ available: boolean; message?: string } | null>(null),
     [availabilityAttempt, setAvailabilityAttempt] = useState(0),
     [snapshotAttempt, setSnapshotAttempt] = useState(0);
+  const sessionScope = useRef<string | null | undefined>(undefined);
   const generation = useRef(0),
     requestInFlight = useRef(false);
   const busy = wallet.busy || reading || working;
@@ -119,37 +121,72 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
       : null;
   useEffect(() => {
     const controller = new AbortController();
-    void fetch("/api/live/status", {
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .then(async (response) => {
+    let checking = false;
+    let queued = false;
+    let requestVersion = 0;
+    async function refreshAccess() {
+      if (document.hidden || controller.signal.aborted) return;
+      const version = ++requestVersion;
+      if (checking) {
+        queued = true;
+        return;
+      }
+      checking = true;
+      setAvailability("loading");
+      try {
+        const response = await fetch("/api/live/status", {
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (!response.ok) throw Error("Availability check failed.");
         const value = (await response.json()) as {
-          walletPilotEnabled?: unknown;
+          walletTransactionsEnabled?: unknown;
+          sessionScope?: unknown;
           chainHealth?: { available?: unknown; message?: unknown };
         };
         if (
-          typeof value.walletPilotEnabled !== "boolean" ||
-          typeof value.chainHealth?.available !== "boolean"
-        )
-          throw Error("Invalid availability.");
-        if (!controller.signal.aborted) {
-          setAvailability(value.walletPilotEnabled ? "enabled" : "unavailable");
-          setChainHealth({
-            available: value.chainHealth.available,
-            message:
-              typeof value.chainHealth.message === "string" ? value.chainHealth.message : undefined,
-          });
+          typeof value.walletTransactionsEnabled !== "boolean" ||
+          typeof value.chainHealth?.available !== "boolean" ||
+          !(value.sessionScope === null ||
+            (typeof value.sessionScope === "string" && /^[a-f0-9]{64}$/.test(value.sessionScope))) ||
+          value.walletTransactionsEnabled !== (value.sessionScope !== null)
+        ) throw Error("Invalid availability.");
+        if (controller.signal.aborted || version !== requestVersion) return;
+        if (requiresSessionReset(sessionScope.current, value.sessionScope)) {
+          // Clear profile data and reviews; the wallet journal survives for recovery.
+          window.location.reload();
+          return;
         }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
+        sessionScope.current = value.sessionScope;
+        setAvailability(value.walletTransactionsEnabled ? "enabled" : "unavailable");
+        setChainHealth({
+          available: value.chainHealth.available,
+          message: typeof value.chainHealth.message === "string" ? value.chainHealth.message : undefined,
+        });
+      } catch {
+        if (!controller.signal.aborted && version === requestVersion) {
           setAvailability("error");
           setChainHealth(null);
         }
-      });
-    return () => controller.abort();
+      } finally {
+        checking = false;
+        if (queued) {
+          queued = false;
+          void refreshAccess();
+        }
+      }
+    }
+    void refreshAccess();
+    const refresh = () => { void refreshAccess(); };
+    window.addEventListener("focus", refresh);
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      controller.abort();
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("pageshow", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, [availabilityAttempt]);
   useEffect(() => {
     const version = ++generation.current;
@@ -281,11 +318,11 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
   const section = dashboardCopy[currentView];
   const accessLabel =
     availability === "enabled"
-      ? "Confirmed"
+      ? "Ready"
       : availability === "loading"
         ? "Checking"
         : availability === "unavailable"
-          ? "Participant required"
+          ? "Sign in required"
           : "Check unavailable";
   const networkLabel = !connected
     ? "Not connected"
@@ -396,7 +433,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           id="wallet-connection"
           data-compact={currentView === "position" && !!connected && network === CHAIN_ID}
           hidden={!connectionVisible}
-          aria-label="Wallet connection and participant access"
+          aria-label="Wallet connection and live access"
         >
           <div className="dashboard-connection-top">
             <div className="dashboard-connection-copy">
@@ -462,7 +499,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               <dd>{networkLabel}</dd>
             </div>
             <div>
-              <dt>Participant access</dt>
+              <dt>Live access</dt>
               <dd data-confirmed={availability === "enabled"}>{accessLabel}</dd>
             </div>
             <div>
@@ -494,7 +531,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                     )
                   }
                 >
-                  Sign in with the participant account <ArrowUpRight size={14} aria-hidden="true" />
+                  Sign in to use your live account <ArrowUpRight size={14} aria-hidden="true" />
                 </button>
               </div>
             </div>

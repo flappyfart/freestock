@@ -3,7 +3,7 @@ import { preparePilot } from "../../../../../lib/live/pilot";
 import { LiveError } from "../../../../../lib/live/config";
 export async function GET(request: Request) {
   const user = await identity();
-  if (!user) return json({ error: "Sign in to use the wallet pilot." }, 401);
+  if (!user) return json({ error: "Sign in to use your live account." }, 401);
   const q = new URL(request.url).searchParams;
   try {
     return json(await preparePilot(user, q));

@@ -1,8 +1,10 @@
 import { identity, json } from "../../../../lib/http";
 import { chainConfig, pin } from "../../../../lib/live/chain";
 import { pilotPolicy } from "../../../../lib/live/pilot-policy";
+import { liveSessionScope } from "../../../../lib/live/pilot-access";
 export async function GET() {
-  const pilot = pilotPolicy(await identity());
+  const userId = await identity();
+  const pilot = pilotPolicy(userId);
   const c = chainConfig();
   let chainHealth: { available: boolean; block?: number; message?: string };
   try {
@@ -24,10 +26,13 @@ export async function GET() {
     tradingKeyRequired: false,
     dedicatedRpcConfigured: c.dedicatedRpc,
     accountSetupPreviews: true,
-    pilotStocks: ["NVDA", "AAPL", "TSLA", "GOOGL", "SPY"],
-    pilotDepositLimit: "100000000",
+    access: "signed-in-wallet",
+    signInRequired: !pilot.enabled,
+    sessionScope: await liveSessionScope(userId),
+    liveStocks: ["NVDA", "AAPL", "TSLA", "GOOGL", "SPY"],
+    depositLimit: "100000000",
     eligibilityConfirmed: false,
-    walletPilotEnabled: pilot.enabled,
+    walletTransactionsEnabled: pilot.enabled,
     realDepositsEnabled: pilot.enabled,
     realTradingEnabled: pilot.enabled,
     backgroundAutomationEnabled: false,

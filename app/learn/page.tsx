@@ -71,7 +71,7 @@ export default function Page() {
                 <DemoLink>Try it yourself</DemoLink> opens a simulation modal with setup, results
                 and activity. Its scenarios and holdings use no real funds. For a live position,
                 choose Connect Wallet on Home, then use <Link href="/dashboard">Dashboard</Link>.
-                The private pilot’s access limits still apply, and every real transaction requires
+                Sign-in is required for live account actions, and every real transaction requires
                 the owner’s wallet approval.
               </p>
             </section>
@@ -247,7 +247,7 @@ export default function Page() {
                 their proceeds would require a separate supported strategy.
               </p>
               <p className="earn-small">
-                Example amounts are illustrative, not a return forecast. The live pilot has no
+                Example amounts are illustrative, not a return forecast. Freestock has no
                 background auto-conversion or automatic split rule.
               </p>
               <p>
@@ -360,9 +360,9 @@ export default function Page() {
               <span className="earn-eyebrow">07 / CURRENT ACCESS</span>
               <h2>What you can use today.</h2>
               <p>
-                The private pilot is enabled for the configured signed-in account. Connecting a
-                wallet does not grant private access. There is no separate eligibility form; stock
-                provider terms and restrictions still apply. The pilot uses one USDG lending vault
+                Live accounts are available to signed-in users. Connect your wallet to create or
+                restore a position. There is no separate eligibility form; stock provider terms
+                and restrictions still apply. Freestock uses one USDG lending vault
                 with a 100 USDG deposit limit. Available stock-token routes are NVDA, AAPL, TSLA,
                 GOOGL and SPY.
               </p>

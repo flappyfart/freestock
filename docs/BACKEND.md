@@ -12,7 +12,7 @@ Application identity scopes saved records; it does not prove ownership of a wall
 
 **Standalone hosts must replace or protect the authentication boundary.** The origin must reject or overwrite client-supplied authentication headers and accept identity only from a trusted gateway, or use a separately implemented session system. The local API fixtures intentionally inject identity headers into a local test server; they are not a production login mechanism.
 
-The private pilot flag uses `FREESTOCK_PILOT_USER_ID`. It is an application access setting, not verification of provider eligibility. Withdrawal preparation remains available to the appropriate account owner when new pilot entry is disabled.
+Live wallet actions are available to signed-in application users. Sign-in does not verify provider eligibility or wallet ownership. No single-participant allowlist remains. Every submitted financial action is still enforced by the owner-only contract. The dashboard rechecks a hashed session scope on focus, page restore and visibility changes; a changed sign-in reloads profile data and reviews while retaining the wallet-scoped recovery journal.
 
 ## A live transaction, end to end
 
@@ -87,7 +87,7 @@ Paths are relative to the application origin. “Identity” means platform-auth
 | `GET /api/stock-lending/markets` | Hosting policy | Five tracked stock-loan markets, read-only |
 | `GET /api/earn/account` | Identity | Load or initialize simulation account |
 | `POST /api/earn/commands` | Identity + same origin | Idempotent simulation commands |
-| `GET /api/live/status` | Hosting policy; identity affects flags | Chain and private-pilot status |
+| `GET /api/live/status` | Hosting policy; identity affects flags | Chain health, live access and hashed session scope |
 | `GET /api/live/wallet` | Identity | Read wallet balances |
 | `GET /api/live/quote` | Identity | Quote a supported stock purchase |
 | `GET /api/live/deposit-preview` | Identity | Read direct-vault deposit preview |

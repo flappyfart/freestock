@@ -5,13 +5,13 @@ assert.equal(origin.protocol, "http:");
 assert.equal(origin.username + origin.password + origin.search + origin.hash, "");
 const wallet = "0x0000000000000000000000000000000000001234";
 let requests = 0;
-async function get(path, authenticated = true) {
+async function get(path, authenticated = true, userId = "live-integration-test") {
   requests++;
   const r = await fetch(new URL(path, origin), {
     redirect: "error",
     headers: authenticated
       ? {
-          "oai-authenticated-user-id": "live-integration-test",
+          "oai-authenticated-user-id": userId,
           "oai-authenticated-user-email": "live-test@sites.test",
         }
       : {},
@@ -46,13 +46,25 @@ assert.equal(status.chainId, 4663);
 assert.equal(status.realDepositsEnabled, false);
 assert.equal(status.realTradingEnabled, false);
 assert.equal(status.backgroundAutomationEnabled, false);
+assert.equal(status.sessionScope, null);
+const firstUser = (await get("/api/live/status")).data;
+const secondUser = (await get("/api/live/status", true, "second-live-user")).data;
+for (const value of [firstUser, secondUser]) {
+  assert.equal(value.walletTransactionsEnabled, true);
+  assert.equal(value.realDepositsEnabled, true);
+  assert.equal(value.realTradingEnabled, true);
+  assert.equal(value.backgroundAutomationEnabled, false);
+  assert.match(value.sessionScope, /^[a-f0-9]{64}$/);
+}
+assert.notEqual(firstUser.sessionScope, secondUser.sessionScope);
+console.log("PASS independent signed-in profiles, anonymous denial and session isolation");
 const balance = await get(`/api/live/wallet?address=${wallet}`);
 assert.equal(balance.status, 200, JSON.stringify(balance.data));
 assert.equal(balance.data.mode, "mainnet-read-only");
 assert.equal(balance.data.stocks.length, 6);
 assert.ok(balance.data.block > 58051564);
 assert.ok(BigInt(balance.data.usdg) >= 0n);
-console.log("PASS actual mainnet balances and disabled execution status");
+console.log("PASS actual mainnet balances and read-only wallet endpoint");
 const quote = await get("/api/live/quote?symbol=NVDA&amount=10");
 assert.equal(quote.status, 200, JSON.stringify(quote.data));
 assert.equal(quote.data.amountIn, "10000000");

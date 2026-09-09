@@ -1,6 +1,8 @@
 # Stock-lending market data
 
-Freestock lists AAPL, GOOGL, NVDA, SPY and TSLA Morpho loan-asset markets on Robinhood Chain (4663). Borrower collateral is USDG. The user selected **read-only market data**, so this release adds no stock approvals, deposits, borrowing or withdrawals. The existing USDG pilot is unchanged.
+> Historical development record. The single-participant access restriction was removed on 9 September 2026. See [current backend behavior](BACKEND.md), [contracts](CONTRACTS.md) and the [roadmap](PRODUCT-MILESTONES.md). Dated tests below retain their original scope; they are not funded production transactions.
+
+Freestock lists AAPL, GOOGL, NVDA, SPY and TSLA Morpho loan-asset markets on Robinhood Chain (4663). Borrower collateral is USDG. The user selected **read-only market data**, so this release adds no stock approvals, deposits, borrowing or withdrawals. The existing USDG account flow is unchanged.
 
 ## Registry and verification
 

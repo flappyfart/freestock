@@ -24,7 +24,6 @@ The stack is React + TypeScript on Vinext/Vite, with a Worker backend and D1. [`
 | --- | --- |
 | `DB` | D1 binding used for simulation and saved live history |
 | `ROBINHOOD_RPC_URL` | Optional RPC override; defaults to the configured public mainnet endpoint |
-| `FREESTOCK_PILOT_USER_ID` | Private-pilot application identity; unset means no matching pilot participant |
 
 Use ignored local environment files or your host's secret/configuration facility for actual values. Do not commit provider credentials, user identities, wallet keys or local database state. The server needs no wallet private key: signing happens in the browser wallet.
 
@@ -64,7 +63,7 @@ TEST_ORIGIN=http://localhost:3011 npm run test:api
 TEST_ORIGIN=http://localhost:3011 node scripts/live-api-check.mjs
 ```
 
-The API scripts enforce local HTTP origins and use test identity headers. Run the live API check with the private-pilot participant flag unset, as its expected status is disabled. Some live checks require healthy external RPC/quote services. Do not point these fixture runners at the hosted product or treat their injected headers as an authentication design.
+The API scripts enforce local HTTP origins and use test identity headers. The live API check verifies that distinct signed-in profiles have access and anonymous requests do not. Some live checks require healthy external RPC/quote services. Do not point these fixture runners at the hosted product or treat their injected headers as an authentication design.
 
 ```sh
 npm run verify:integrations
@@ -85,7 +84,7 @@ The client verifies account deployment and fixed dependencies before preparing o
 - Preserve browser signing and the owner-only contract boundary unless a new authorization design is explicitly reviewed and implemented.
 - Reconcile uncertain receipts before allowing a retry that could duplicate a financial action.
 - Add ordered migrations; do not rewrite already-applied history to hide schema changes.
-- Document whether a feature is implemented, read-only, simulated, private-pilot or planned.
+- Document whether a feature is implemented, read-only, simulated, live or planned.
 - Preserve third-party notices. Public visibility does not supply a missing repository-wide license.
 
 See [the roadmap](PRODUCT-MILESTONES.md) for the next product and execution milestones.

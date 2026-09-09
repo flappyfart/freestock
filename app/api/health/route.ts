@@ -1,17 +1,20 @@
-import { json } from "../../../lib/http";
-import { LAUNCH_POLICY } from "../../../lib/launch-policy";
-export function GET() {
+import { identity, json } from "../../../lib/http";
+import { pilotPolicy } from "../../../lib/live/pilot-policy";
+export async function GET() {
+  const access = pilotPolicy(await identity());
   return json({
     status: "ok",
     product: "freestock",
-    mode: "wallet-pilot-with-practice",
-    walletPilot: "participant-restricted, wallet-approved",
-    walletPilotStatusEndpoint: "/api/live/status",
-    realDepositsEnabled: LAUNCH_POLICY.realDepositsEnabled,
-    realTradingEnabled: LAUNCH_POLICY.realTradingEnabled,
-    launch: LAUNCH_POLICY,
-    earnings: { practice: "explicit-time-simulation", live: "chain-reads" },
-    automation: "simulation-step-only",
-    schema: 1,
+    mode: "live-wallet-with-simulation",
+    liveWalletAvailable: true,
+    access: "signed-in-wallet",
+    liveStatusEndpoint: "/api/live/status",
+    realDepositsEnabled: access.enabled,
+    realTradingEnabled: access.enabled,
+    launch: { phase: "live", audience: "non-us-users-subject-to-provider-restrictions" },
+    earnings: { simulation: "explicit-time-simulation", live: "wallet-approved-transactions" },
+    automation: "recommendations-with-manual-approval",
+    backgroundAutomationEnabled: false,
+    schema: 2,
   });
 }

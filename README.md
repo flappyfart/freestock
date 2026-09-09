@@ -6,9 +6,9 @@
 
 Freestock brings USDG lending, stock selections, rule-based lending recommendations and verified transaction history into one wallet dashboard. Choose a single stock or a basket, review what your available gains could buy, and approve the transaction yourself.
 
-[Product](https://tryfreestock.com/) · [20-second intro](docs/media/freestock-intro.mp4) · [Backend](docs/BACKEND.md) · [Contracts](docs/CONTRACTS.md) · [Developer guide](docs/DEVELOPMENT.md) · [Roadmap](docs/PRODUCT-MILESTONES.md)
+[Website](https://tryfreestock.com/) · [![X](docs/assets/x.svg) @tryfreestock](https://x.com/tryfreestock) · [20-second intro](docs/media/freestock-intro.mp4) · [Backend](docs/BACKEND.md) · [Contracts](docs/CONTRACTS.md) · [Developer guide](docs/DEVELOPMENT.md) · [Roadmap](docs/PRODUCT-MILESTONES.md)
 
-> **Public source · private pilot.** The hosted application is access controlled. Agentic Lending currently recommends actions; it does not move funds autonomously. Every financial transaction requires the owner's wallet approval. Publishing this repository does not enable unrestricted funded access.
+> **Public source · live wallet transactions.** Browse the website publicly, then sign in and connect your wallet to create or restore a live account. Agentic Lending recommends actions; every deposit, conversion and withdrawal requires the owner's wallet approval. Stock-provider restrictions apply.
 
 ## How it works
 
@@ -22,7 +22,7 @@ Freestock brings USDG lending, stock selections, rule-based lending recommendati
 
 | Capability | Current implementation |
 | --- | --- |
-| USDG lending | One configured vault in a capped, wallet-approved private pilot |
+| USDG lending | One configured vault through capped, wallet-approved live accounts |
 | Stock purchases | NVDA, AAPL, TSLA, GOOGL and SPY; single stock or basket |
 | Agentic Lending | Deterministic recommendations, explicit reasons and manual approval; no model or autonomous trader |
 | Compounding | Reserve available gains by increasing the principal baseline; vault returns already accrue while shares are held |
@@ -33,7 +33,7 @@ Freestock brings USDG lending, stock selections, rule-based lending recommendati
 | Stock lending, staking and leveraged LP execution | Not enabled for funded transactions |
 | Background conversion and cross-pool allocation | Not implemented; require a new permission and execution design |
 
-The pilot's **100 USDG cap** applies when adding deposits against the account's principal baseline. It is not a lifetime contribution limit or a hard ceiling on account value. See [accounting and permissions](docs/CONTRACTS.md#accounting-and-the-cap).
+The account's **100 USDG cap** applies when adding deposits against the account's principal baseline. It is not a lifetime contribution limit or a hard ceiling on account value. See [accounting and permissions](docs/CONTRACTS.md#accounting-and-the-cap).
 
 ## Architecture
 
@@ -55,7 +55,7 @@ The backend reads chain state, prepares unsigned transactions, verifies accounts
 
 ## Contracts and addresses
 
-Freestock uses a **per-user `FreestockYieldAccount`**. There is no shared Freestock account, factory or Freestock project-token address configured. Each participant deploys their own account from their wallet and can inspect that address in the dashboard and explorer.
+Freestock uses a **per-user `FreestockYieldAccount`**. There is no shared Freestock account, factory or Freestock project-token address configured. Each user deploys their own account from their wallet and can inspect that address in the dashboard and explorer.
 
 | Configured dependency · Robinhood Chain, chain ID 4663 | Address |
 | --- | --- |
@@ -115,7 +115,7 @@ npm test
 npm run build
 ```
 
-Publication check on 9 September 2026: all 123 application tests passed. Local and fork tests use fake funds. Passing tests does not establish a completed, funded production lifecycle.
+Publication check on 9 September 2026: the application test suite passed. Local and fork tests use fake funds. Passing tests does not establish a completed, funded production lifecycle.
 
 ## What comes next
 
@@ -124,7 +124,7 @@ Publication check on 9 September 2026: all 123 application tests passed. Local a
 3. Design bounded automation with explicit spending limits, cost limits, expiry, revocation and recovery before granting any execution authority.
 4. Add another earning source only after its accounting, permissions, liquidity and receipt behavior are verified.
 
-See the [delivery roadmap](docs/PRODUCT-MILESTONES.md), [user validation kit](docs/USER-VALIDATION-KIT.md) and [integration readiness notes](docs/INTEGRATION-READINESS.md). Earlier prize/draw documents describe a retired product direction. Microsoft and Sandisk references or artwork do not imply support in the funded five-stock pilot.
+See the [delivery roadmap](docs/PRODUCT-MILESTONES.md), [user validation kit](docs/USER-VALIDATION-KIT.md) and [integration readiness notes](docs/INTEGRATION-READINESS.md). Earlier prize/draw documents describe a retired product direction. Microsoft and Sandisk references or artwork do not imply support in the five-stock live account.
 
 ## Source and licensing
 

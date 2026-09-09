@@ -57,7 +57,7 @@ export default function Home() {
               </DemoLink>
             </div>
             <p className="home-hero-note">
-              Private wallet pilot · Up to 100 USDG deposited
+              Live on Robinhood Chain · 100 USDG deposit limit
               <br />
               Returns vary. Capital can lose value.
             </p>
@@ -145,7 +145,7 @@ export default function Home() {
               <span className="home-step-number">01</span>
               <h3>Put USDG to work</h3>
               <p>
-                Connect your wallet and create a lending position. The pilot uses the Steakhouse
+                Connect your wallet and create a lending position. Freestock uses the Steakhouse
                 USDG vault on Robinhood Chain.
               </p>
             </li>

@@ -1,12 +1,7 @@
-import { env } from "cloudflare:workers";
-import { hasPrivatePilotAccess } from "./pilot-access";
+import { hasLiveWalletAccess } from "./pilot-access";
 export function pilotPolicy(userId: string | null) {
-  const v = env as unknown as {
-    FREESTOCK_PILOT_USER_ID?: string;
-  };
-  const enabled = hasPrivatePilotAccess(userId, v.FREESTOCK_PILOT_USER_ID);
   return {
-    enabled,
+    enabled: hasLiveWalletAccess(userId),
     eligibilityVerified: false,
     backgroundAutomationEnabled: false,
   };

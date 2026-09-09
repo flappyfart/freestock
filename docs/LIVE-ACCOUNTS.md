@@ -1,12 +1,14 @@
-# Freestock real-chain integration — 8 September 2026
+# Freestock live accounts — updated 9 September 2026
+
+> Current account behavior with dated integration evidence. See [backend behavior](BACKEND.md), [contracts](CONTRACTS.md) and the [roadmap](PRODUCT-MILESTONES.md). The tests below retain their original scope; they are not funded production transactions.
 
 ## What works now
 
-Connect Wallet uses EIP-6963 and leads to `/dashboard`; `/live` redirects there for compatibility. “Try it yourself” opens a separate simulation popup. Private account access is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
+Connect Wallet uses EIP-6963 and leads to `/dashboard`; `/live` redirects there for compatibility. “Try it yourself” opens a separate simulation popup. Application sign-in is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The live account supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
 
 Preparation verifies chain 4663, exact deployment calldata, canonical deployment receipt/block, CREATE address, runtime bytes, constructor ownership and fixed dependencies. Deposits apply a 0.1% share minimum; stock legs have a 1% minimum-output allowance and a 120-second onchain deadline. A fresh actual-sender simulation and gas estimate precede each wallet prompt. Plans expire after 45 seconds and bind the nonce. Client validation repeats route, amount, recipient, expiry, sender and network checks. Receipts and token purchase events are reconciled against the verified account.
 
-Only the exact signed-in account configured by `FREESTOCK_PILOT_USER_ID` receives entry/trading preparation. This is private product authorization, not issuer eligibility verification. The country questionnaire and declaration checkbox have been removed; country and US-person environment values no longer control product authorization. Withdrawal preparation remains available for an existing verified account even if new pilot actions are disabled. All routes require Sites identity and return private, uncached responses.
+Signed-in users can prepare account creation, deposits and stock purchases. Sign-in does not verify issuer eligibility or wallet ownership. There is no country questionnaire or participant allowlist. Withdrawal preparation remains available for an existing verified account even when new deposit or purchase actions are unavailable. Account routes require Sites identity and return private, uncached responses. The owner’s wallet must approve every financial transaction.
 
 Pending wallet requests use a device-only owner/chain journal with unique request IDs, nonces and transaction/account references. Web Locks serialize updates across tabs. Unknown submission outcomes stay locked against automatic retries; late replies cannot replace successor requests. Recovery checks original sender/nonce and canonical receipts, including wallet cancellation or another transaction consuming that nonce. Journal state is not a balance ledger. No background trading runs.
 
@@ -34,22 +36,22 @@ Available gains equal account asset value above the recorded principal baseline.
 - The account test advanced **local time by 30 days**. Genuine adapter accounting at that pinned state produced a surplus, but neither that amount nor time acceleration represents a real deposit, live earnings or a return forecast. A two-micro-USDG buffer was retained for rounding.
 - The vault explorer reports a partial source match. Its exact deployed Git commit has not been proven. Local success does not prove future liquidity or eligibility.
 
-Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifacts/account-standard-input.json` permits exact recompilation. The source/artifact hash is tested automatically. No public transaction was submitted by the builder. Mainnet deployment occurs only when the participant creates an account in their own wallet.
+Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifacts/account-standard-input.json` permits exact recompilation. The source/artifact hash is tested automatically. No public transaction was submitted by the builder. Mainnet deployment occurs only when the user creates an account in their own wallet.
 
-## Private access and provider boundaries
+## Account access and provider boundaries
 
-The product is intended for non-US users and currently retains its configured private account access. Freestock has no separate eligibility questionnaire and makes no eligibility determination. Investor representations and applicable stock-provider restrictions still apply; non-US location alone does not establish unrestricted availability.
+The public website is intended for non-US users; live account actions require sign-in and wallet approval. Freestock has no separate eligibility questionnaire and makes no eligibility determination. Investor representations and applicable stock-provider restrictions still apply; non-US location alone does not establish unrestricted availability.
 
 The prospectus distinguishes direct secondary blockchain purchases from purchases through an Authorised Participant, while also containing broader KYC/AML wording. This work does not assert that self-attestation alone is a completed verification. No issuer API key is required for the verified direct AMM route, and no mandatory AMM provider-preapproval workflow was established.
 
-The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. This is a limited private pilot, not an unrestricted public product.
+The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. Provider restrictions and the account’s deposit cap continue to apply.
 
 ## Verification performed on this version
 
 - 69 unit tests passed, including six account-reference storage/recovery tests, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
 - Lint, TypeScript and the production build passed.
 - 18 local read-only live API checks passed against current mainnet reads: authentication, input validation, balances, NVIDIA quote, MSFT route rejection, unfunded deposit preview and simulated account creation.
-- Existing practice API regression: 12 groups / 46 requests passed in an isolated local database. No hosted account was changed.
+- Existing simulation API regression: 12 groups / 46 requests passed in an isolated local database. No hosted account was changed.
 
 - The full five-stock API and wallet pipeline passed **93 assertions** on a separate fresh local fork pinned to block **58,065,058**, hash `0x360c98ead6fcff5b014f857cd57939035ead668de49e66735ee54453d060af2a`. It used a fresh fake-funded wallet, deposited 10, donated 0.1 to create gains, reserved 0.02, purchased five 0.01 stock legs and withdrew the remaining 10.05 USDG. The donation was **not lending income**; genuine adapter-interest conversion was proved separately by the earlier 39-check test. No public transactions, privileged impersonation or gate overrides were used.
 - UI switches follow the supplied Uiverse.io design by reglobby with accessible native controls, clear state text, focus indicators and reduced-motion support.
@@ -72,7 +74,7 @@ Additional selected-token Final Terms: [AAPL](https://cdn.robinhood.com/assets/r
 
 `contracts/test/current-mainnet-readiness.json` records the fresh check. On 2026-09-09 at 00:40:27 UTC, 65 read-only RPC checks completed without error at block 58,125,772. Vault runtime matched the pinned dependency, the 100 USDG deposit preview remained positive, and all five selected fee-500 stock pools returned positive 1 and 100 USDG quotes. The issuer registry still listed all five tokens as active. This check submitted no public transactions and is not proof of future liquidity. The Apple multiplier was 1.000566080061092436, so quantities are labeled tokens rather than underlying shares.
 
-The deployed environment still uses the official public RPC fallback; dedicated production capacity is not configured. General registration, unattended conversion, staking and leveraged LP execution remain outside this private wallet pilot.
+The deployed environment still uses the official public RPC fallback; dedicated production capacity is not configured. Unattended conversion, staking and leveraged LP execution are not available. Browsing is public; live account actions require application sign-in and owner wallet approval.
 
 ## Portfolio history update — 2026-09-09
 

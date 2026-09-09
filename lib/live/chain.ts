@@ -163,7 +163,7 @@ export async function previewDeposit(account: string, input: string) {
       expiresAt: new Date(Date.now() + 60000).toISOString(),
       canSubmit: false,
       reason:
-        "This read-only check previews a direct vault deposit. Use the separate private wallet pilot for a reviewed yield-account deposit.",
+        "This read-only check previews a direct vault deposit. Open Your position in Dashboard for a reviewed yield-account deposit.",
     };
   });
 }

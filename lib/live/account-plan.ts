@@ -27,7 +27,7 @@ export function accountPlan(ownerInput: string) {
     transaction: { from: owner, data, value: "0x0", chainId: "0x1237" },
     canSubmit: false,
     reason:
-      "This read-only setup preview does not deploy. Use the private wallet pilot to review an actual wallet transaction.",
+      "This read-only setup preview does not deploy. Open Your position in Dashboard to review an actual wallet transaction.",
   };
 }
 

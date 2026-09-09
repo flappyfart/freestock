@@ -1,5 +1,7 @@
 > Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
 
+> Historical development record. The single-participant access restriction was removed on 9 September 2026. See [current backend behavior](BACKEND.md), [contracts](CONTRACTS.md) and the [roadmap](PRODUCT-MILESTONES.md). Dated tests below retain their original scope; they are not funded production transactions.
+
 # Freestock integration readiness
 
 Verified 2026-09-08. This report treats the pasted conversation as background claims and separates them from current documentation and read-only network evidence. No transaction, deposit, token purchase, bridge, or deployment was submitted.

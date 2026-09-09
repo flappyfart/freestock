@@ -1,5 +1,7 @@
 > Historical record: this document describes the retired prize preview. See README.md and the in-app Docs for the active DeFi product.
 
+> Historical development record. The single-participant access restriction was removed on 9 September 2026. See [current backend behavior](BACKEND.md), [contracts](CONTRACTS.md) and the [roadmap](PRODUCT-MILESTONES.md). Dated tests below retain their original scope; they are not funded production transactions.
+
 # Verification record
 
 September 8, 2026.
@@ -14,4 +16,4 @@ September 8, 2026.
 - Optional WebMCP tools are feature-detected and cleaned up on page teardown. No supported WebMCP browser validation context was used; tool execution remains unverified.
 - The design skill installation contains only SKILL.md; its referenced product guide and detector script are absent. The available guidance and supplied style reference were applied without claiming the absent automated check ran.
 
-Live funded activation remains disabled in every environment. The private hosted beta is not a declaration of protocol production readiness.
+At this September 8 checkpoint, funded activation was disabled. These historical tests do not establish production readiness; current live wallet behavior is documented in [Live accounts](LIVE-ACCOUNTS.md).

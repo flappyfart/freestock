@@ -124,13 +124,13 @@ Score **revealed task behavior**, not enthusiasm. Keep the underlying categories
 | P07 |               |                  |            |           |                    |                      |
 | P08 |               |                  |            |           |                    |                      |
 
-Do not use a high total to hide a comprehension failure. Report initial preference, post-cost preference and follow-up preference separately. Distinguish observed choices from a request to try a future funded pilot; neither proves willingness to pay or long-term retention.
+Do not use a high total to hide a comprehension failure. Report initial preference, post-cost preference and follow-up preference separately. Distinguish observed choices from a request to try a funded usability session; neither proves willingness to pay or long-term retention.
 
 ## Decision rule before running the study
 
 These are directional research thresholds, not statistically representative estimates:
 
-- **Proceed to a small manual pilot:** at least five of eight choose stocks after a complete cost display; at least four still choose stocks at follow-up; and at least six correctly explain the earnings source and cost/waiting behavior. Address any principal-value or revoke misunderstanding before funded testing.
+- **Proceed to a small wallet-approved usability study:** at least five of eight choose stocks after a complete cost display; at least four still choose stocks at follow-up; and at least six correctly explain the earnings source and cost/waiting behavior. Address any principal-value or revoke misunderstanding before funded testing.
 - **Adjust the segment or batching:** interest is strong but realistic costs repeatedly reverse choices. Identify the smallest position/available-earnings combination that survives costs; test monthly or threshold-based batches with that segment.
 - **Reconsider the core proposition:** fewer than three choose stocks after costs, or most repeatedly prefer USDG/reinvestment. Do not answer this result by adding more animation or a token.
 - **Inconclusive:** important costs or available-earnings inputs were unknown, or follow-up participation was too low. Fix the evidence before drawing a product conclusion.

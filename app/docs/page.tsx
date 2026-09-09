@@ -16,7 +16,7 @@ export default function Page() {
             works today.
           </h1>
           <p>
-            Current mechanics, data sources and private wallet pilot limits. For the concepts behind
+            Current mechanics, data sources and live account limits. For the concepts behind
             lending, compounding and stock-token exposure, start with{" "}
             <Link href="/learn">Learn</Link>.
           </p>
@@ -33,7 +33,7 @@ export default function Page() {
             <a href="#automation">Demo automation</a>
             <a href="#pricing">Token quantities</a>
             <a href="#storage">Saved records</a>
-            <a href="#execution">Wallet pilot</a>
+            <a href="#execution">Live transactions</a>
           </aside>
           <div className="education-body">
             <section id="status">
@@ -77,7 +77,7 @@ export default function Page() {
                     <tr>
                       <td>Live USDG lending</td>
                       <td>
-                        One vault for the enabled participant, with a 100 USDG deposit limit and
+                        One vault for signed-in users, with a 100 USDG deposit limit and
                         wallet approval for each transaction
                       </td>
                     </tr>
@@ -119,8 +119,8 @@ export default function Page() {
                     <tr>
                       <td>Access</td>
                       <td>
-                        Private pilot for the configured signed-in account; connecting a wallet does
-                        not grant access
+                        Live accounts for signed-in users; every financial action requires owner
+                        wallet approval
                       </td>
                     </tr>
                   </tbody>
@@ -192,7 +192,7 @@ export default function Page() {
                 return forecast. The simulation excludes conversion costs.
               </p>
               <p>
-                The current live pilot creates a Freestock account in one supported USDG vault. It
+                Freestock creates a Freestock account in one supported USDG vault. It
                 cannot attach to an arbitrary existing lending position. Real conversions and
                 reserving gains are separate wallet-approved actions. Additional lending adapters,
                 automatic fee limits and revocable background conversion rules are future work.
@@ -456,7 +456,7 @@ export default function Page() {
               </p>
               <p>
                 Live vault shares reflect the underlying return without a new wallet signature. The
-                pilot has no background auto-conversion service. Reserving gains as principal or
+                account has no background auto-conversion service. Reserving gains as principal or
                 converting available gains into stock tokens requires a transaction that the owner
                 reviews and approves.
               </p>
@@ -559,16 +559,16 @@ export default function Page() {
               </p>
             </section>
             <section id="execution">
-              <h2>The private wallet pilot</h2>
+              <h2>Live wallet transactions</h2>
               <p>
                 Choose Connect Wallet on Home, then create or manage your live position in{" "}
                 <Link href="/dashboard">Dashboard</Link>. New deposits and stock purchases are
-                limited to the configured signed-in account. This private access does not verify
-                eligibility for the stock provider’s services. General registration for live actions
-                is not enabled.
+                available to signed-in users. Sign-in saves your positions and history; it does
+                not verify eligibility for the stock provider’s services. Provider restrictions
+                still apply.
               </p>
               <p>
-                The pilot supports one USDG lending vault, a 100 USDG deposit limit and purchases of
+                Freestock supports one USDG lending vault, a 100 USDG deposit limit and purchases of
                 NVIDIA (NVDA), Apple (AAPL), Tesla (TSLA), Alphabet (GOOGL) and SPY Stock Tokens.
                 The owner can create an account, deposit, reserve available gains as principal,
                 purchase selected tokens and withdraw. Every transaction requires wallet approval;
@@ -614,7 +614,7 @@ export default function Page() {
               <p>
                 Local execution checks used fake funds against a local copy of the route. The
                 builder has not deployed a public account or submitted real transactions. A
-                participant must create and fund their own account through wallet-approved
+                owner must create and fund their own account through wallet-approved
                 transactions. Country, issuer and transaction restrictions still apply.
               </p>
               <Link href="/dashboard" className="earn-link">

@@ -1,6 +1,7 @@
 import { COUNTRIES } from "./countries.ts";
 
-// General registration policy, not authorization for the separately configured private pilot.
+// Retired questionnaire metadata, preserved for legacy simulation compatibility.
+// Live wallet authorization is defined in live/pilot-policy.ts.
 export const LAUNCH_POLICY = Object.freeze({
   audience: "eligible-non-us-users",
   payoutAsset: "robinhood-stock-tokens",
@@ -101,6 +102,6 @@ export function assessAvailability(input: AvailabilityInput): AvailabilityResult
   return result(
     "pending",
     "Availability is not yet confirmed.",
-    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility or grant live access. The private wallet pilot is limited to its configured participant.",
+    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility or grant live access. Live account access is handled separately through sign-in and owner wallet approval.",
   );
 }

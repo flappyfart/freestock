@@ -75,3 +75,6 @@ The owner supplied `a9ekptulht2f1glph7ar.mp4` and `yknj7ul7zvjvnejfmpyf.mp4` as 
 
 
 The AAPL, NVDA, and MSFT hero cutouts are background-extraction edits of the original generated freestock stock artwork. The ribbon backdrop is removed, each card keeps its full chrome outline, and transparent alpha is preserved in the website assets.
+
+
+The X glyph used in navigation and the repository README is from Simple Icons (CC0): https://github.com/simple-icons/simple-icons/blob/develop/icons/x.svg. X remains a trademark of its owner.

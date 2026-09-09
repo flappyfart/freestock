@@ -42,3 +42,15 @@ next-env.d.ts
 # local Wrangler secrets
 .dev.vars
 .dev.vars.*
+
+# Local credentials and private signing material
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa
+id_ed25519
+credentials*.json
+secrets*.json
+secret.json
+*.log

@@ -610,12 +610,12 @@ export default function PilotWorkspace({
 
       {availability === "loading" && (
         <p className="pd-notice" aria-live="polite">
-          Checking participant access. Existing accounts can still be restored.
+          Checking live access. Existing accounts can still be restored.
         </p>
       )}
       {(availability === "unavailable" || availability === "error") && (
         <p className="pd-notice">
-          New actions require confirmed participant access. You can still restore and withdraw from
+          Sign in to enable new live actions. You can still restore and withdraw from
           an existing verified account.
         </p>
       )}

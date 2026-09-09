@@ -10,7 +10,7 @@ import { DemoProvider } from "./demo/demo-provider";
 export const metadata: Metadata = {
   title: "freestock | Agentic Lending, your stock picks",
   description:
-    "Set a lending plan, check available gains and review stock purchases with Agentic Lending. Rule-based recommendations in the private wallet pilot; every transaction needs your approval.",
+    "Set a lending plan, check available gains and review stock purchases with Agentic Lending. Rule-based recommendations for your live lending account; every transaction needs your approval.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

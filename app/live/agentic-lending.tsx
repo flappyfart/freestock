@@ -454,8 +454,7 @@ export function AgenticLending({
             </div>
             {!!owner && !enabled && (
               <p className="agentic-note">
-                Live transaction estimates and purchases remain limited to the enabled private-pilot
-                participant. Purchase checks are capped at 100 USDG per action.
+                Sign in to review live transaction estimates and stock purchases. Purchase checks are capped at 100 USDG per action.
               </p>
             )}
             {error && (

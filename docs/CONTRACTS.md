@@ -2,7 +2,7 @@
 
 [README](../README.md) · [Backend](BACKEND.md) · [Developer guide](DEVELOPMENT.md)
 
-Freestock's private pilot uses one owner-controlled `FreestockYieldAccount` per participant. **There is no shared Freestock account, deployment factory or Freestock project-token address configured.** The participant deploys their account from their wallet; the dashboard verifies it before using it.
+Freestock uses one owner-controlled `FreestockYieldAccount` per wallet-deployed account. **There is no shared Freestock account, deployment factory or Freestock project-token address configured.** The participant deploys their account from their wallet; the dashboard verifies it before using it.
 
 ## Network and configured dependencies
 
@@ -18,7 +18,7 @@ Robinhood Chain mainnet, chain ID **4663**. Native gas token: **ETH**. USDG acco
 
 ## Enabled stock tokens
 
-The funded pilot supports these five configured tokens, each with 18 decimals. The addresses identify the onchain token contracts, not ordinary brokerage shares.
+The live account supports these five configured tokens, each with 18 decimals. The addresses identify the onchain token contracts, not ordinary brokerage shares.
 
 | Symbol | Name | Address / explorer |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ The funded pilot supports these five configured tokens, each with 18 decimals. T
 | GOOGL | Alphabet | [`0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3`](https://robinhoodchain.blockscout.com/address/0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3) |
 | SPY | SPDR S&P 500 ETF | [`0x117cc2133c37B721F49dE2A7a74833232B3B4C0C`](https://robinhoodchain.blockscout.com/address/0x117cc2133c37B721F49dE2A7a74833232B3B4C0C) |
 
-The executable configuration lives in [`config.ts`](../lib/live/config.ts), [`basket.ts`](../lib/live/basket.ts) and [`quote.ts`](../lib/live/quote.ts). Microsoft references and Sandisk artwork do not add those assets to the enabled pilot.
+The executable configuration lives in [`config.ts`](../lib/live/config.ts), [`basket.ts`](../lib/live/basket.ts) and [`quote.ts`](../lib/live/quote.ts). Microsoft references and Sandisk artwork do not add those assets to the live account.
 
 ## Ownership and permissions
 
@@ -94,6 +94,6 @@ The saved build uses Solidity **0.8.30**, optimizer enabled with **200 runs**, *
 
 ## Validation evidence and limits
 
-The repository retains dated [account test evidence](../contracts/test/ACCOUNT-TEST.md), [fork execution notes](../contracts/test/FORK-EXECUTION.md) and [pilot API checks](../contracts/test/PILOT-API-TEST.md). A 39-assertion local-fork exercise used fake funds and accelerated time. A separate 93-assertion exercise used constructed surplus, including donations. These are implementation checks, not funded production results or return forecasts.
+The repository retains dated [account test evidence](../contracts/test/ACCOUNT-TEST.md), [fork execution notes](../contracts/test/FORK-EXECUTION.md) and [live account API checks](../contracts/test/PILOT-API-TEST.md). A 39-assertion local-fork exercise used fake funds and accelerated time. A separate 93-assertion exercise used constructed surplus, including donations. These are implementation checks, not funded production results or return forecasts.
 
 Some historical reports refer to scratch runners outside the repository; those reports are evidence records, not reproducible setup commands. Use the committed application tests and the [developer guide](DEVELOPMENT.md) for the current checkout. The next operational milestone is an explicitly owner-approved funded lifecycle with reconciled receipts.

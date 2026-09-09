@@ -450,3 +450,21 @@ void test('a confirmed third replacement resolves every earlier request with the
   );
   f.sql.close();
 });
+
+void test('two profiles can save the same public account without sharing or overwriting history', async () => {
+  const f = fixture();
+  f.add(2, 11);
+  await f.reader.sync(user, wallet, deployment);
+  const aliceBefore = await f.store.page(scope);
+  await f.reader.sync('bob', wallet, deployment);
+  const bobScope = { user: 'bob', wallet, account };
+  assert.equal((await f.store.page(bobScope)).records.length, aliceBefore.records.length);
+  f.setHead(30);
+  f.add(3, 25, 'withdraw', [['Withdrawn', [10n, 9999990n]]]);
+  await f.reader.sync('bob', wallet, deployment);
+  assert.deepEqual(await f.store.page(scope), aliceBefore);
+  const bobAfter = await f.store.page(bobScope);
+  assert.equal(bobAfter.account?.syncedBlock, 30);
+  assert.equal(bobAfter.records.length, aliceBefore.records.length + 1);
+  f.sql.close();
+});

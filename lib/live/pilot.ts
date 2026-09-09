@@ -157,11 +157,11 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
     const owner = address(query.get("owner")),
       action = query.get("action") ?? "";
     if (!["deploy", "approve", "deposit", "harvest", "compound", "withdraw"].includes(action))
-      throw new LiveError("Choose a supported pilot action.", 400);
+      throw new LiveError("Choose a supported account action.", 400);
     // Withdrawal preparation stays available even if pilot entry/trading is later disabled.
     const policy = pilotPolicy(userId);
     if (!policy.enabled && action !== "withdraw")
-      throw new LiveError("This wallet pilot is not enabled for the signed-in account.", 403);
+      throw new LiveError("Sign in to enable live wallet actions.", 403);
     const block = await pin();
     let transaction: Transaction,
       summary: string,
@@ -181,7 +181,7 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
     if (action === "deploy") {
       if ((await rpc("eth_getCode", [owner, block])) !== "0x")
         throw new LiveError(
-          "This pilot requires a wallet that deploys directly from its own address.",
+          "Use a wallet that deploys directly from its own address.",
           422,
         );
       transaction = accountPlan(owner).transaction;

@@ -36,6 +36,10 @@ Required behavior: below-baseline losses recover first; small or uneconomic conv
 
 ## Later: expand sources
 
-Add another lending adapter only when its gain accounting, liquidity, permissions and receipt semantics are verified. Connecting an arbitrary existing position is not currently supported. Staking, leveraged LP execution and stock-lending transactions remain outside the live pilot; stock lending is read-only data.
+Add another lending adapter only when its gain accounting, liquidity, permissions and receipt semantics are verified. Connecting an arbitrary existing position is not currently supported. Staking, leveraged LP execution and stock-lending transactions remain outside the live account; stock lending is read-only data.
 
 Success is a repeatable customer outcome with understandable costs and reliable execution. Do not claim first, only, guaranteed income or principal protection.
+
+## Public access update — 9 September 2026
+
+The single-participant application allowlist has been removed. Signed-in users can prepare owner-approved account creation, deposits, stock purchases, compounding and withdrawals. Public browsing and real wallet execution remain separate from the simulator. The existing contract cap, owner checks, receipt checks and manual signing remain in place. Website: https://tryfreestock.com/. X: https://x.com/tryfreestock. No funded user lifecycle was performed by the builder during this release.
