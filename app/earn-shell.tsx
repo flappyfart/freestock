@@ -12,6 +12,7 @@ import { ScrollMotion } from './scroll-motion';
 import { MotionEffects } from './motion-effects';
 import { DemoLink } from './demo/demo-link';
 import { HeaderWalletButton } from './live/header-wallet-button';
+import { TokenContract } from './token-contract';
 export function EarnShell({
   children,
   active = 'Home',
@@ -245,6 +246,7 @@ export function EarnShell({
             About Stock Tokens <ArrowUpRight size={14} />
           </a>
         </div>
+        <TokenContract />
       </footer>
     </div>
   );

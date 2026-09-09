@@ -96,6 +96,67 @@
   flex-wrap: wrap;
   margin-top: 28px;
 }
+.earn .token-contract {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--flow-line);
+  border-radius: 16px;
+  background: #ffffffdf;
+  color: var(--flow-ink);
+}
+.home-hero-copy > .token-contract {
+  max-width: 510px;
+  margin-top: 22px;
+}
+.earn-footer > .token-contract {
+  grid-column: 1 / -1;
+}
+.token-contract-label {
+  grid-column: 1 / -1;
+  color: var(--flow-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.earn .token-contract code {
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.earn .token-contract button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 86px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #dbe6fc;
+  border-radius: 12px;
+  background: #eff5ff;
+  color: #0755d9;
+  font-size: 14px;
+  cursor: pointer;
+}
+.earn .token-contract button:hover {
+  background: #e3edff;
+}
+.earn .token-contract button:focus-visible {
+  outline: 2px solid #0755d9;
+  outline-offset: 3px;
+}
+.token-contract-error {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  color: var(--flow-muted);
+}
 .earn .earn-button {
   border-radius: 999px;
   min-height: 46px;

@@ -16,6 +16,7 @@ import { useDemo, type DemoView } from './demo/demo-provider';
 import { DemoLink } from './demo/demo-link';
 import { useWalletConnection } from './live/wallet-provider';
 import { HomePools } from './home-pools';
+import { TokenContract } from './token-contract';
 export default function Home() {
   const { openDemo } = useDemo();
   const { requestConnect, owner } = useWalletConnection();
@@ -78,6 +79,7 @@ export default function Home() {
               <br />
               Returns vary. Capital can lose value.
             </p>
+            <TokenContract />
           </div>
           <div className="home-stock-scene" aria-hidden="true">
             <div className="home-stock-apple">
