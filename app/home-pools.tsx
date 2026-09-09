@@ -151,6 +151,7 @@ export function HomePools() {
         </button>
         <button type="button" aria-pressed={asset === "stocks"} onClick={() => setAsset("stocks")}>
           Stock lending
+          <span className="home-pools-soon">Soon</span>
         </button>
       </fieldset>
       {asset === "stocks" ? (

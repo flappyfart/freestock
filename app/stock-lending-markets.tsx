@@ -224,7 +224,10 @@ export function StockLendingMarkets({ embedded = false }: { embedded?: boolean }
     >
       <div className="stock-lending-heading">
         <div>
-          <Heading id={`${id}-heading`}>Stock-token lending markets</Heading>
+          <div className="stock-lending-title">
+            <Heading id={`${id}-heading`}>Stock-token lending markets</Heading>
+            <span className="stock-lending-soon">Coming soon</span>
+          </div>
           <p>Supply asset: Stock Tokens. Borrower collateral: USDG.</p>
         </div>
         <div className="stock-lending-controls">
@@ -244,7 +247,8 @@ export function StockLendingMarkets({ embedded = false }: { embedded?: boolean }
         </div>
       </div>
       <p className="stock-lending-notice" id={`${id}-notice`}>
-        Market data only · deposits not enabled in Freestock
+        Stock lending is coming to Freestock. Explore live market data while deposits are
+        unavailable.
         <Link href="/docs#stock-lending" className="stock-lending-review-link">
           Read the lending review <ArrowUpRight size={14} aria-hidden="true" />
         </Link>

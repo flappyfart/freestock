@@ -29,12 +29,34 @@
   padding: 25px 30px 14px;
 }
 .stock-lending .stock-lending-heading :is(h2, h3) {
-  margin: 0 0 6px;
+  margin: 0;
   color: var(--stock-ink);
   font-size: 20px;
   line-height: 1.3;
   letter-spacing: -0.025em;
   text-wrap: balance;
+}
+.stock-lending-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
+.stock-lending-soon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1px solid #3b5d82;
+  border-radius: 999px;
+  background: #152b43;
+  color: #b9dcff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 .stock-lending .stock-lending-heading p {
   margin: 0;

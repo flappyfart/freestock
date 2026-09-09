@@ -398,6 +398,7 @@
 
 .home-pools-asset-switch {
   display: inline-flex;
+  max-width: calc(100% - 60px);
   gap: 4px;
   margin: 0 30px 24px;
   padding: 5px;
@@ -406,6 +407,11 @@
   background: #111f32;
 }
 .earn .home-pools-asset-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
   min-height: 44px;
   padding: 10px 22px;
   border: 0;
@@ -426,8 +432,19 @@
 .earn .home-pools-asset-switch button:hover {
   color: #fff;
 }
+.home-pools-soon {
+  padding: 2px 6px;
+  border: 1px solid #3b5d82;
+  border-radius: 999px;
+  background: #152b43;
+  color: #b9dcff;
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
 @media (max-width: 700px) {
   .home-pools-asset-switch {
+    max-width: calc(100% - 40px);
     margin-inline: 20px;
   }
   .earn .home-pools-asset-switch button {
