@@ -1,0 +1,103 @@
+{
+  "checkedAt": "2026-09-09T02:41:17.483Z",
+  "chain": 4663,
+  "localChain": 31337,
+  "block": 58196418,
+  "hash": "0xfa94fc59ab2529b08f35267432cf72a524cc631b269d05456ec66ea52f266dba",
+  "syntheticFunds": true,
+  "publicTransactions": false,
+  "privilegedImpersonation": false,
+  "gateOverrides": false,
+  "cases": [
+    {
+      "symbol": "AAPL",
+      "marketId": "0xb257b94f5fc1b69d1960d0a43684f7fc39c8f8c3748b84b51d6dfbbc0e362915",
+      "checks": [
+        "exact market parameters",
+        "supply without allowance rejects",
+        "exact approval consumed",
+        "same-token supply recorded",
+        "other wallet cannot withdraw lender position",
+        "excessive borrow rejected",
+        "loan paid in stock token",
+        "full withdrawal blocked while liquidity is borrowed",
+        "borrower repays stock principal plus modeled-day interest",
+        "withdraws same token plus borrower-paid interest",
+        "no remaining supply position",
+        "borrower collateral recoverable"
+      ]
+    },
+    {
+      "symbol": "GOOGL",
+      "marketId": "0x9d4ceedfeead12af47fee247c9970e91e12009b2283f8fbea7029dbd97eb3e31",
+      "checks": [
+        "exact market parameters",
+        "supply without allowance rejects",
+        "exact approval consumed",
+        "same-token supply recorded",
+        "other wallet cannot withdraw lender position",
+        "excessive borrow rejected",
+        "loan paid in stock token",
+        "full withdrawal blocked while liquidity is borrowed",
+        "borrower repays stock principal plus modeled-day interest",
+        "withdraws same token plus borrower-paid interest",
+        "no remaining supply position",
+        "borrower collateral recoverable"
+      ]
+    },
+    {
+      "symbol": "NVDA",
+      "marketId": "0x2fdd5af0a36ab05917ea93b1266b15f655b920d83a497adbfadcf4fcd9b28324",
+      "checks": [
+        "exact market parameters",
+        "supply without allowance rejects",
+        "exact approval consumed",
+        "same-token supply recorded",
+        "other wallet cannot withdraw lender position",
+        "excessive borrow rejected",
+        "loan paid in stock token",
+        "full withdrawal blocked while liquidity is borrowed",
+        "borrower repays stock principal plus modeled-day interest",
+        "withdraws same token plus borrower-paid interest",
+        "no remaining supply position",
+        "borrower collateral recoverable"
+      ]
+    },
+    {
+      "symbol": "SPY",
+      "marketId": "0xf670348a152ced94c8dd240645d7bef7abd83049a7ae1f2e13949cee638a2ecc",
+      "checks": [
+        "exact market parameters",
+        "supply without allowance rejects",
+        "exact approval consumed",
+        "same-token supply recorded",
+        "other wallet cannot withdraw lender position",
+        "excessive borrow rejected",
+        "loan paid in stock token",
+        "full withdrawal blocked while liquidity is borrowed",
+        "borrower repays stock principal plus modeled-day interest",
+        "withdraws same token plus borrower-paid interest",
+        "no remaining supply position",
+        "borrower collateral recoverable"
+      ]
+    },
+    {
+      "symbol": "TSLA",
+      "marketId": "0x85f86f26ef02da6c9991a0bf7afd6c8969f41e2aec4ff8c54b29998ea9966551",
+      "checks": [
+        "exact market parameters",
+        "supply without allowance rejects",
+        "exact approval consumed",
+        "same-token supply recorded",
+        "other wallet cannot withdraw lender position",
+        "excessive borrow rejected",
+        "loan paid in stock token",
+        "full withdrawal blocked while liquidity is borrowed",
+        "borrower repays stock principal plus modeled-day interest",
+        "withdraws same token plus borrower-paid interest",
+        "no remaining supply position",
+        "borrower collateral recoverable"
+      ]
+    }
+  ]
+}

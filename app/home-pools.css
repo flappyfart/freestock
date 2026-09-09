@@ -395,3 +395,47 @@
     box-shadow: 0 0 0 6px #91dfc900;
   }
 }
+
+.home-pools-asset-switch {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0 30px 24px;
+  padding: 5px;
+  border: 1px solid #294367;
+  border-radius: 99px;
+  background: #111f32;
+}
+.earn .home-pools-asset-switch button {
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: #a6b7ce;
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background-color 180ms,
+    color 180ms;
+}
+.earn .home-pools-asset-switch button[aria-pressed="true"] {
+  background: #234c7d;
+  color: #eef7ff;
+  box-shadow: inset 0 1px #ffffff20;
+}
+.earn .home-pools-asset-switch button:hover {
+  color: #fff;
+}
+@media (max-width: 700px) {
+  .home-pools-asset-switch {
+    margin-inline: 20px;
+  }
+  .earn .home-pools-asset-switch button {
+    padding-inline: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .earn .home-pools-asset-switch button {
+    transition: none;
+  }
+}

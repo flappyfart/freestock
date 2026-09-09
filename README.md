@@ -29,6 +29,8 @@ The LP model uses leverage, fee APR, borrowing APR, annual costs on exposure and
 
 `lib/markets.ts` reads current balances and seven-day rates for one tracked Steakhouse USDG vault and five previously verified listed Morpho USDG markets on Robinhood Chain 4663. Directory membership was checked September 8, 2026. This is an explicit subset; it does not claim all-chain pool coverage. Vault and market assets overlap and are never added together. Refresh failure returns the dated snapshot with a prominent status. Read-only observations do not establish an executable route. See the in-app Docs for direct source links.
 
+`/api/stock-lending/markets` reads five separately verified AAPL, GOOGL, NVDA, SPY and TSLA loan-asset markets with USDG collateral. Home provides USDG/Stock lending tabs; Dashboard also shows the stock market feed. Stock lending is data-only: no stock approval, supply or withdrawal route is enabled. Amounts retain 18-decimal precision, missing responses never become zero, and historical rates are independent of balance availability. See [stock-lending verification](docs/STOCK-LENDING.md) and `/docs#stock-lending`.
+
 ## Persistence and requests
 
 `lib/earn-store.ts` saves independent per-owner state in `earn_accounts` and permanent request receipts in `earn_commands`. A compare-and-swap update and receipt insertion share an atomic D1 batch. Duplicate retries return the original receipt and current state. Server routes obtain account identity from trusted Sites dispatch headers, validate same-origin requests, bound streamed bodies to 4 KB and return uncached private responses.

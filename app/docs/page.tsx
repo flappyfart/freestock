@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { EarnShell } from "../earn-shell";
 import { DemoLink } from "../demo/demo-link";
+import stockLendingRegistry from "../../lib/stock-lending-registry.json";
 import { STOCKS } from "../../lib/earn-engine";
 export default function Page() {
   return (
@@ -25,6 +26,7 @@ export default function Page() {
             <strong>Contents</strong>
             <a href="#status">Feature status</a>
             <a href="#market-data">Pool coverage</a>
+            <a href="#stock-lending">Stock lending</a>
             <a href="#accounting">Demo accounting</a>
             <a href="#automation">Demo automation</a>
             <a href="#pricing">Token quantities</a>
@@ -46,6 +48,13 @@ export default function Page() {
                     <tr>
                       <td>Pool catalogue</td>
                       <td>Live read-only Morpho API, with a labeled saved-snapshot fallback</td>
+                    </tr>
+                    <tr>
+                      <td>Stock-lending markets</td>
+                      <td>
+                        Live read-only data for AAPL, GOOGL, NVDA, SPY and TSLA. No stock deposits,
+                        approvals or withdrawals are enabled in Freestock.
+                      </td>
                     </tr>
                     <tr>
                       <td>Try it yourself</td>
@@ -163,6 +172,122 @@ export default function Page() {
                   rel="noreferrer"
                 >
                   Vault API ↗
+                </a>
+              </p>
+            </section>
+            <section id="stock-lending">
+              <h2>Stock lending: live data, read-only access</h2>
+              <p>
+                Home’s Stock lending view and Dashboard track five Morpho markets whose loan asset
+                is a Robinhood Stock Token. Borrowers supply USDG collateral. These are separate
+                from the USDG lending markets above. Freestock does not prepare or submit
+                transactions for these stock-lending markets.
+              </p>
+              <div className="earn-table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Loan asset</th>
+                      <th>Collateral</th>
+                      <th>Verified market source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stockLendingRegistry.markets.map((market) => (
+                      <tr key={market.id}>
+                        <td>{market.symbol} · 18 decimals</td>
+                        <td>USDG · 6 decimals</td>
+                        <td>
+                          <a
+                            href={`https://api.morpho.org/v0/blue/markets/4663:${market.id}/state`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {market.id.slice(0, 10)}…{market.id.slice(-6)} ↗
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                The market IDs were recomputed from each exact loan token, collateral token, oracle,
+                interest-rate model and liquidation threshold, then matched to the deployed Morpho
+                contract. All five use a 62.5% liquidation loan-to-value threshold. Their loan token
+                addresses match Robinhood’s asset registry.
+              </p>
+              <h3>What the figures mean</h3>
+              <p>
+                Supplied, borrowed and available amounts are quantities of that row’s Stock Token,
+                not dollars or an aggregate stock valuation. Available tokens equal supplied minus
+                borrowed tokens. The displayed APY is the seven-day supply APY, excluding rewards;
+                it is not the borrowing rate and does not forecast your return. Lenders earn in the
+                same token they supply.
+              </p>
+              <p>
+                At block 58,196,418 (September 9, 2026, 02:39:15 UTC), all five markets had zero
+                supply, borrowing and liquidity. The API also reported 0% seven-day supply APY.
+                These are dated observations. With no borrowing there is no borrower-paid interest.
+              </p>
+              <p>
+                The feed requests Morpho’s state and historical-rate endpoints separately. A missing
+                rate stays unavailable while valid balances remain visible; a failed balance read
+                never becomes zero. Successful responses may be cached for 60 seconds, incomplete
+                responses for 15 seconds. The page checks each minute while visible, labels retained
+                responses when updates fail, and exposes the source’s indexed blocks. “Live API
+                data” describes a successful API response, not a guarantee that the upstream indexer
+                is current.
+              </p>
+              <h3>What was checked before listing</h3>
+              <p>
+                A local fork passed 60 checks across the five markets: supplying tokens, recording
+                shares, rejecting unauthorized withdrawals, collateralized borrowing,
+                insufficient-liquidity behavior, repayment with accrued interest and withdrawing the
+                same token. These checks used synthetic funds in a local chain. They did not submit
+                public transactions or establish future returns.
+              </p>
+              <p>
+                The custom price adapters accepted stock prices up to four days old and USDG prices
+                up to 26 hours old in the inspected configuration. A two-day-old stock price was
+                still accepted. The primary and secondary stock proxies shared an underlying
+                aggregator, so they were not independent price sources. Stock-token feeds already
+                incorporate the corporate-action multiplier; applying it again would misprice the
+                token.
+              </p>
+              <p>
+                Verified adapter source was not available from the checked source services, and no
+                official Robinhood sequencer-uptime feed was established. The review is limited to
+                observed contracts, prices and local behavior. Stock lending remains data-only in
+                Freestock.
+              </p>
+              <p>
+                <a
+                  href="https://mast.bond/journal/lending-is-live-on-mast"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Mast lending announcement ↗
+                </a>
+                {" · "}
+                <a href="https://api.robinhood.com/rhj/assets" target="_blank" rel="noreferrer">
+                  Robinhood asset registry ↗
+                </a>
+                {" · "}
+                <a
+                  href="https://docs.morpho.org/learn/concepts/blue/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Morpho lending mechanics ↗
+                </a>
+                {" · "}
+                <a
+                  href="https://reference-data-directory.vercel.app/feeds-robinhood-mainnet.json"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Chainlink feed registry ↗
                 </a>
               </p>
             </section>

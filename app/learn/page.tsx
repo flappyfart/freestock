@@ -26,6 +26,7 @@ export default function Page() {
             <strong>On this page</strong>
             <a href="#flow">The basic idea</a>
             <a href="#strategies">Where earnings come from</a>
+            <a href="#stock-lending">Lending Stock Tokens</a>
             <a href="#destinations">Convert or compound</a>
             <a href="#timing">Can it happen in real time?</a>
             <a href="#leverage">Understanding leverage</a>
@@ -120,6 +121,40 @@ export default function Page() {
                   </a>
                 </p>
               </article>
+            </section>
+            <section id="stock-lending">
+              <h2>Can you lend Stock Tokens?</h2>
+              <p>
+                Yes. Five verified Morpho markets on Robinhood Chain use AAPL, GOOGL, NVDA, SPY or
+                TSLA Stock Tokens as the asset being lent. Borrowers post USDG as collateral.
+                Freestock now shows these markets on Home and Dashboard as live market data only;
+                stock deposits are not enabled here.
+              </p>
+              <h3>Same token in. Same token earned.</h3>
+              <p>
+                For example, a lender supplies NVDA tokens. When someone borrows them, the borrower
+                owes NVDA tokens plus variable interest. The lender’s claim is denominated in NVDA
+                tokens, and withdrawals depend on available liquidity. This does not turn tokens
+                into direct ownership of NVIDIA shares.
+              </p>
+              <p>
+                This differs from Freestock’s USDG vault: that route earns in USDG, then lets the
+                owner approve a purchase of chosen Stock Tokens. Direct stock lending earns in the
+                token supplied; it does not automatically convert interest into another stock or
+                basket.
+              </p>
+              <p className="learn-callout">
+                No borrowing means no borrower-paid interest. These five markets were empty and
+                showed 0% supply APY when checked on September 9, 2026 (UTC). The market feed shows
+                current observations as they change. A deployed market alone does not establish
+                demand or future returns.
+              </p>
+              <p>
+                Stock prices, token restrictions, collateral, pricing feeds and borrower defaults
+                can affect the outcome. Read the{" "}
+                <Link href="/docs#stock-lending">market checks and current limits</Link>, or open{" "}
+                <Link href="/#home-pools-title">Stock lending on Home</Link> to explore the data.
+              </p>
             </section>
             <section id="destinations">
               <span className="earn-eyebrow">03 / YOUR RULES</span>

@@ -6,6 +6,7 @@ import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
 import { WalletConnectButton } from "./wallet-connect-button";
 import { useWalletConnection } from "./wallet-provider";
 import { EarnShell } from "../earn-shell";
+import { StockLendingMarkets } from "../stock-lending-markets";
 import { MarketDirectory } from "../market-directory";
 import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
 import "./live-workspace.css";
@@ -494,6 +495,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           </section>
         </div>
       </details>
+      <StockLendingMarkets />
       <MarketDirectory />
     </div>
   );

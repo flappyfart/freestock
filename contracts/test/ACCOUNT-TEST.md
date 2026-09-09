@@ -1,6 +1,6 @@
 # FreestockYieldAccount pinned-fork validation
 
-Source tested: `/Users/freestock/Documents/Codex/2026-09-08/e/outputs/freestock/contracts/src/FreestockYieldAccount.sol`.
+Source tested: `contracts/src/FreestockYieldAccount.sol`.
 
 Source keccak256: `0xb43bec67f7266c27c1da0fc40b35775496f2ee5c0a8f31218500bd1ea7352656`.
 

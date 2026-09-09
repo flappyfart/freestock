@@ -63,13 +63,10 @@ export default function Home() {
             </p>
           </div>
           <div className="home-stock-scene" aria-hidden="true">
-            <img
-              className="home-stock-apple"
-              src="/stocks/bubble-aapl.webp"
-              width="260"
-              height="260"
-              alt=""
-            />
+            <div className="home-stock-apple">
+              <img src="/stocks/bubble-aapl.webp" width="260" height="260" alt="" />
+              <span className="home-stock-apple-label">APPLE</span>
+            </div>
             <img
               className="home-stock-sandisk"
               src="/stocks/bubble-sndk.webp"

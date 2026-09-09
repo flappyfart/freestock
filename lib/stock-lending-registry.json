@@ -1,0 +1,65 @@
+{
+  "verifiedAt": "2026-09-09T02:39:15Z",
+  "verifiedBlock": 58196418,
+  "verifiedBlockHash": "0xfa94fc59ab2529b08f35267432cf72a524cc631b269d05456ec66ea52f266dba",
+  "source": "https://mast.bond/journal/lending-is-live-on-mast",
+  "chainId": 4663,
+  "morpho": "0x9D53d5E3bd5E8d4Cbfa6DB1ca238AEA02E651010",
+  "markets": [
+    {
+      "id": "0xb257b94f5fc1b69d1960d0a43684f7fc39c8f8c3748b84b51d6dfbbc0e362915",
+      "symbol": "AAPL",
+      "decimals": "18",
+      "collateralSymbol": "USDG",
+      "loanToken": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "collateralToken": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "oracle": "0x7Bf2558FBC0f48d54ba9a4F55d09A3d258024125",
+      "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+      "lltv": "625000000000000000"
+    },
+    {
+      "id": "0x9d4ceedfeead12af47fee247c9970e91e12009b2283f8fbea7029dbd97eb3e31",
+      "symbol": "GOOGL",
+      "decimals": "18",
+      "collateralSymbol": "USDG",
+      "loanToken": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "collateralToken": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "oracle": "0xD3F293F4e093f4a9f764647Ff4651644881d7d04",
+      "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+      "lltv": "625000000000000000"
+    },
+    {
+      "id": "0x2fdd5af0a36ab05917ea93b1266b15f655b920d83a497adbfadcf4fcd9b28324",
+      "symbol": "NVDA",
+      "decimals": "18",
+      "collateralSymbol": "USDG",
+      "loanToken": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "collateralToken": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "oracle": "0x548196c5A7D2127Ae69FBc69e2fEd9686Fdd7A10",
+      "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+      "lltv": "625000000000000000"
+    },
+    {
+      "id": "0xf670348a152ced94c8dd240645d7bef7abd83049a7ae1f2e13949cee638a2ecc",
+      "symbol": "SPY",
+      "decimals": "18",
+      "collateralSymbol": "USDG",
+      "loanToken": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "collateralToken": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "oracle": "0x0Ca840Cdaf5aa6066817CcD31CA2cc7647991135",
+      "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+      "lltv": "625000000000000000"
+    },
+    {
+      "id": "0x85f86f26ef02da6c9991a0bf7afd6c8969f41e2aec4ff8c54b29998ea9966551",
+      "symbol": "TSLA",
+      "decimals": "18",
+      "collateralSymbol": "USDG",
+      "loanToken": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "collateralToken": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "oracle": "0x2050739E0Ce165451246455943B113c900D53d77",
+      "irm": "0x2BD3d5965B26B51814AC95127B2b80dD6CcC0fa1",
+      "lltv": "625000000000000000"
+    }
+  ]
+}

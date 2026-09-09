@@ -123,7 +123,8 @@
   min-height: 430px;
   padding: 30px 0 56px;
 }
-.home-stock-scene img {
+.home-stock-scene > img,
+.home-stock-apple {
   object-fit: contain;
   height: auto;
   filter: drop-shadow(0 24px 20px #0957b918);
@@ -776,11 +777,13 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .home-stock-scene img {
+  .home-stock-scene > img,
+  .home-stock-apple {
     animation: none;
   }
 }
-html[data-motion-paused="true"] .home-stock-scene img {
+html[data-motion-paused="true"] .home-stock-scene > img,
+html[data-motion-paused="true"] .home-stock-apple {
   animation-play-state: paused;
 }
 @media (forced-colors: active) {
@@ -851,4 +854,32 @@ html[data-motion-paused="true"] .home-stock-scene img {
   .home-stock-apple {
     top: 12px;
   }
+}
+
+.home-stock-apple {
+  display: block;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+.home-stock-apple > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.home-stock-apple-label {
+  position: absolute;
+  left: 51.5%;
+  top: 65.5%;
+  transform: translate(-50%, -50%) rotate(18deg);
+  transform-origin: center;
+  color: #c4edff;
+  font-family: Arial, sans-serif;
+  font-size: 5.5cqw;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
 }
