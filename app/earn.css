@@ -168,8 +168,7 @@
   margin-top: 16px;
 }
 #try-it-yourself,
-#live-account,
-#demo-results {
+#live-account {
   scroll-margin-top: 24px;
 }
 #try-it-yourself {
@@ -181,34 +180,11 @@
 .home-live-account {
   padding-block: 0 16px;
 }
-.demo-results {
-  border: 1px solid #dbe3ef;
-  border-radius: 22px;
-  background: #f5f8fcdc;
-  padding: 22px;
-  margin-block: 24px 36px;
+.demo-results-title .home-live-actions {
+  margin-bottom: 20px;
 }
-.demo-results > summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 18px;
-  color: #263957;
-}
-.demo-results > summary small {
-  display: block;
-  margin: 6px 0 0 22px;
-  color: #56647c;
-  font-size: 13px;
-  line-height: 1.5;
-  font-weight: 400;
-}
-.demo-results > .earn-section {
-  padding-bottom: 12px;
-}
-.demo-results > summary:focus-visible {
-  outline: 2px solid #2862de;
-  outline-offset: 5px;
-  border-radius: 8px;
+.demo-results-page > .earn-section {
+  padding-bottom: 32px;
 }
 .earn-stock-art {
   display: flex;

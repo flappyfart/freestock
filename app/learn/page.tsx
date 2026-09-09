@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { EarnShell } from "../earn-shell";
+import { DemoLink } from "../demo/demo-link";
 export default function Page() {
   return (
     <EarnShell active="Learn">
@@ -13,13 +14,12 @@ export default function Page() {
             go somewhere <em>you choose.</em>
           </h1>
           <p>
-            Use available lending gains to buy selected Stock Tokens or keep more capital in your
-            lending position. Explore the idea with simulated money, or use Wallet if your account
-            is enabled for the private pilot.
+            Understand how lending gains can become stock-token exposure, what compounding means,
+            and how costs and losses affect the result. Explore the idea with simulated money.
           </p>
-          <Link href="/#try-it-yourself" className="earn-button">
+          <DemoLink className="earn-button">
             Try it yourself <ArrowUpRight size={17} />
-          </Link>
+          </DemoLink>
         </section>
         <div className="education-layout">
           <aside>
@@ -66,10 +66,11 @@ export default function Page() {
                 </div>
               </div>
               <p className="learn-callout">
-                On the home page, Wallet shows your live account. “Try it yourself” is the separate
-                simulator with simulated money; its scenarios and holdings are not real positions.
-                The private wallet pilot supports USDG lending and selected Stock Token purchases
-                from available gains. Every real transaction requires the owner’s wallet approval.
+                <DemoLink>Try it yourself</DemoLink> opens a simulation modal with setup, results
+                and activity. Its scenarios and holdings use no real funds. For a live position,
+                choose Connect Wallet on Home, then use <Link href="/dashboard">Dashboard</Link>.
+                The private pilot’s access limits still apply, and every real transaction requires
+                the owner’s wallet approval.
               </p>
             </section>
             <section id="strategies">
@@ -124,8 +125,9 @@ export default function Page() {
               <span className="earn-eyebrow">03 / YOUR RULES</span>
               <h2>Convert. Compound. Or split.</h2>
               <p>
-                These automatic rules belong to the home demo. They run only when you advance a
-                scenario and do not authorize real transactions.
+                Choose your rules in the modal’s <DemoLink>setup view</DemoLink>, then advance the
+                saved scenario in its <DemoLink view="results">results view</DemoLink>. The rules
+                run only when you advance a scenario and do not authorize real transactions.
               </p>
               <div className="learn-options">
                 <article>
@@ -162,8 +164,8 @@ export default function Page() {
                 background auto-conversion or automatic split rule.
               </p>
               <p>
-                In Wallet, vault shares already reflect the underlying return without a new
-                signature. Reserving gains increases recorded principal and deposits any idle
+                In your live account, vault shares already reflect the underlying return without a
+                new signature. Reserving gains increases recorded principal and deposits any idle
                 account USDG into the vault. Buying stock tokens uses available gains. Both actions
                 require the owner to review and approve a wallet transaction.
               </p>
@@ -279,13 +281,16 @@ export default function Page() {
                 submitted real transactions.
               </p>
               <p>
-                “Try it yourself” and saved simulated positions use simulated money. Staking,
-                leveraged LP execution and background auto-conversion are not implemented. Live
-                vault shares can accrue their underlying return without another signature; buying
-                stock tokens still requires your approval.
+                <DemoLink>Try it yourself</DemoLink> keeps simulated setup,{" "}
+                <DemoLink view="results">results</DemoLink> and{" "}
+                <DemoLink view="activity">activity</DemoLink> together in one modal. All demo
+                amounts are simulated and use no real funds. Staking, leveraged LP execution and
+                background auto-conversion are not implemented. Live vault shares can accrue their
+                underlying return without another signature; buying stock tokens still requires your
+                approval.
               </p>
-              <Link href="/live" className="earn-link">
-                Open Wallet <ArrowUpRight size={17} />
+              <Link href="/dashboard" className="earn-link">
+                Open Dashboard <ArrowUpRight size={17} />
               </Link>
               <p>
                 <Link href="/docs" className="earn-link">

@@ -4,6 +4,9 @@ import "./homepage.css";
 import "./nexaris.css";
 import "./motion.css";
 import "./earn.css";
+import "./flow.css";
+import { WalletProvider } from "./live/wallet-provider";
+import { DemoProvider } from "./demo/demo-provider";
 export const metadata: Metadata = {
   title: "freestock | Put DeFi earnings toward your stock picks",
   description:
@@ -13,7 +16,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-theme="nexaris">
-      <body>{children}</body>
+      <body>
+        <WalletProvider>
+          <DemoProvider>{children}</DemoProvider>
+        </WalletProvider>
+      </body>
     </html>
   );
 }

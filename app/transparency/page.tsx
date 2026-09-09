@@ -1,4 +1,4 @@
-import EarnApp from "../earn-app";
-export default function Page() {
-  return <EarnApp transparency />;
+import { redirect } from "next/navigation";
+export default function ActivityEntry() {
+  redirect("/?demo=activity");
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { EarnShell } from "../earn-shell";
+import { DemoLink } from "../demo/demo-link";
 import { STOCKS } from "../../lib/earn-engine";
 export default function Page() {
   return (
@@ -14,8 +15,9 @@ export default function Page() {
             works today.
           </h1>
           <p>
-            Mechanics, data sources and the difference between the home demo and the private wallet
-            pilot.
+            Current mechanics, data sources and private wallet pilot limits. For the concepts behind
+            lending, compounding and stock-token exposure, start with{" "}
+            <Link href="/learn">Learn</Link>.
           </p>
         </section>
         <div className="education-layout">
@@ -48,8 +50,17 @@ export default function Page() {
                     <tr>
                       <td>Try it yourself</td>
                       <td>
-                        Home simulator with simulated money, saved scenarios and illustrative stock
-                        purchases; these are not real positions
+                        <DemoLink>Opens the simulation modal</DemoLink> with setup, results and
+                        activity in one place; all amounts are simulated and use no real funds
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Demo results</td>
+                      <td>
+                        <DemoLink view="results">
+                          Saved simulated positions, balances and holdings
+                        </DemoLink>{" "}
+                        inside the modal, with controls to advance the model; no real positions
                       </td>
                     </tr>
                     <tr>
@@ -67,7 +78,7 @@ export default function Page() {
                       <td>Live stock-token purchases</td>
                       <td>
                         Manually buy NVDA, AAPL, TSLA, GOOGL or SPY with available account gains;
-                        quotes and purchases are reviewed in Wallet
+                        quotes and purchases are reviewed in Dashboard
                       </td>
                     </tr>
                     <tr>
@@ -79,7 +90,7 @@ export default function Page() {
                       <td>Explained in Learn; no connected strategy</td>
                     </tr>
                     <tr>
-                      <td>Wallet</td>
+                      <td>Dashboard</td>
                       <td>
                         Live balances, participant status, account recovery, transaction review and
                         read-only refresh while the page is visible
@@ -158,11 +169,13 @@ export default function Page() {
             <section id="accounting">
               <h2>How a simulated position earns</h2>
               <p>
-                The home section labeled “Try it yourself” uses simulated money. Each demo account
-                starts with 10,000 simulated USDG. Creating a scenario moves capital from the demo
-                wallet; it does not create or fund a real position. Saved simulated positions can be
-                expanded on the home page. The retired prize account is preserved separately and
-                does not fund this simulator.
+                Open <DemoLink>Try it yourself</DemoLink> to set up a scenario in the simulation
+                modal. Each demo account starts with 10,000 simulated USDG. Creating a scenario
+                moves capital from the demo wallet; it does not create or fund a real position.
+                After the save is confirmed, the modal’s{" "}
+                <DemoLink view="results">results view</DemoLink> shows your saved simulated
+                positions, balances and holdings. The retired prize account is preserved separately
+                and does not fund this simulator.
               </p>
               <h3>Lending scenario</h3>
               <p>
@@ -204,8 +217,9 @@ export default function Page() {
             <section id="automation">
               <h2>Demo conversion and compounding rules</h2>
               <p>
-                These rules apply to the simulator. They do not authorize transactions in your live
-                account.
+                These rules apply when you advance a scenario in the modal’s{" "}
+                <DemoLink view="results">results view</DemoLink>. They do not authorize transactions
+                in your live account.
               </p>
               <ol>
                 <li>Advance a position by 1, 7 or 30 modeled days.</li>
@@ -282,13 +296,15 @@ export default function Page() {
                 before saving.
               </p>
               <p>
-                The <Link href="/transparency">Transparency page</Link> shows each saved entry and
-                exports the demo ledger. It reconciles wallet balance, capital, available earnings
-                and stock purchase cost against initial funds plus net modeled earnings. Compounding
-                is an internal transfer, not additional income.
+                The simulation modal’s <DemoLink view="results">results view</DemoLink> shows saved
+                simulated positions, balances and holdings. Its{" "}
+                <DemoLink view="activity">activity view</DemoLink> provides the detailed ledger and
+                JSON export. It reconciles wallet balance, capital, available earnings and stock
+                purchase cost against initial funds plus net modeled earnings. Compounding is an
+                internal transfer, not additional income.
               </p>
               <p>
-                The demo account uses no real funds. Wallet keeps the live account separate: the
+                The demo account uses no real funds. Dashboard keeps the live account separate: the
                 owner reviews and signs transactions in their connected wallet. Transaction recovery
                 references are saved in this browser. You can restore a live account from its
                 creation transaction reference, which is checked against the connected owner and
@@ -299,11 +315,11 @@ export default function Page() {
             <section id="execution">
               <h2>The private wallet pilot</h2>
               <p>
-                Wallet is available on the home page and at <Link href="/live">/live</Link>. New
-                deposits and stock purchases are limited to the configured signed-in participant,
-                who declared Norway residence and location and non-US-person status. These
-                declarations are not identity verification or legal approval. General registration
-                for live actions is not enabled.
+                Choose Connect Wallet on Home, then create or manage your live position in{" "}
+                <Link href="/dashboard">Dashboard</Link>. New deposits and stock purchases are
+                limited to the configured signed-in participant, who declared Norway residence and
+                location and non-US-person status. These declarations are not identity verification
+                or legal approval. General registration for live actions is not enabled.
               </p>
               <p>
                 The pilot supports one USDG lending vault, a 100 USDG deposit limit and purchases of
@@ -339,8 +355,8 @@ export default function Page() {
                 participant must create and fund their own account through wallet-approved
                 transactions. Country, issuer and transaction restrictions still apply.
               </p>
-              <Link href="/live" className="earn-link">
-                Open Wallet <ArrowUpRight size={17} />
+              <Link href="/dashboard" className="earn-link">
+                Open Dashboard <ArrowUpRight size={17} />
               </Link>
             </section>
           </div>

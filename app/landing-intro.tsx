@@ -13,7 +13,7 @@ export function LandingIntro() {
 
   const dismiss = useCallback(() => {
     if (introRef.current?.contains(document.activeElement)) {
-      document.querySelector<HTMLAnchorElement>(".wordmark")?.focus({ preventScroll: true });
+      document.querySelector<HTMLAnchorElement>(".earn-wordmark")?.focus({ preventScroll: true });
     }
     setVisible(false);
     try {
@@ -32,7 +32,12 @@ export function LandingIntro() {
     } catch {
       // Do not make storage a prerequisite for entering the app.
     }
-    if (preference.matches || seen || window.location.hash) {
+    if (
+      preference.matches ||
+      seen ||
+      window.location.hash ||
+      new URLSearchParams(window.location.search).has("demo")
+    ) {
       const skip = window.requestAnimationFrame(dismiss);
       return () => window.cancelAnimationFrame(skip);
     }

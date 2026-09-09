@@ -4,15 +4,32 @@ import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { ScrollMotion } from "./scroll-motion";
 import { MotionEffects } from "./motion-effects";
 import { AvailabilityCheck } from "./availability-check";
+import { DemoLink } from "./demo/demo-link";
+import { HeaderWalletButton } from "./live/header-wallet-button";
 export function EarnShell({
   children,
   active = "Home",
+  navigationLocked = false,
+  onNavigationBlocked,
 }: {
   children: React.ReactNode;
   active?: string;
+  navigationLocked?: boolean;
+  onNavigationBlocked?: () => void;
 }) {
   return (
-    <div className="earn">
+    <div
+      className="earn"
+      data-page={active.toLowerCase()}
+      onClickCapture={(event) => {
+        if (!navigationLocked || !(event.target instanceof Element)) return;
+        const link = event.target.closest<HTMLAnchorElement>("a[href]");
+        if (!link || link.getAttribute("href")?.startsWith("#") || link.target === "_blank") return;
+        event.preventDefault();
+        event.stopPropagation();
+        onNavigationBlocked?.();
+      }}
+    >
       <MotionEffects />
       <ScrollMotion />
       <a className="skip-link" href="#earn-main">
@@ -25,19 +42,20 @@ export function EarnShell({
         <nav aria-label="Main navigation">
           {[
             ["Home", "/"],
-            ["Wallet", "/live"],
+            ["Dashboard", "/dashboard"],
             ["Learn", "/learn"],
             ["Docs", "/docs"],
-            ["Demo activity", "/transparency"],
           ].map(([name, url]) => (
             <Link href={url} key={name} aria-current={active === name ? "page" : undefined}>
               {name}
             </Link>
           ))}
+          <DemoLink className="nav-demo">Try it yourself</DemoLink>
         </nav>
-        <span className="earn-status">
-          <i /> Private wallet pilot
-        </span>
+        <HeaderWalletButton
+          navigationLocked={navigationLocked}
+          onNavigationBlocked={onNavigationBlocked}
+        />
       </header>
       <main id="earn-main">{children}</main>
       <footer className="earn-footer">
@@ -59,9 +77,9 @@ export function EarnShell({
           <Link href="/docs">
             Product mechanics <ArrowRight size={16} />
           </Link>
-          <Link href="/transparency">
-            Demo activity <ArrowRight size={16} />
-          </Link>
+          <DemoLink view="results" className="earn-link">
+            Your demo results <ArrowRight size={16} />
+          </DemoLink>
         </div>
         <div>
           <AvailabilityCheck />

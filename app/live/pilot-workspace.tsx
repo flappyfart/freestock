@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { formatUnits } from "ethers";
+import { formatUnits, parseUnits } from "ethers";
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import { type Prepared, type WalletProvider } from "../../lib/live/wallet-transaction";
 import { ENABLED_STOCKS } from "../../lib/live/basket";
@@ -21,6 +21,7 @@ import {
 } from "../../lib/live/account-reference";
 import { MechanicalSwitch } from "../mechanical-switch";
 import { EXPLORER_URL } from "../../lib/live/config";
+import "./pilot-dashboard.css";
 type Account = {
   account: string;
   deployment: string;
@@ -47,6 +48,7 @@ type Receipt = {
   }[];
   snapshot?: Account;
 };
+const toInteger = (value: string) => BigInt(value);
 const fmt = (value: string, decimals = 6) => formatUnits(value, decimals);
 async function api<T>(path: string, signal?: AbortSignal) {
   const r = await fetch(path, { cache: "no-store", signal });
@@ -88,6 +90,9 @@ export default function PilotWorkspace({
     [weights, setWeights] = useState<Record<string, number>>(
       Object.fromEntries(ENABLED_STOCKS.map((s) => [s.symbol, 20])),
     );
+  const [actionView, setActionView] = useState<
+    "deposit" | "harvest" | "compound" | "withdraw" | null
+  >(null);
   const alive = useRef(true),
     inFlight = useRef(false),
     readEpoch = useRef(0),
@@ -348,79 +353,541 @@ export default function PilotWorkspace({
     window.history.replaceState(null, "", url);
     await confirm(hash, true);
   }
+  const depositAmount = (() => {
+    try {
+      return /^\d+(?:\.\d{1,6})?$/.test(amount) ? parseUnits(amount, 6) : 0n;
+    } catch {
+      return 0n;
+    }
+  })();
+  const needsApproval = !!account && depositAmount > toInteger(account.allowance);
+  const hasPosition = !!account && toInteger(account.assetValue) > 0n;
+  const activeView = hasPosition ? actionView : "deposit";
+  const actionBlocked = busy || !!pending || !!journal;
+  const newActionBlocked = actionBlocked || !enabled || !acknowledged;
+  const holdings = account?.stocks.filter((stock) => toInteger(stock.balance) > 0n) ?? [];
+  const changeView = (view: "deposit" | "harvest" | "compound" | "withdraw" | null) => {
+    setActionView(view);
+    setPlan(null);
+  };
   return (
-    <section className="earn-section pilot-workspace">
-      <div className="section-title">
-        <h2>Your wallet pilot</h2>
-        <span className="earn-pill">Norway · 5 stocks · 100 USDG deposit limit</span>
-      </div>
-      <p>
-        Deposit USDG into lending, let returns accumulate, then use available gains to buy your
-        chosen Stock Tokens or basket. Every action is approved by you. Background auto-conversion
-        is not active.
-      </p>
-      <p className="earn-small">
-        Access is based on the participant’s Norway and non-U.S.-person declarations, not an
-        identity verification or legal approval.{" "}
-        <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
-          Issuer terms and restrictions ↗
-        </a>
-      </p>
-      <label className="pilot-ack">
-        <input
-          type="checkbox"
-          checked={acknowledged}
-          onChange={(e) => {
-            setAcknowledged(e.target.checked);
-            setPlan(null);
-          }}
-          disabled={busy}
-        />
-        <span>
-          I am the declared participant, the issuer restrictions do not exclude me, and I understand
-          this uses real funds. Capital can lose value; withdrawals depend on liquidity. I have
-          reviewed the issuer terms.
-        </span>
-      </label>
+    <section className="pilot-workspace pilot-dashboard">
+      <header className="pd-heading">
+        <div>
+          <h2>
+            {hasPosition
+              ? "Your position"
+              : account
+                ? "Fund your position"
+                : "Create your position"}
+          </h2>
+          <p>
+            {hasPosition
+              ? "Lend USDG. Turn available gains into stocks."
+              : "One USDG lending position, owned by your wallet."}
+          </p>
+        </div>
+        <span className="pd-network">Robinhood Chain</span>
+      </header>
+
+      {!hasPosition && (
+        <ol className="pd-steps" aria-label="Position setup">
+          <li data-complete={!!account} aria-current={!account ? "step" : undefined}>
+            <span>1</span>Create account
+          </li>
+          <li aria-current={account ? "step" : undefined}>
+            <span>2</span>Add USDG
+          </li>
+          <li>
+            <span>3</span>Use your gains
+          </li>
+        </ol>
+      )}
+
       {availability === "loading" && (
-        <p aria-live="polite">
-          Checking access before new actions… Existing accounts can still be restored.
+        <p className="pd-notice" aria-live="polite">
+          Checking participant access. Existing accounts can still be restored.
         </p>
       )}
       {(availability === "unavailable" || availability === "error") && (
-        <p className="earn-warning">
-          New actions require confirmed participant access. An existing verified account can still
-          be recovered and withdrawn from.
+        <p className="pd-notice">
+          New actions require confirmed participant access. You can still restore and withdraw from
+          an existing verified account.
         </p>
       )}
       {refreshWarning && (
-        <p className="earn-small" aria-live="polite">
+        <p className="pd-notice" aria-live="polite">
           {refreshWarning}
         </p>
       )}
       {storageWarning && (
-        <p className="earn-small live-storage-note" aria-live="polite">
+        <p className="pd-notice" aria-live="polite">
           {storageWarning}
         </p>
       )}
-      {!account ? (
-        <div className="live-grid">
-          <article className="earn-builder">
-            <h3>Create your account</h3>
-            <p>
-              The account belongs to your wallet. Creation costs ETH for gas and does not transfer
-              USDG.
-            </p>
+
+      {account && (
+        <div className="pd-position">
+          <div className="pd-position-title">
+            <div>
+              <h3>Steakhouse USDG</h3>
+              <span>USDG lending · 100 USDG deposit limit</span>
+            </div>
             <button
-              className="earn-button"
-              disabled={busy || !!pending || !!journal || !enabled || !acknowledged}
-              onClick={() => void act(() => prepare("deploy"))}
+              className="pd-refresh"
+              disabled={actionBlocked}
+              onClick={() => void act(loadAccount)}
+              aria-label="Refresh position balances"
             >
-              Review account creation <ArrowUpRight size={16} />
+              <RefreshCw size={17} />
             </button>
-          </article>
-          <article className="earn-builder">
-            <h3>Restore an account</h3>
+          </div>
+          <div className="pd-balances">
+            <div>
+              <span>Lending balance</span>
+              <strong>
+                {fmt(account.assetValue)} <small>USDG</small>
+              </strong>
+            </div>
+            <div>
+              <span>Available gains</span>
+              <strong>
+                {fmt(account.spendableWithRoundingBuffer)} <small>USDG</small>
+              </strong>
+            </div>
+          </div>
+          <dl className="pd-account-facts">
+            <div>
+              <dt>Principal baseline</dt>
+              <dd>{fmt(account.principal)} USDG</dd>
+            </div>
+            <div>
+              <dt>In your wallet</dt>
+              <dd>{fmt(account.walletUsdg)} USDG</dd>
+            </div>
+          </dl>
+          {hasPosition && (
+            <div className="pd-position-actions">
+              <button
+                className="pd-button"
+                disabled={actionBlocked}
+                onClick={() => changeView("harvest")}
+              >
+                Buy stocks with gains <ArrowUpRight size={16} />
+              </button>
+              <button
+                className="pd-button pd-secondary"
+                disabled={actionBlocked}
+                onClick={() => changeView("deposit")}
+              >
+                Add funds
+              </button>
+              <details className="pd-more">
+                <summary>More actions</summary>
+                <div>
+                  <button
+                    disabled={actionBlocked}
+                    onClick={(event) => {
+                      event.currentTarget.closest("details")?.removeAttribute("open");
+                      changeView("compound");
+                    }}
+                  >
+                    Reserve gains as principal
+                  </button>
+                  <button
+                    disabled={actionBlocked}
+                    onClick={(event) => {
+                      event.currentTarget.closest("details")?.removeAttribute("open");
+                      changeView("withdraw");
+                    }}
+                  >
+                    Withdraw all USDG
+                  </button>
+                </div>
+              </details>
+            </div>
+          )}
+          {lastChecked && (
+            <p className="pd-updated">
+              Checked{" "}
+              <time dateTime={new Date(lastChecked).toISOString()}>
+                {new Date(lastChecked).toLocaleTimeString()}
+              </time>{" "}
+              · block {account.block.toLocaleString()}
+            </p>
+          )}
+        </div>
+      )}
+
+      <details className="pd-eligibility" open={!acknowledged}>
+        <summary>
+          {acknowledged ? "Participant declaration reviewed" : "Review before using real funds"}
+        </summary>
+        <label className="pilot-ack">
+          <input
+            type="checkbox"
+            checked={acknowledged}
+            onChange={(e) => {
+              setAcknowledged(e.target.checked);
+              setPlan(null);
+            }}
+            disabled={busy}
+          />
+          <span>
+            I am the declared participant, the issuer restrictions do not exclude me, and I
+            understand this uses real funds. Capital can lose value; withdrawals depend on
+            liquidity. I have reviewed the issuer terms.
+          </span>
+        </label>
+        <p>
+          Access is based on Norway residence and non-U.S.-person declarations, not identity
+          verification or legal approval.{" "}
+          <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
+            Issuer terms and restrictions <ArrowUpRight size={13} />
+          </a>
+        </p>
+      </details>
+
+      {!account ? (
+        <div className="pd-setup">
+          <div className="pd-setup-copy">
+            <h3>A lending account for your wallet</h3>
+            <p>
+              Create the account first, then choose how much USDG to add. Account creation costs ETH
+              for gas and does not move USDG.
+            </p>
+          </div>
+          <button
+            className="pd-button"
+            disabled={newActionBlocked}
+            onClick={() => void act(() => prepare("deploy"))}
+          >
+            Review account creation <ArrowUpRight size={16} />
+          </button>
+        </div>
+      ) : (
+        activeView && (
+          <div className="pd-action-panel">
+            <div className="pd-panel-heading">
+              <div>
+                <h3>
+                  {activeView === "deposit"
+                    ? "Add USDG"
+                    : activeView === "harvest"
+                      ? "Buy stocks with gains"
+                      : activeView === "compound"
+                        ? "Reserve your gains"
+                        : "Withdraw your position"}
+                </h3>
+                <p>
+                  {activeView === "deposit"
+                    ? "Approve an amount, then deposit it into lending."
+                    : activeView === "harvest"
+                      ? "Choose a stock or split your purchase across a basket."
+                      : activeView === "compound"
+                        ? "Add available gains to the principal baseline. Your vault shares already accumulate returns."
+                        : "Return the full remaining account value to your wallet."}
+                </p>
+              </div>
+              {hasPosition && (
+                <button
+                  className="pd-text-button"
+                  disabled={actionBlocked}
+                  onClick={() => changeView(null)}
+                >
+                  Close
+                </button>
+              )}
+            </div>
+            {activeView !== "withdraw" && (
+              <div className="pd-amount-row">
+                <label className="pd-amount-label">
+                  {activeView === "deposit" ? "Deposit amount" : "Gains to use"}
+                  <div className="pd-amount-input">
+                    <input
+                      type="number"
+                      min="0.000001"
+                      max="100"
+                      step="0.000001"
+                      value={amount}
+                      disabled={busy}
+                      onChange={(e) => {
+                        setAmount(e.target.value);
+                        setPlan(null);
+                      }}
+                    />
+                    <span>USDG</span>
+                  </div>
+                </label>
+                <p>
+                  {activeView === "deposit"
+                    ? `${fmt(account.walletUsdg)} USDG in your wallet`
+                    : `${fmt(account.spendableWithRoundingBuffer)} USDG available`}
+                </p>
+              </div>
+            )}
+            {activeView === "harvest" && (
+              <div className="pd-stock-picker">
+                <MechanicalSwitch
+                  label="Split across a basket"
+                  description={
+                    selection === "basket"
+                      ? "Set a percentage for each selected stock."
+                      : "Purchase one Stock Token."
+                  }
+                  checked={selection === "basket"}
+                  disabled={busy}
+                  onChange={(checked) => {
+                    setSelection(checked ? "basket" : "NVDA");
+                    setPlan(null);
+                  }}
+                />
+                {selection !== "basket" ? (
+                  <label>
+                    Stock Token
+                    <select
+                      value={selection}
+                      disabled={busy}
+                      onChange={(e) => {
+                        setSelection(e.target.value);
+                        setPlan(null);
+                      }}
+                    >
+                      {ENABLED_STOCKS.map((stock) => (
+                        <option key={stock.symbol} value={stock.symbol}>
+                          {stock.symbol}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <div className="pilot-weights">
+                    {ENABLED_STOCKS.map((stock) => (
+                      <label key={stock.symbol}>
+                        {stock.symbol} %
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          value={weights[stock.symbol]}
+                          disabled={busy}
+                          onChange={(e) => {
+                            setWeights((v) => ({ ...v, [stock.symbol]: Number(e.target.value) }));
+                            setPlan(null);
+                          }}
+                        />
+                      </label>
+                    ))}
+                    <p>
+                      Total: {Object.values(weights).reduce((sum, value) => sum + value, 0)}% · must
+                      equal 100%.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="pd-panel-actions">
+              {activeView === "deposit" ? (
+                <>
+                  {needsApproval && (
+                    <button
+                      className="pd-button pd-secondary"
+                      disabled={newActionBlocked || depositAmount <= 0n}
+                      onClick={() => void act(() => prepare("approve"))}
+                    >
+                      1. Review USDG approval
+                    </button>
+                  )}
+                  <button
+                    className="pd-button"
+                    disabled={newActionBlocked || needsApproval || depositAmount <= 0n}
+                    onClick={() => void act(() => prepare("deposit"))}
+                  >
+                    {needsApproval ? "2. Review deposit" : "Review deposit"}{" "}
+                    <ArrowUpRight size={16} />
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="pd-button"
+                  disabled={activeView === "withdraw" ? actionBlocked : newActionBlocked}
+                  onClick={() => void act(() => prepare(activeView))}
+                >
+                  {activeView === "harvest"
+                    ? "Review stock purchase"
+                    : activeView === "compound"
+                      ? "Review reserve"
+                      : "Review full withdrawal"}
+                  <ArrowUpRight size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+        )
+      )}
+
+      {plan && (
+        <div className="pd-review" aria-live="polite">
+          <div className="pd-panel-heading">
+            <div>
+              <h3>Review your transaction</h3>
+              <strong>
+                {plan.action === "deploy" ? "Create lending account" : `${fmt(plan.assets)} USDG`}
+              </strong>
+            </div>
+            <span className="pd-network">Your wallet approves</span>
+          </div>
+          <p>{plan.summary}</p>
+          {plan.purchases?.map((purchase) => (
+            <p key={purchase.symbol}>
+              {fmt(purchase.amountIn)} USDG → at least {fmt(purchase.minimumOut, 18)}{" "}
+              {purchase.symbol} tokens.
+            </p>
+          ))}
+          <p className="pd-meta">
+            Estimated network fee: {fmt(plan.estimatedGasCostWei, 18)} ETH. Includes a 20% gas-limit
+            buffer; your wallet shows the final fee. Gas is separate from USDG gains.
+          </p>
+          {!plan.hasGasBalance && (
+            <p className="pd-notice">Your wallet needs more ETH for the estimated gas.</p>
+          )}
+          <p className="pd-meta">
+            Preview expires {new Date(plan.expiresAt).toLocaleTimeString()}. Review all details in
+            your wallet.
+          </p>
+          <button
+            className="pd-button"
+            disabled={
+              busy ||
+              !!journal ||
+              !plan.canSubmit ||
+              now >= Date.parse(plan.expiresAt) ||
+              (plan.action !== "withdraw" && (!enabled || !acknowledged))
+            }
+            onClick={() => void act(send)}
+          >
+            {now >= Date.parse(plan.expiresAt)
+              ? "Preview expired. Review again"
+              : "Approve in my wallet"}
+            <ArrowUpRight size={16} />
+          </button>
+        </div>
+      )}
+
+      {(pending || journal) && (
+        <div className="pd-recovery" aria-live="polite">
+          <h3>{pending ? "Awaiting confirmation" : "Check your wallet request"}</h3>
+          <p>
+            {pending
+              ? "Your transaction was submitted. Do not repeat this action while it is pending."
+              : "Your wallet may still be awaiting approval, or its response was interrupted. Check wallet activity first. No automatic retry will occur."}
+          </p>
+          {pending && (
+            <div className="pd-panel-actions">
+              <button
+                className="pd-button"
+                disabled={busy}
+                onClick={() => void act(() => confirm(pending, false))}
+              >
+                Check confirmation
+              </button>
+              <a href={`${EXPLORER_URL}/tx/${pending}`} target="_blank" rel="noreferrer">
+                View transaction <ArrowUpRight size={14} />
+              </a>
+            </div>
+          )}
+          <details className="pd-inline-details" open={!pending}>
+            <summary>Recover a submitted or replaced transaction</summary>
+            <label>
+              Recovery transaction hash
+              <input
+                value={recoveryHash}
+                onChange={(e) => setRecoveryHash(e.target.value)}
+                placeholder="Submitted, sped-up or cancellation transaction hash"
+                disabled={busy}
+              />
+            </label>
+            <button
+              className="pd-button pd-secondary"
+              disabled={busy || !recoveryHash}
+              onClick={() => void act(() => confirm(recoveryHash, false))}
+            >
+              Verify recovery transaction
+            </button>
+            <p>
+              Recovery checks the sender and original wallet nonce. Pending references are saved
+              only in this browser. Account values and confirmation always come from the chain.
+            </p>
+          </details>
+        </div>
+      )}
+
+      {receipt?.status === "confirmed" && (
+        <div className="pd-confirmed" aria-live="polite">
+          <strong>Confirmed on Robinhood Chain</strong>
+          {receipt.events?.map((event, i) => (
+            <p key={i}>
+              {event.name === "StockPurchased"
+                ? `${fmt(event.assetAmount)} USDG bought ${fmt(event.tokenAmount!, 18)} ${ENABLED_STOCKS.find((stock) => stock.address.toLowerCase() === event.token?.toLowerCase())?.symbol ?? "Stock"} tokens.`
+                : `${event.name}: ${fmt(event.assetAmount)} USDG.`}
+            </p>
+          ))}
+          <a href={`${EXPLORER_URL}/tx/${receipt.hash}`} target="_blank" rel="noreferrer">
+            View confirmed transaction <ArrowUpRight size={14} />
+          </a>
+        </div>
+      )}
+      {busy && (
+        <p className="pd-progress" aria-live="polite">
+          Checking the chain or waiting for your wallet…
+        </p>
+      )}
+      {error && (
+        <p className="pd-notice" role="alert">
+          {error}
+        </p>
+      )}
+
+      {account && (
+        <section className="pd-holdings">
+          <h3>Your stock tokens</h3>
+          {holdings.length > 0 ? (
+            <dl>
+              {holdings.map((stock) => (
+                <div key={stock.symbol}>
+                  <dt>{stock.symbol}</dt>
+                  <dd>
+                    {fmt(stock.balance, 18)} <span>tokens</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <p>Stock purchases will appear in your wallet here.</p>
+          )}
+        </section>
+      )}
+
+      <details className="pd-details">
+        <summary>{account ? "Position details" : "Already have an account? Restore it"}</summary>
+        {account ? (
+          <>
+            <a href={`${EXPLORER_URL}/address/${account.account}`} target="_blank" rel="noreferrer">
+              View your lending account <ArrowUpRight size={14} />
+            </a>
+            <p>
+              Gains are value above the principal baseline after a 0.000002 USDG rounding buffer.
+              Donations also count as gains. Each transaction preview checks withdrawal
+              availability.
+            </p>
+            <p>
+              Balances refresh every 30 seconds while this tab is visible and no review or wallet
+              action is in progress.
+            </p>
+          </>
+        ) : (
+          <>
             <label>
               Account creation transaction
               <input
@@ -433,323 +900,24 @@ export default function PilotWorkspace({
                 disabled={busy}
               />
             </label>
-            <p className="earn-small">
-              Use the creation transaction from your wallet. This checks its code, owner and fixed
-              lending route. A verified account reference is saved in this browser for your next
-              visit. Keep the creation transaction or bookmark this page for recovery on another
-              device.
+            <p>
+              This verifies the account code, owner and lending route. Verified references are saved
+              in this browser. Keep the creation transaction or bookmark this page to recover on
+              another device.
             </p>
             <button
-              className="earn-button"
+              className="pd-button pd-secondary"
               disabled={busy || !deployment}
               onClick={() => void act(loadAccount)}
             >
-              {busy && restoreCandidate && !account
-                ? "Checking account…"
-                : "Load and verify account"}
+              {busy && restoreCandidate ? "Checking account…" : "Load and verify account"}
             </button>
-          </article>
-        </div>
-      ) : (
-        <>
-          <div className="earn-stats">
-            <div>
-              <span>Principal baseline</span>
-              <strong>
-                {fmt(account.principal)}
-                <small> USDG</small>
-              </strong>
-            </div>
-            <div>
-              <span>Account value</span>
-              <strong>
-                {fmt(account.assetValue)}
-                <small> USDG</small>
-              </strong>
-            </div>
-            <div>
-              <span>Available gains</span>
-              <strong>
-                {fmt(account.spendableWithRoundingBuffer)}
-                <small> USDG</small>
-              </strong>
-            </div>
-            <div>
-              <span>Wallet USDG</span>
-              <strong>{fmt(account.walletUsdg)}</strong>
-            </div>
-          </div>
-          <p className="earn-small">
-            Balances at block {account.block.toLocaleString()}. Gains are value above the principal
-            baseline after a 0.000002 USDG rounding buffer. Donations also count as gains;
-            withdrawal availability is checked in each preview. Vault shares already accumulate
-            returns.
-          </p>
-          <div className="model-prices">
-            {account.stocks.map((s) => (
-              <div key={s.symbol}>
-                <strong>{s.symbol}</strong>
-                <span>{fmt(s.balance, 18)} tokens</span>
-              </div>
-            ))}
-          </div>
-          <div className="live-actions">
-            <a
-              className="earn-link"
-              href={`${EXPLORER_URL}/address/${account.account}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Your account <ArrowUpRight size={14} />
-            </a>
-            <button
-              className="earn-link"
-              disabled={busy || !!pending || !!journal}
-              onClick={() => void act(loadAccount)}
-            >
-              <RefreshCw size={14} />
-              Refresh actual balances
-            </button>
-          </div>
-          {lastChecked && (
-            <p className="earn-small live-last-checked">
-              Last checked{" "}
-              <time dateTime={new Date(lastChecked).toISOString()}>
-                {new Date(lastChecked).toLocaleTimeString()}
-              </time>
-              . Refreshes every 30 seconds while this tab is visible and no review or wallet action
-              is in progress.
-            </p>
-          )}
-          <div className="earn-builder">
-            <label>
-              USDG amount
-              <input
-                type="number"
-                min="0.000001"
-                max="100"
-                step="0.000001"
-                value={amount}
-                disabled={busy}
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                  setPlan(null);
-                }}
-              />
-            </label>
-            <MechanicalSwitch
-              label="Stock basket"
-              description={
-                selection === "basket"
-                  ? "Split this purchase by your selected percentages."
-                  : "Buy one stock with this purchase."
-              }
-              checked={selection === "basket"}
-              disabled={busy}
-              onChange={(checked) => {
-                setSelection(checked ? "basket" : "NVDA");
-                setPlan(null);
-              }}
-            />
-            {selection !== "basket" && (
-              <label>
-                Stock Token
-                <select
-                  value={selection}
-                  disabled={busy}
-                  onChange={(e) => {
-                    setSelection(e.target.value);
-                    setPlan(null);
-                  }}
-                >
-                  {ENABLED_STOCKS.map((s) => (
-                    <option key={s.symbol} value={s.symbol}>
-                      {s.symbol}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-            {selection === "basket" && (
-              <div className="pilot-weights">
-                {ENABLED_STOCKS.map((s) => (
-                  <label key={s.symbol}>
-                    {s.symbol} %
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="1"
-                      value={weights[s.symbol]}
-                      disabled={busy}
-                      onChange={(e) => {
-                        setWeights((v) => ({
-                          ...v,
-                          [s.symbol]: Number(e.target.value),
-                        }));
-                        setPlan(null);
-                      }}
-                    />
-                  </label>
-                ))}
-                <p>
-                  Total: {Object.values(weights).reduce((sum, value) => sum + value, 0)}% · must
-                  equal 100%.
-                </p>
-              </div>
-            )}
-            <p className="earn-small">
-              Deposit: approve the exact amount, then deposit. Convert or reserve: enter an amount
-              no larger than available gains. Withdrawal always returns the full remaining account
-              value.
-            </p>
-            <div className="live-actions">
-              {[
-                ["approve", "1. Approve USDG"],
-                ["deposit", "2. Deposit"],
-                ["harvest", "Buy stocks with gains"],
-                ["compound", "Reserve gains as principal"],
-                ["withdraw", "Withdraw all"],
-              ].map(([action, label]) => (
-                <button
-                  key={action}
-                  className="earn-button"
-                  disabled={
-                    busy ||
-                    !!pending ||
-                    !!journal ||
-                    (action !== "withdraw" && (!enabled || !acknowledged))
-                  }
-                  onClick={() => void act(() => prepare(action))}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-      {plan && (
-        <div className="live-result" aria-live="polite">
-          <span className="earn-eyebrow">REVIEW BEFORE YOUR WALLET OPENS</span>
-          <strong>
-            {plan.action === "deploy" ? "Create your lending account" : `${fmt(plan.assets)} USDG`}
-          </strong>
-          <p>{plan.summary}</p>
-          {plan.purchases?.map((p) => (
-            <p key={p.symbol}>
-              {fmt(p.amountIn)} USDG → at least {fmt(p.minimumOut, 18)} {p.symbol} tokens.
-            </p>
-          ))}
-          <p>
-            Estimated gas allowance: {fmt(plan.estimatedGasCostWei, 18)} ETH, including a 20%
-            gas-limit buffer. Your wallet shows the final fee. ETH gas is separate from USDG gains.
-          </p>
-          {!plan.hasGasBalance && (
-            <p className="earn-warning">Your wallet needs more ETH for the estimated gas.</p>
-          )}
-          <small>
-            Preview expires {new Date(plan.expiresAt).toLocaleTimeString()}. Review all details in
-            your wallet.
-          </small>
-          <button
-            className="earn-button"
-            disabled={
-              busy ||
-              !!journal ||
-              !plan.canSubmit ||
-              now >= Date.parse(plan.expiresAt) ||
-              (plan.action !== "withdraw" && (!enabled || !acknowledged))
-            }
-            onClick={() => void act(send)}
-          >
-            {now >= Date.parse(plan.expiresAt)
-              ? "Preview expired — review again"
-              : "Approve in my wallet"}
-            <ArrowUpRight size={16} />
-          </button>
-        </div>
-      )}
-      {journal && !journal.hash && (
-        <div className="live-result" aria-live="polite">
-          <strong>Wallet request still needs reconciliation</strong>
-          <p>
-            The wallet may still be awaiting approval, or its response was interrupted. Check wallet
-            activity before doing anything else. No automatic retry will occur.
-          </p>
-        </div>
-      )}
-      {(pending || journal) && (
-        <div className="live-result">
-          <label>
-            Recovery transaction hash
-            <input
-              value={recoveryHash}
-              onChange={(e) => setRecoveryHash(e.target.value)}
-              placeholder="Paste the submitted, sped-up or cancellation transaction hash"
-              disabled={busy}
-            />
-          </label>
-          <button
-            className="earn-button"
-            disabled={busy || !recoveryHash}
-            onClick={() => void act(() => confirm(recoveryHash, false))}
-          >
-            Verify recovery transaction
-          </button>
-          <p className="earn-small">
-            Recovery checks the sender and original wallet nonce. Pending references are saved only
-            in this browser. Account values and confirmation always come from the chain.
-          </p>
-        </div>
-      )}
-      {pending && (
-        <div className="live-result" aria-live="polite">
-          <strong>Transaction submitted — awaiting confirmation</strong>
-          <a
-            className="earn-link"
-            href={`${EXPLORER_URL}/tx/${pending}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View wallet transaction <ArrowUpRight size={14} />
-          </a>
-          <button
-            className="earn-button"
-            disabled={busy}
-            onClick={() => void act(() => confirm(pending, false))}
-          >
-            Check confirmation
-          </button>
-          <p>Do not repeat this action while it is pending.</p>
-        </div>
-      )}
-      {receipt?.status === "confirmed" && (
-        <div className="live-result" aria-live="polite">
-          <strong>Confirmed on Robinhood Chain</strong>
-          {receipt.events?.map((e, i) => (
-            <p key={i}>
-              {e.name === "StockPurchased"
-                ? `${fmt(e.assetAmount)} USDG bought ${fmt(e.tokenAmount!, 18)} ${ENABLED_STOCKS.find((s) => s.address.toLowerCase() === e.token?.toLowerCase())?.symbol ?? "Stock"} tokens.`
-                : `${e.name}: ${fmt(e.assetAmount)} USDG.`}
-            </p>
-          ))}
-          <a
-            className="earn-link"
-            href={`${EXPLORER_URL}/tx/${receipt.hash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View confirmed transaction <ArrowUpRight size={14} />
-          </a>
-        </div>
-      )}
-      {busy && <p aria-live="polite">Checking the chain or waiting for your wallet…</p>}
-      {error && (
-        <p className="earn-warning" role="alert">
-          {error}
-        </p>
-      )}
+          </>
+        )}
+      </details>
+      <p className="pd-footnote">
+        Every action requires your wallet approval. Background conversion is not active.
+      </p>
     </section>
   );
 }

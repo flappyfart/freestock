@@ -108,3 +108,42 @@
     display: none;
   }
 }
+
+.header-wallet-control {
+  flex: 0 0 auto;
+  width: 194px;
+  max-width: 100%;
+}
+.wallet-connect-option-compact {
+  margin: 0;
+  border-radius: 9px;
+}
+.earn .wallet-connect-option-compact .wallet-connect-button {
+  min-height: 50px;
+  gap: 4px;
+  padding: 8px 12px;
+}
+.wallet-connect-option-compact .wallet-connect-text {
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.wallet-connect-option-compact .wallet-connect-provider {
+  font-size: 10px;
+  line-height: 1.2;
+}
+#wallet-connection {
+  scroll-margin-top: 24px;
+}
+.wallet-connection-panel h2:focus-visible {
+  outline: 2px solid #0066ff;
+  outline-offset: 4px;
+}
+@media (max-width: 760px) {
+  .header-wallet-control {
+    width: 172px;
+    margin-left: auto;
+  }
+  .wallet-connect-option-compact .wallet-connect-text {
+    font-size: 12px;
+  }
+}

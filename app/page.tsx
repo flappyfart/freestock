@@ -1,4 +1,4 @@
-import EarnApp from "./earn-app";
+import Home from "./home";
 export default function Page() {
-  return <EarnApp />;
+  return <Home />;
 }

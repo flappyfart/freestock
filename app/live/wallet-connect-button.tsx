@@ -6,21 +6,27 @@ export function WalletConnectButton({
   reconnect = false,
   disabled,
   onClick,
+  compact = false,
+  label: customLabel,
+  ariaLabel,
 }: {
   walletName: string;
   reconnect?: boolean;
   disabled: boolean;
   onClick: () => void;
+  compact?: boolean;
+  label?: string;
+  ariaLabel?: string;
 }) {
-  const label = reconnect ? "Reconnect wallet" : "Connect wallet";
+  const label = customLabel ?? (reconnect ? "Reconnect wallet" : "Connect wallet");
   return (
-    <div className="wallet-connect-option">
+    <div className={`wallet-connect-option${compact ? " wallet-connect-option-compact" : ""}`}>
       <button
         type="button"
         className="wallet-connect-button"
         disabled={disabled}
         onClick={onClick}
-        aria-label={`${label}: ${walletName}`}
+        aria-label={ariaLabel ?? `${label}: ${walletName}`}
       >
         <span className="wallet-connect-text" aria-hidden="true">
           <span>{label}</span>

@@ -1,21 +1,25 @@
 # freestock
 
-Private USDG lending and Stock Token wallet pilot with a separate demo account for exploring DeFi scenarios. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
+Private USDG lending and Stock Token wallet pilot with a simulation modal for exploring DeFi scenarios. The modal uses a separate demo account to create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
 
-**The homepage leads to your live account and keeps the simulator under “Try it yourself.”** `/live` offers the same private, participant-restricted wallet pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
+**The live flow is Home → Connect Wallet → Dashboard.** `/dashboard` is the place to create and manage a live position in the private, participant-restricted pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. “Try it yourself” opens an accessible simulation modal containing setup, saved results and activity. The demo uses no real funds. There is no separate Wallet page. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
 
 ## Working routes
 
-- `/`: live wallet account, “Try it yourself” simulated box, collapsible saved simulated results and read-only market catalogue.
-- `/live`: wallet connection, actual chain balances, Uniswap V3 quotes, direct deposit simulations and yield-account setup plus reviewed wallet transactions. The read-only checks request no signatures; the separately labeled wallet pilot opens a wallet confirmation only after an explicit review action.
-- `/learn`: plain-English explanations, earnings sources, timing, leverage, tokens and future possibilities.
-- `/docs`: current capability matrix, exact model mechanics, sources and execution boundaries.
-- `/transparency`: saved ledger and JSON export, including exact purchase allocations and modeled prices.
-- `/fairness`: redirects to earnings transparency. The draw/prize concept has been retired.
+- `/`: Home, with Connect Wallet leading to Dashboard and “Try it yourself” opening the simulation modal.
+- `/dashboard`: create and manage live positions, with actual chain balances, participant status, account recovery and reviewed wallet transactions. Read-only checks request no signatures; transactions open the wallet only after explicit review.
+- `/learn`: plain-English concepts, earnings sources, compounding, timing, leverage and stock-token exposure.
+- `/docs`: current capability matrix, exact model mechanics, sources, saved records and execution boundaries.
+- `/live`: compatibility redirect to `/dashboard`; not a separate Wallet page.
+- `/demo`: compatibility entry into the simulation modal’s results view, not a standalone results page.
+- `/transparency`: compatibility entry into the modal’s activity view, including the detailed saved ledger and JSON export.
+- `/fairness`: legacy entry through Demo activity. The draw/prize concept has been retired.
+
+`app/demo/demo-link.tsx` exports `DemoLink` for opening the global simulation modal from any page. Its optional `view` selects `setup`, `results` or `activity`. Setup switches to results only after the scenario is confirmed saved. Simulated positions, balances and holdings stay in the results view; the detailed ledger stays in activity. All three views use no real funds.
 
 ## Accounting and automation
 
-A new DeFi account starts with 10,000 simulated USDG. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
+A new demo account starts with 10,000 simulated USDG. Open “Try it yourself” to set up a scenario, manage saved results or inspect activity inside the same modal. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
 
 Lending converts the observed seven-day vault APY to an effective daily rate, then accrues linearly within each simulation step. Fractions below one micro-USDG carry into the next step. Compounding happens at step boundaries. The observed rate is fixed for that position, not treated as a forecast or live accrual.
 
@@ -48,3 +52,7 @@ Private pilot runtime settings: `FREESTOCK_PILOT_USER_ID` must equal the exact t
 UI switches use the user-provided Uiverse.io design by reglobby: a blue off state, green on state and animated glowing orb, with accessible controls and reduced-motion support.
 
 Verified account creation references are remembered per wallet on this browser and rechecked against the chain on return. Live account balances refresh every 30 seconds while visible and idle. Reviews and pending wallet requests pause this refresh. Storage never substitutes for chain balances.
+
+The compact header Connect Wallet button uses the same injected-wallet connection as Dashboard. It opens a wallet chooser, or explains how to open a wallet-enabled browser when no wallet is detected. The connected user continues to `/dashboard` to create or manage a live position. Connecting never submits a financial transaction. “Try it yourself” opens the simulation modal independently of the live account flow.
+
+The homepage displays Apple, NVIDIA and Sandisk as illustrative floating artwork. The live purchase choices remain NVDA, AAPL, TSLA, GOOGL and SPY. Chain reads use bounded retry/backoff for transient failures, request-scoped in-flight coalescing, and safe upstream status diagnostics. Completed quotes and transaction previews are never cached or automatically submitted. `/api/live/status` reports the actual server-to-chain health without disclosing a provider URL or credentials.

@@ -1,12 +1,10 @@
 "use client";
 /* oxlint-disable next/no-img-element -- Local optimized WebP artwork and vector marks have explicit dimensions. */
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, Layers, RefreshCw } from "lucide-react";
-import { EarnShell } from "./earn-shell";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../components/ui/dialog";
+import type { DemoView } from "./demo/demo-provider";
 import { MechanicalSwitch } from "./mechanical-switch";
-import { LandingIntro } from "./landing-intro";
-import LiveWorkspace from "./live/live-workspace";
 import {
   STOCKS,
   modeledNetApr,
@@ -23,8 +21,6 @@ const money = (micro: number) =>
   new Intl.NumberFormat("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(
     micro / 1e6,
   );
-const compact = (n: number) =>
-  new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(n);
 const percent = (n: number | null) => (n === null ? "Unavailable" : `${(n * 100).toFixed(2)}%`);
 type Preferences = {
   allocation: Allocation;
@@ -345,15 +341,25 @@ function PositionCard({
     </article>
   );
 }
-export default function EarnApp({ transparency = false }: { transparency?: boolean }) {
+export default function DemoWorkspace({
+  open,
+  view,
+  onViewChange,
+  onClose,
+}: {
+  open: boolean;
+  view: DemoView;
+  onViewChange: (view: DemoView) => void;
+  onClose: () => void;
+}) {
+  const requestInFlight = useRef(false);
+  const [marketError, setMarketError] = useState("");
   const [state, setState] = useState<EarnState | null>(null),
     [market, setMarket] = useState<MarketCatalogue | null>(null);
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false);
-  const [showPracticeResults, setShowPracticeResults] = useState(false);
-  const [feedbackLocation, setFeedbackLocation] = useState<"form" | "results">("form");
   const [pendingRequest, setPendingRequest] = useState<{
     key: string;
     body: Record<string, unknown>;
@@ -370,35 +376,53 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
     threshold: 5e6,
     compoundBps: 0,
   });
-  async function load() {
+  const load = useCallback(async () => {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    setLoading(true);
     try {
-      const results = await Promise.all([
-        fetch("/api/earn/account").then(async (r) => {
-          const v = (await r.json()) as { error?: string; state: EarnState; replayed?: boolean };
-          if (!r.ok) throw Error(v.error ?? "Account unavailable.");
-          return v;
-        }),
-        fetch("/api/markets").then(async (r) => {
-          if (!r.ok) throw Error("Market data unavailable.");
-          return r.json() as Promise<MarketCatalogue>;
-        }),
-      ]);
-      setState(results[0].state);
-      setMarket(results[1]);
+      const r = await fetch("/api/earn/account");
+      const v = (await r.json()) as { error?: string; state: EarnState };
+      if (!r.ok) throw Error(v.error ?? "Account unavailable.");
+      setState(v.state);
+      setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load your account.");
     } finally {
+      requestInFlight.current = false;
       setLoading(false);
     }
-  }
-  useEffect(() => {
-    // oxlint-disable-next-line react/react-compiler -- load updates state only after awaited network responses.
-    void load();
   }, []);
+  useEffect(() => {
+    if (!open || pendingRequest) return;
+    // oxlint-disable-next-line react/react-compiler -- account updates follow awaited network responses.
+    void load();
+  }, [open, load, pendingRequest]);
+  useEffect(() => {
+    if (!open || view !== "setup") return;
+    let active = true;
+    void fetch("/api/markets")
+      .then(async (r) => {
+        if (!r.ok)
+          throw Error("Lending rates are unavailable. Try again shortly or explore the LP model.");
+        return r.json() as Promise<MarketCatalogue>;
+      })
+      .then((value) => {
+        if (active) {
+          setMarket(value);
+          setMarketError("");
+        }
+      })
+      .catch((e) => {
+        if (active) setMarketError(e instanceof Error ? e.message : "Market data unavailable.");
+      });
+    return () => {
+      active = false;
+    };
+  }, [open, view]);
   async function command(body: Record<string, unknown>, retryKey?: string) {
-    if (busy || (pendingRequest && !retryKey)) return;
-    setFeedbackLocation(body.type === "open" ? "form" : "results");
-    if (body.type !== "open") setShowPracticeResults(true);
+    if (requestInFlight.current || (pendingRequest && !retryKey)) return;
+    requestInFlight.current = true;
     const key = retryKey ?? crypto.randomUUID();
     setBusy(true);
     setError("");
@@ -411,26 +435,28 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
       });
       const v = (await r.json()) as { error?: string; state: EarnState; replayed?: boolean };
       if (!r.ok) {
-        if (r.status >= 500) setPendingRequest({ key, body });
+        if (r.status >= 500 || retryKey) setPendingRequest({ key, body });
         else setPendingRequest(null);
         throw Error(v.error ?? "Action failed.");
       }
+      setError("");
       setState(v.state);
-      if (body.type === "open") setShowPracticeResults(true);
       setPendingRequest(null);
       setNotice(
         v.replayed
           ? "Your saved action is confirmed. Nothing was applied twice."
           : "Demo account saved. Balances and earnings are up to date.",
       );
+      if (body.type === "open") onViewChange("results");
     } catch (e) {
       if (e instanceof TypeError || e instanceof SyntaxError) setPendingRequest({ key, body });
       setError(e instanceof Error ? e.message : "Could not confirm this action.");
     } finally {
+      requestInFlight.current = false;
       setBusy(false);
     }
   }
-  const locked = busy || !!pendingRequest || !state;
+  const locked = loading || busy || !!pendingRequest || !state;
   const capital = state?.positions.reduce((n, p) => n + p.capital, 0) ?? 0,
     earned = state?.positions.reduce((n, p) => n + p.earned, 0) ?? 0,
     ready = state?.positions.reduce((n, p) => n + p.pending, 0) ?? 0;
@@ -466,7 +492,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
   }
   const feedback = (
     <div className="earn-feedback" aria-live="polite">
-      {loading && <p>Loading your demo account and market data…</p>}
+      {loading && <p>Loading your demo account…</p>}
       {error && (
         <p role="alert">
           {error}{" "}
@@ -478,22 +504,38 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
             >
               Retry this action
             </button>
-          ) : !state ? (
-            <>
-              {error.startsWith("Sign in") && (
-                <button
-                  type="button"
-                  className="earn-link"
-                  onClick={() => window.location.assign("/signin-with-chatgpt?return_to=%2F")}
-                >
-                  Sign in to try it
-                </button>
-              )}
-              <button type="button" onClick={() => void load()}>
-                Retry loading
-              </button>
-            </>
           ) : null}
+          {error.startsWith("Sign in") && pendingRequest && (
+            <span>
+              Sign in in a new tab, then retry this saved action here.{" "}
+              <a
+                className="earn-link"
+                href="/signin-with-chatgpt?return_to=%2F%3Fdemo%3Dresults"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Sign in again
+              </a>
+            </span>
+          )}
+          {error.startsWith("Sign in") && !pendingRequest && (
+            <button
+              type="button"
+              className="earn-link"
+              onClick={() =>
+                window.location.assign(
+                  `/signin-with-chatgpt?return_to=${encodeURIComponent(`/?demo=${view}`)}`,
+                )
+              }
+            >
+              Sign in to try it
+            </button>
+          )}
+          {!state && !pendingRequest && (
+            <button type="button" onClick={() => void load()}>
+              Retry loading
+            </button>
+          )}
         </p>
       )}
       {notice && (
@@ -504,74 +546,69 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
       )}
     </div>
   );
+  const canClose = !busy && !pendingRequest;
   return (
-    <EarnShell active={transparency ? "Demo activity" : "Home"}>
-      {!transparency && <LandingIntro />}
-      <div className="earn-wrap">
-        <div className="earn-notice">
-          <span>
-            <i /> {transparency ? "DEMO ACTIVITY" : "LIVE WALLET PILOT"}
-          </span>
-          <p>
-            {transparency
-              ? "This ledger records simulated money only. Your real balances and receipts are in your live account."
-              : "USDG lending and stock purchases for the configured Norway participant. Every real transaction needs your wallet approval."}
-          </p>
+    <Dialog
+      open={open}
+      onOpenChange={(next, details) => {
+        if (next) return;
+        if (!canClose) {
+          details.cancel();
+          setError(
+            pendingRequest
+              ? "Retry your pending action before closing so its result can be confirmed."
+              : "Your action is saving. This will only take a moment.",
+          );
+        } else onClose();
+      }}
+    >
+      <DialogContent className="earn demo-modal" showCloseButton={canClose}>
+        <div className="demo-modal-heading">
+          <span className="earn-eyebrow">THE FREESTOCK DEMO</span>
+          <DialogTitle className="demo-modal-title">Try it yourself</DialogTitle>
+          <DialogDescription className="demo-modal-description">
+            Explore with simulated money. Your real wallet is never affected.
+          </DialogDescription>
         </div>
-        {transparency && feedback}
-        {!transparency ? (
-          <>
-            <section className="earn-top">
-              <div className="earn-intro">
-                <span className="earn-eyebrow">DEFI IN. STOCK TOKENS OUT.</span>
-                <h1>
-                  Your yield.
-                  <br />
-                  Your next <em>stock.</em>
-                </h1>
-                <p>
-                  Lend USDG, let returns accumulate, then use available gains to buy the stock
-                  tokens you choose. Start with NVIDIA, Apple, Tesla, Alphabet or SPY.
-                </p>
-                <div className="home-live-actions">
-                  <a className="earn-button" href="#live-account">
-                    Open live account <ArrowUpRight size={18} />
-                  </a>
-                  <a className="earn-link" href="#try-it-yourself">
-                    Try it yourself
-                  </a>
-                </div>
-                <p className="home-live-limit">
-                  Private Norway pilot · 100 USDG deposit limit · Returns vary and capital can lose
-                  value.
-                </p>
-                <Link className="earn-link" href="/learn">
-                  New to this? Start here <ArrowUpRight size={17} />
-                </Link>
-                <div className="earn-stock-art" aria-label="NVIDIA and Apple stock tokens">
-                  <img
-                    className="earn-bubble earn-bubble-a"
-                    src="/stocks/bubble-aapl.webp"
-                    alt="Apple stock bubble"
-                    width="160"
-                    height="160"
-                  />
-                  <img
-                    className="earn-bubble earn-bubble-n"
-                    src="/stocks/bubble-nvda.webp"
-                    alt="NVIDIA stock bubble"
-                    width="210"
-                    height="210"
-                  />
-                </div>
-                <div className="earn-path">
-                  <span>Earn in DeFi</span>
-                  <ArrowRight size={18} />
-                  <span>Approve a stock purchase</span>
-                  <ArrowRight size={18} />
-                  <span>Your portfolio</span>
-                </div>
-              </div>
+        <div className="demo-modal-toolbar">
+          <nav aria-label="Simulation views" className="demo-tabs">
+            {(
+              [
+                ["setup", "Create position"],
+                ["results", "Your results"],
+                ["activity", "Activity"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-current={view === key ? "page" : undefined}
+                disabled={busy}
+                onClick={() => onViewChange(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <span className="demo-balance">
+            {state ? money(state.wallet) : "…"} <small>simulated USDG available</small>
+          </span>
+        </div>
+        <div className="demo-modal-body" key={view}>
+          {feedback}
+          {view === "setup" ? (
+            <div className="demo-setup-layout">
+              <aside className="demo-guide">
+                <span className="earn-pill">No real funds</span>
+                <h3>See where your earnings could go.</h3>
+                <ol>
+                  <li>Choose a lending or LP scenario.</li>
+                  <li>Pick a stock, basket, or compound.</li>
+                  <li>Advance time and explore the results.</li>
+                </ol>
+                <p>Start with 10,000 simulated USDG. Saved scenarios stay in this demo.</p>
+                {marketError && <output className="earn-warning">{marketError}</output>}
+              </aside>
               <form
                 className="earn-builder"
                 id="try-it-yourself"
@@ -598,7 +635,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   Explore with 10,000 simulated USDG. These settings and results do not affect your
                   wallet. Auto-convert and leveraged LP options here are simulations.
                 </p>
-                {feedbackLocation === "form" && feedback}
+
                 <fieldset className="earn-segment" aria-label="Position type" data-kind={kind}>
                   <button
                     type="button"
@@ -681,265 +718,207 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   {busy ? "Saving…" : "Try this position"}
                   <ArrowUpRight size={18} />
                 </button>
-                <a
+                <button
+                  type="button"
                   className="earn-link"
-                  href="#demo-results"
-                  onClick={() => setShowPracticeResults(true)}
+                  disabled={busy || !!pendingRequest}
+                  onClick={() => onViewChange("results")}
                 >
-                  View your simulated results <ArrowRight size={16} />
-                </a>
+                  View saved results <ArrowRight size={16} />
+                </button>
               </form>
-            </section>
-            <section id="live-account" className="home-live-account">
-              <LiveWorkspace embedded />
-            </section>
-            <span id="practice-results" aria-hidden="true" />
-            <details
-              className="demo-results"
-              id="demo-results"
-              open={showPracticeResults}
-              onToggle={(e) => setShowPracticeResults(e.currentTarget.open)}
-            >
-              <summary>
-                <span>Your simulated results</span>
-                <small>
-                  Simulated positions and stock tokens · separate from your live account
-                </small>
-              </summary>
-              {feedbackLocation === "results" && feedback}
-              <section className="earn-section" id="positions">
-                <div className="section-title">
-                  <div>
-                    <span className="earn-eyebrow">TRY IT YOURSELF</span>
-                    <h2>Simulated positions</h2>
-                  </div>
-                  <Link href="/transparency" className="earn-link">
-                    See every earnings step <ArrowUpRight size={16} />
-                  </Link>
-                </div>
-                <div className="earn-stats">
-                  <div>
-                    <span>Simulated DeFi capital</span>
-                    <strong>
-                      {money(capital)} <small>USDG</small>
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Net modeled earnings</span>
-                    <strong>
-                      {money(earned)} <small>USDG</small>
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Ready to convert</span>
-                    <strong>
-                      {money(ready)} <small>USDG</small>
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Spent on stock tokens</span>
-                    <strong>
-                      {money(stockCost)} <small>USDG</small>
-                    </strong>
-                  </div>
-                </div>
-                <div className="positions-grid">
-                  {state?.positions.map((p) => (
-                    <PositionCard key={p.id} p={p} busy={locked} command={(v) => void command(v)} />
-                  ))}
-                </div>
-                {state?.positions.length === 0 && (
-                  <div className="earn-empty">
-                    <Layers size={24} />
-                    <h3>Your first position starts above.</h3>
-                    <p>Choose an earnings destination, then simulate a day, a week or a month.</p>
-                  </div>
-                )}
-              </section>
-              <section className="earn-section">
-                <div className="section-title">
-                  <div>
-                    <span className="earn-eyebrow">BUILD YOUR EXPOSURE</span>
-                    <h2>Simulated stock tokens</h2>
-                  </div>
-                  <span className="earn-small">Simulated quantities · cost, not current value</span>
-                </div>
-                <div className="holdings-grid">
-                  {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
-                    <article key={s.symbol}>
-                      <StockMark symbol={s.symbol} size={40} />
-                      <div>
-                        <h3>{s.symbol}</h3>
-                        <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} simulated tokens</p>
-                        <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                {stockCost === 0 && (
-                  <p className="earn-muted">
-                    Your chosen tokens appear here after a simulated earnings conversion.
-                  </p>
-                )}
-              </section>
-            </details>
-            <section className="earn-section" id="markets">
-              <div className="section-title">
+            </div>
+          ) : view === "results" ? (
+            <>
+              <div className="demo-view-heading">
                 <div>
-                  <span className="earn-eyebrow">READ-ONLY DISCOVERY</span>
-                  <h2>Inside the lending market.</h2>
+                  <h2>Your simulated portfolio</h2>
+                  <p>Advance time, convert earnings, and explore your positions.</p>
                 </div>
-                <span className="earn-pill">
-                  {market?.status === "live" ? "Live API response" : "Saved snapshot"}
-                </span>
+                <button type="button" className="earn-link" onClick={() => onViewChange("setup")}>
+                  New position <ArrowRight size={16} />
+                </button>
               </div>
-              <p className="earn-muted">
-                One tracked vault and five listed Morpho markets. This is a verified subset, not
-                every pool on Robinhood Chain. Vault assets overlap with the markets below.
-              </p>
-              {market && (
-                <>
-                  <div className="catalogue-vault">
+              <div className="demo-results-page">
+                <section className="earn-section" id="positions">
+                  <div className="section-title">
                     <div>
-                      <strong>Steakhouse USDG vault</strong>
-                      <span>
-                        Net APY {percent(market.vault.apy)} · vault fees already reflected · rewards
-                        excluded
-                      </span>
+                      <span className="earn-eyebrow">TRY IT YOURSELF</span>
+                      <h2>Simulated positions</h2>
+                    </div>
+                    <button
+                      type="button"
+                      className="earn-link"
+                      onClick={() => onViewChange("activity")}
+                    >
+                      See activity <ArrowUpRight size={16} />
+                    </button>
+                  </div>
+                  <div className="earn-stats">
+                    <div>
+                      <span>Simulated DeFi capital</span>
+                      <strong>
+                        {money(capital)} <small>USDG</small>
+                      </strong>
                     </div>
                     <div>
-                      <strong>{compact(market.vault.assets)} USDG</strong>
-                      <span>{compact(market.vault.liquidity)} USDG withdrawable</span>
+                      <span>Net modeled earnings</span>
+                      <strong>
+                        {money(earned)} <small>USDG</small>
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Ready to convert</span>
+                      <strong>
+                        {money(ready)} <small>USDG</small>
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Spent on stock tokens</span>
+                      <strong>
+                        {money(stockCost)} <small>USDG</small>
+                      </strong>
                     </div>
                   </div>
-                  <div className="earn-table-scroll">
-                    <table>
-                      <caption>
-                        Listed USDG lending markets. Collateral belongs to borrowers; USDG is the
-                        asset supplied.
-                      </caption>
-                      <thead>
-                        <tr>
-                          <th>Borrower collateral</th>
-                          <th>7-day supply APY</th>
-                          <th>USDG supplied</th>
-                          <th>Unborrowed USDG</th>
-                          <th>Source</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {market.markets.map((m) => (
-                          <tr key={m.id}>
-                            <td>
-                              {m.collateral}
-                              {m.liquidity < 10 && <small>Negligible liquidity</small>}
-                            </td>
-                            <td>{percent(m.apy)}</td>
-                            <td>{compact(m.assets)}</td>
-                            <td>{compact(m.liquidity)}</td>
-                            <td>
-                              <a
-                                href={`https://api.morpho.org/v0/blue/markets/4663:${m.id}/state`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                API <ArrowUpRight size={13} />
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="positions-grid">
+                    {state?.positions.map((p) => (
+                      <PositionCard
+                        key={p.id}
+                        p={p}
+                        busy={locked}
+                        command={(v) => void command(v)}
+                      />
+                    ))}
                   </div>
-                  <p className="earn-small">
-                    {market.note}. Fetched {new Date(market.asOf).toLocaleString()}. Cached up to 60
-                    seconds; this page refreshes on reload. Directory membership last checked
-                    September 8, 2026. Rates can change or turn negative.
-                  </p>
-                </>
-              )}
-            </section>
-          </>
-        ) : (
-          <>
-            <section className="education-title">
-              <span className="earn-eyebrow">EVERY STEP, EXPLAINED</span>
-              <h1>Follow the earnings.</h1>
-              <p>
-                Your saved demo record shows deposits, modeled returns, compounding, withdrawals and
-                each stock allocation. These are simulation entries, not blockchain transaction
-                receipts.
-              </p>
-            </section>
-            <div className="earn-stats">
-              <div>
-                <span>Demo wallet</span>
-                <strong>{money(state?.wallet ?? 0)}</strong>
-              </div>
-              <div>
-                <span>Position capital</span>
-                <strong>{money(capital)}</strong>
-              </div>
-              <div>
-                <span>Awaiting conversion</span>
-                <strong>{money(ready)}</strong>
-              </div>
-              <div>
-                <span>Stock purchase cost</span>
-                <strong>{money(stockCost)}</strong>
-              </div>
-            </div>
-            <div className="transparency-equation">
-              Wallet + position capital + available earnings + stock purchase cost = 10,000 starting
-              USDG + net modeled earnings.
-            </div>
-            <p className="earn-small">
-              Reconciliation uses historical purchase cost, not stock market value. Internal
-              transfers and compounding do not create earnings.
-            </p>
-            <div className="section-title">
-              <h2>Activity record</h2>
-              <button className="earn-button" disabled={!state} onClick={exportLedger}>
-                Export demo ledger <ArrowUpRight size={16} />
-              </button>
-            </div>
-            <div className="ledger">
-              {state?.entries.toReversed().map((entry) => (
-                <article key={entry.id}>
-                  <div className="earn-row">
-                    <span className="earn-eyebrow">
-                      #{entry.id} · {entry.positionId.toUpperCase()} ·{" "}
-                      {new Date(entry.at).toLocaleString()}
-                    </span>
-                    <strong>{entry.amount === 0 ? "—" : `${money(entry.amount)} USDG`}</strong>
-                  </div>
-                  <h3>{simulationLabel(entry.action)}</h3>
-                  <p>{simulationLabel(entry.detail)}</p>
-                  {entry.purchases && (
-                    <ul>
-                      {entry.purchases.map((buy) => (
-                        <li key={buy.symbol}>
-                          {buy.symbol}: {buy.quantity.toFixed(8)} simulated tokens ·{" "}
-                          {money(buy.amount)} USDG · illustrative price ${buy.price}
-                        </li>
-                      ))}
-                    </ul>
+                  {state?.positions.length === 0 && (
+                    <div className="earn-empty">
+                      <Layers size={24} />
+                      <h3>Start your first scenario.</h3>
+                      <p>
+                        Choose a position and your stock picks, then advance time to explore the
+                        outcome.
+                      </p>
+                      <button
+                        type="button"
+                        className="earn-link"
+                        onClick={() => onViewChange("setup")}
+                      >
+                        Try your first position <ArrowRight size={16} />
+                      </button>
+                    </div>
                   )}
-                </article>
-              ))}
-            </div>
-            {state?.entries.length === 0 && (
-              <div className="earn-empty">
-                <RefreshCw size={24} />
-                <h3>No earnings activity yet.</h3>
-                <Link className="earn-link" href="/">
-                  Create a simulated position <ArrowRight size={16} />
-                </Link>
+                </section>
+                <section className="earn-section">
+                  <div className="section-title">
+                    <div>
+                      <span className="earn-eyebrow">BUILD YOUR EXPOSURE</span>
+                      <h2>Simulated stock tokens</h2>
+                    </div>
+                    <span className="earn-small">
+                      Simulated quantities · cost, not current value
+                    </span>
+                  </div>
+                  <div className="holdings-grid">
+                    {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
+                      <article key={s.symbol}>
+                        <StockMark symbol={s.symbol} size={40} />
+                        <div>
+                          <h3>{s.symbol}</h3>
+                          <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} simulated tokens</p>
+                          <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                  {stockCost === 0 && (
+                    <p className="earn-muted">
+                      Your chosen tokens appear here after a simulated earnings conversion.
+                    </p>
+                  )}
+                </section>
               </div>
-            )}
-          </>
-        )}
-      </div>
-    </EarnShell>
+            </>
+          ) : (
+            <>
+              <div className="demo-view-heading">
+                <div>
+                  <h2>Your demo activity</h2>
+                  <p>
+                    Every deposit, modeled return and stock allocation. These are simulation
+                    records.
+                  </p>
+                </div>
+              </div>
+              <div className="earn-stats">
+                <div>
+                  <span>Demo wallet</span>
+                  <strong>{money(state?.wallet ?? 0)}</strong>
+                </div>
+                <div>
+                  <span>Position capital</span>
+                  <strong>{money(capital)}</strong>
+                </div>
+                <div>
+                  <span>Awaiting conversion</span>
+                  <strong>{money(ready)}</strong>
+                </div>
+                <div>
+                  <span>Stock purchase cost</span>
+                  <strong>{money(stockCost)}</strong>
+                </div>
+              </div>
+              <div className="transparency-equation">
+                Wallet + position capital + available earnings + stock purchase cost = 10,000
+                starting USDG + net modeled earnings.
+              </div>
+              <p className="earn-small">
+                Reconciliation uses historical purchase cost, not stock market value. Internal
+                transfers and compounding do not create earnings.
+              </p>
+              <div className="section-title">
+                <h2>Activity record</h2>
+                <button className="earn-button" disabled={!state} onClick={exportLedger}>
+                  Export demo ledger <ArrowUpRight size={16} />
+                </button>
+              </div>
+              <div className="ledger">
+                {state?.entries.toReversed().map((entry) => (
+                  <article key={entry.id}>
+                    <div className="earn-row">
+                      <span className="earn-eyebrow">
+                        #{entry.id} · {entry.positionId.toUpperCase()} ·{" "}
+                        {new Date(entry.at).toLocaleString()}
+                      </span>
+                      <strong>{entry.amount === 0 ? "—" : `${money(entry.amount)} USDG`}</strong>
+                    </div>
+                    <h3>{simulationLabel(entry.action)}</h3>
+                    <p>{simulationLabel(entry.detail)}</p>
+                    {entry.purchases && (
+                      <ul>
+                        {entry.purchases.map((buy) => (
+                          <li key={buy.symbol}>
+                            {buy.symbol}: {buy.quantity.toFixed(8)} simulated tokens ·{" "}
+                            {money(buy.amount)} USDG · illustrative price ${buy.price}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                ))}
+              </div>
+              {state?.entries.length === 0 && (
+                <div className="earn-empty">
+                  <RefreshCw size={24} />
+                  <h3>No earnings activity yet.</h3>
+                  <button type="button" className="earn-link" onClick={() => onViewChange("setup")}>
+                    Create a simulated position <ArrowRight size={16} />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
