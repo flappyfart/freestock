@@ -22,8 +22,14 @@ import {
 import { MechanicalSwitch } from "../mechanical-switch";
 import { EXPLORER_URL } from "../../lib/live/config";
 import { positionBudget } from "../../lib/live/position-budget";
+import {
+  validateAgentIntent,
+  type AgentAccount,
+  type AgentIntent,
+  type PilotReadState,
+} from "../../lib/live/agentic-lending";
 import "./pilot-dashboard.css";
-type Account = {
+type Account = AgentAccount & {
   account: string;
   deployment: string;
   principal: string;
@@ -67,10 +73,18 @@ export default function PilotWorkspace({
   owner,
   provider,
   availability,
+  scope,
+  onReadState,
+  agentIntent,
+  onAgentIntentHandled,
 }: {
   owner: string;
   provider: WalletProvider;
   availability: PilotAvailability;
+  scope: string;
+  onReadState: (value: PilotReadState) => void;
+  agentIntent: AgentIntent | null;
+  onAgentIntentHandled: (id: string) => void;
 }) {
   const enabled = availability === "enabled";
   const [account, setAccount] = useState<Account | null>(null),
@@ -95,6 +109,8 @@ export default function PilotWorkspace({
   const [actionView, setActionView] = useState<
     "deposit" | "harvest" | "compound" | "withdraw" | null
   >(null);
+  const [agentNote, setAgentNote] = useState("");
+  const consumedIntent = useRef<string | null>(null);
   const alive = useRef(true),
     inFlight = useRef(false),
     readEpoch = useRef(0),
@@ -375,7 +391,54 @@ export default function PilotWorkspace({
   const changeView = (view: "deposit" | "harvest" | "compound" | "withdraw" | null) => {
     setActionView(view);
     setPlan(null);
+    setAgentNote("");
   };
+  useEffect(() => {
+    onReadState({
+      scope,
+      account,
+      blocked: busy || !!pending || !!journal || !!plan,
+      error: refreshWarning,
+    });
+  }, [scope, account, busy, pending, journal, plan, refreshWarning, onReadState]);
+  useEffect(() => {
+    if (!agentIntent || consumedIntent.current === agentIntent.id) return;
+    consumedIntent.current = agentIntent.id;
+    try {
+      if (
+        busy ||
+        inFlight.current ||
+        pending ||
+        journal ||
+        plan ||
+        readJournal(owner) ||
+        new URLSearchParams(window.location.search).get("transaction")
+      )
+        throw Error("Finish your current action before opening an Agentic Lending recommendation.");
+      validateAgentIntent(agentIntent, scope, account, owner, Date.now());
+      // oxlint-disable-next-line react/react-compiler -- Consume a scoped one-shot parent request by filling the manual review form, without preparing or submitting a transaction.
+      setAmount(formatUnits(agentIntent.amount, 6));
+      setSelection(
+        agentIntent.allocations.length === 1 ? agentIntent.allocations[0].symbol : "basket",
+      );
+      setWeights(
+        Object.fromEntries(
+          ENABLED_STOCKS.map((s) => [
+            s.symbol,
+            (agentIntent.allocations.find((a) => a.symbol === s.symbol)?.weightBps ?? 0) / 100,
+          ]),
+        ),
+      );
+      setActionView("harvest");
+      setError("");
+      setAgentNote(
+        "Your Agentic Lending plan filled in this purchase. Review a fresh quote below; its costs may differ from the recommendation. No transaction has been submitted.",
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Check your recommendation again.");
+    }
+    onAgentIntentHandled(agentIntent.id);
+  }, [agentIntent, scope, account, owner, busy, pending, journal, plan, onAgentIntentHandled]);
   return (
     <section className="pilot-workspace pilot-dashboard">
       <header className="pd-heading">
@@ -395,6 +458,7 @@ export default function PilotWorkspace({
         </div>
         <span className="pd-network">Robinhood Chain</span>
       </header>
+      {agentNote && <p className="pd-notice">{agentNote}</p>}
 
       {!hasPosition && (
         <ol className="pd-steps" aria-label="Position setup">

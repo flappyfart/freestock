@@ -20,6 +20,8 @@ export type Prepared = {
     minimumOut: string;
     fee: number;
     weightBps: number;
+    observedAt?: string;
+    expiresAt?: string;
   }[];
   minimumOut: string | null;
   tokenOut: string | null;

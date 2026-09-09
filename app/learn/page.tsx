@@ -25,6 +25,7 @@ export default function Page() {
           <aside>
             <strong>On this page</strong>
             <a href="#flow">The basic idea</a>
+            <a href="#agentic-lending">Agentic Lending</a>
             <a href="#strategies">Where earnings come from</a>
             <a href="#stock-lending">Lending Stock Tokens</a>
             <a href="#destinations">Convert or compound</a>
@@ -72,6 +73,28 @@ export default function Page() {
                 choose Connect Wallet on Home, then use <Link href="/dashboard">Dashboard</Link>.
                 The private pilot’s access limits still apply, and every real transaction requires
                 the owner’s wallet approval.
+              </p>
+            </section>
+            <section id="agentic-lending">
+              <h2>A lending plan with a reason for the next move.</h2>
+              <p>
+                <Link href="/dashboard?view=agentic">Agentic Lending</Link> checks the available
+                surplus in your Freestock account against your chosen rules. It can suggest waiting
+                for more gains, keeping vault shares invested or reviewing a stock purchase.
+                Recommendations use live position data; they are separate from the simulated
+                scenarios.
+              </p>
+              <p>
+                Choose your stock allocation, a minimum amount of available gains and an ETH
+                network-fee limit. Request a quote when the minimum is met. A recommendation to
+                review is not a trade or a claim that the trade is profitable. You still check the
+                final cost and approve any transaction in your wallet.
+              </p>
+              <p>
+                The first release is rule-based recommendation mode. It uses one lending vault, does
+                not call an AI model and does not move funds automatically. Plans are saved on this
+                browser, and checks stop when the view is closed. Keeping gains invested needs no
+                transaction because vault shares already accumulate underlying returns.
               </p>
             </section>
             <section id="strategies">

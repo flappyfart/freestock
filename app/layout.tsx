@@ -8,9 +8,9 @@ import "./flow.css";
 import { WalletProvider } from "./live/wallet-provider";
 import { DemoProvider } from "./demo/demo-provider";
 export const metadata: Metadata = {
-  title: "freestock | Put DeFi earnings toward your stock picks",
+  title: "freestock | Agentic Lending, your stock picks",
   description:
-    "Use the private USDG lending and Stock Token wallet pilot, or try the flow with simulated money. Every real transaction requires your wallet approval.",
+    "Set a lending plan, check available gains and review stock purchases with Agentic Lending. Rule-based recommendations in the private wallet pilot; every transaction needs your approval.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

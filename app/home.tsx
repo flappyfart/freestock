@@ -2,7 +2,7 @@
 /* oxlint-disable next/no-img-element -- Existing optimized local stock artwork. */
 import { useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Play, ScanLine, SlidersHorizontal, Check } from "lucide-react";
 import { EarnShell } from "./earn-shell";
 import { LandingIntro } from "./landing-intro";
 import { useDemo, type DemoView } from "./demo/demo-provider";
@@ -32,15 +32,15 @@ export default function Home() {
       <div className="home-flow">
         <section className="home-hero">
           <div className="home-hero-copy">
-            <span className="earn-eyebrow">DEFI EARNINGS. YOUR STOCK PICKS.</span>
+            <span className="earn-eyebrow">AGENTIC LENDING. YOUR STOCK PICKS.</span>
             <h1>
               Keep lending.
               <br />
               Grow your <em>stocks.</em>
             </h1>
             <p>
-              Put available USDG lending gains toward the stock tokens you choose. Build a portfolio
-              from your earnings.
+              Give your lending a plan. Agentic Lending checks your available gains and helps you
+              decide when to put them toward the stock tokens you choose.
             </p>
             <div className="home-hero-actions">
               {owner ? (
@@ -82,6 +82,53 @@ export default function Home() {
               alt=""
             />
             <span className="home-stock-caption">Earnings, meet your stock picks.</span>
+          </div>
+        </section>
+        <section className="home-agentic" aria-labelledby="agentic-title">
+          <div className="home-agentic-copy">
+            <span className="home-agentic-label">
+              <ScanLine size={18} /> Agentic Lending
+            </span>
+            <h2 id="agentic-title">
+              Your plan.
+              <br />A clearer next move.
+            </h2>
+            <p>
+              Know when to wait, keep gains invested or review a stock purchase. Freestock checks
+              your position against your plan and shows the reason for every recommendation.
+            </p>
+            <Link href="/dashboard?view=agentic" className="earn-button">
+              Explore Agentic Lending <ArrowUpRight size={18} />
+            </Link>
+            <small>Recommendation mode · Rule-based checks · You approve transactions</small>
+          </div>
+          <div className="home-agentic-flow" aria-label="How Agentic Lending works">
+            <div>
+              <ScanLine size={21} />
+              <span>
+                <strong>Read your position</strong>
+                <small>Live balance, principal baseline and available gains.</small>
+              </span>
+            </div>
+            <div>
+              <SlidersHorizontal size={21} />
+              <span>
+                <strong>Check your plan</strong>
+                <small>Your stock picks, conversion minimum and gas budget.</small>
+              </span>
+            </div>
+            <div>
+              <Check size={21} />
+              <span>
+                <strong>Explain the next move</strong>
+                <small>A reason to wait, hold or open a fresh transaction review.</small>
+              </span>
+            </div>
+            <p>
+              One connected lending vault today.
+              <br />
+              Pool switching and automatic execution are planned.
+            </p>
           </div>
         </section>
         <section className="home-how" aria-labelledby="how-title">

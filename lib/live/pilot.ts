@@ -94,7 +94,7 @@ export async function verifiedAccount(ownerInput: string, deploymentInput: strin
   return { owner, account, deployment };
 }
 async function balances(owner: string, account: string, block: string) {
-  const [principal, value, gains, usd, stock, allowance, stocks] = await Promise.all([
+  const [principal, value, gains, usd, stock, allowance, stocks, header] = await Promise.all([
     read(account, accountAbi, "principal", [], block),
     read(account, accountAbi, "totalAssets", [], block),
     read(account, accountAbi, "availableYield", [], block),
@@ -108,12 +108,17 @@ async function balances(owner: string, account: string, block: string) {
         balance: String((await read(s.address, tokenAbi, "balanceOf", [owner], block))[0]),
       })),
     ),
+    rpc("eth_getBlockByNumber", [block, false]),
   ]);
   const available = BigInt(String(gains[0]));
   const budget = positionBudget(BigInt(String(principal[0])), BigInt(String(value[0])));
   if (budget.surplus !== available)
     throw new LiveError("Position balances are inconsistent. Refresh before continuing.", 503);
   return {
+    chainId: 4663,
+    vault: VAULT,
+    observedAt: new Date().toISOString(),
+    blockTime: new Date(Number(hex(object(header).timestamp)) * 1000).toISOString(),
     principal: String(principal[0]),
     assetValue: String(value[0]),
     availableGains: available.toString(),

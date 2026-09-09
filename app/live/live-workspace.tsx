@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { formatUnits } from "ethers";
 import {
@@ -12,6 +12,7 @@ import {
   SlidersHorizontal,
   BookOpen,
   ChevronRight,
+  ScanLine,
 } from "lucide-react";
 import { readJournal, JOURNAL_EVENT } from "../../lib/live/wallet-journal";
 import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
@@ -21,6 +22,12 @@ import { EarnShell } from "../earn-shell";
 import { StockLendingMarkets } from "../stock-lending-markets";
 import { MarketDirectory } from "../market-directory";
 import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
+import { AgenticLending } from "./agentic-lending";
+import {
+  type AgentIntent,
+  type PilotReadState,
+  validateAgentIntent,
+} from "../../lib/live/agentic-lending";
 import "./live-workspace.css";
 type Snapshot = {
   address: string;
@@ -56,16 +63,21 @@ const format = (v: string, decimals = 6) => {
     maximumFractionDigits: decimals === 18 ? 6 : 4,
   }).format(n);
 };
-type DashboardView = "overview" | "position" | "markets" | "advanced";
+type DashboardView = "overview" | "position" | "agentic" | "markets" | "advanced";
 const dashboardSections = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "position", label: "Your position", icon: Wallet },
+  { id: "agentic", label: "Agentic Lending", icon: ScanLine },
   { id: "markets", label: "Market explorer", icon: Layers3 },
   { id: "advanced", label: "Advanced tools", icon: SlidersHorizontal },
 ] as const;
 const dashboardCopy: Record<DashboardView, { title: string; description: string }> = {
   overview: { title: "Overview", description: "Your wallet, lending position and next step." },
   position: { title: "Your position", description: "Manage your USDG lending account." },
+  agentic: {
+    title: "Agentic Lending",
+    description: "Your lending plan. A reason for every next move.",
+  },
   markets: {
     title: "Market explorer",
     description: "Follow the lending markets. These feeds are read-only.",
@@ -205,6 +217,23 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
   }
   const workspaceId = useId();
   const [view, setView] = useState<DashboardView>("overview");
+  const [pilotState, setPilotState] = useState<PilotReadState | null>(null);
+  const [agentIntent, setAgentIntent] = useState<AgentIntent | null>(null);
+  const pilotScope = `${selected?.info.uuid ?? "none"}:${connected?.toLowerCase() ?? "none"}:${network ?? "none"}`;
+  const activePilot = pilotState?.scope === pilotScope ? pilotState : null;
+  const intentHandled = useCallback(
+    (id: string) => setAgentIntent((current) => (current?.id === id ? null : current)),
+    [],
+  );
+  useEffect(() => {
+    const followView = () => {
+      const target = new URLSearchParams(window.location.search).get("view");
+      if (dashboardSections.some((s) => s.id === target)) setView(target as DashboardView);
+    };
+    followView();
+    window.addEventListener("popstate", followView);
+    return () => window.removeEventListener("popstate", followView);
+  }, []);
   const [recoveryOwner, setRecoveryOwner] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   useEffect(() => {
@@ -222,7 +251,11 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     };
     // Connecting opens the position; a URL receipt alone must not lock navigation after recovery.
     // oxlint-disable-next-line react/react-compiler -- Synchronize navigation with a newly connected wallet.
-    setView("position");
+    setView(
+      new URLSearchParams(window.location.search).get("view") === "agentic"
+        ? "agentic"
+        : "position",
+    );
     inspect();
     window.addEventListener(JOURNAL_EVENT, inspect);
     window.addEventListener("storage", inspect);
@@ -253,6 +286,9 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
   function navigate(next: DashboardView) {
     if (hasRecovery && next !== "position") return;
     setView(next);
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", next);
+    window.history.replaceState(null, "", url);
     window.requestAnimationFrame(() => headingRef.current?.focus());
   }
   const content = (
@@ -492,6 +528,13 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               <button
                 type="button"
                 className="dashboard-refresh"
+                onClick={() => navigate("agentic")}
+              >
+                Agentic Lending <ChevronRight size={16} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="dashboard-refresh"
                 onClick={() => navigate("markets")}
               >
                 Explore markets <ChevronRight size={16} aria-hidden="true" />
@@ -508,8 +551,39 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               owner={connected}
               provider={selected.provider}
               availability={availability}
+              scope={pilotScope}
+              onReadState={setPilotState}
+              agentIntent={agentIntent}
+              onAgentIntentHandled={intentHandled}
             />
           )}
+        </div>
+
+        <div hidden={currentView !== "agentic"}>
+          <AgenticLending
+            key={pilotScope}
+            scope={pilotScope}
+            active={currentView === "agentic"}
+            owner={connected}
+            correctNetwork={network === CHAIN_ID}
+            readState={activePilot}
+            enabled={availability === "enabled"}
+            onConnect={requestConnect}
+            onPosition={() => navigate("position")}
+            onReview={(intent) => {
+              if (!connected || activePilot?.blocked || readJournal(connected))
+                throw Error("Finish the current wallet action first.");
+              validateAgentIntent(
+                intent,
+                pilotScope,
+                activePilot?.account ?? null,
+                connected,
+                Date.now(),
+              );
+              setAgentIntent(intent);
+              navigate("position");
+            }}
+          />
         </div>
 
         {currentView === "markets" && (

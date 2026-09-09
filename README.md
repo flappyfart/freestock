@@ -6,6 +6,10 @@ Private USDG lending and Stock Token wallet pilot with a simulation modal for ex
 
 ## Working routes
 
+**Agentic Lending** is a prominent Home feature and a Dashboard section at `/dashboard?view=agentic`. Its first release is a deterministic, read-only recommendation engine, not a connected language model or autonomous executor. It uses the existing verified account snapshot, including chain time, to recommend waiting, retaining vault shares or reviewing a stock purchase. The plan specifies supported stock weights, a minimum surplus and a maximum ETH network-fee estimate. It does not compute an all-in USDG fee percentage or optimize across executable pools.
+
+Plans are explicitly device-local and wallet-scoped; decision activity is session-only. Existing 30-second account reads remain the single position data source. Quote/simulation preparation occurs only when requested. Recommendations cannot send transactions: identity-bound, short-lived intents only prefill the existing purchase form, which obtains a new reviewed quote. Pending journals and reviews take priority. Owner-only contracts and wallet-signing checks are unchanged. `/docs#agentic-lending` describes freshness, storage, cost and execution boundaries.
+
 The product focus is **keep lending, grow a stock-token portfolio with available gains**. The demo separates the earning source from three earnings destinations: Buy stocks, Reinvest and Split both. The summary expresses every destination as a share of new simulated earnings, after loss recovery. Full reinvestment suppresses automatic stock purchases even when an earlier plan left pending earnings; those remain available for a manual action. Existing saved-account and command formats are unchanged.
 
 Live Dashboard shows the principal-baseline calculation, the two-micro-USDG rounding reserve and any shortfall. Surplus includes direct transfers and cannot be described as a pure interest ledger. Stock reviews display the quoted output, encoded minimum and included pool fee, with ETH gas separately. Displayed fee and quote/minimum relationship are checked against the reviewed transaction. The latest confirmed receipt includes block/time, actual purchase amounts, explorer link and JSON download; it is not a persistent receipt history. Arbitrary existing-position connections, cost-limited conversion automation and delegated executors remain future work.
@@ -13,7 +17,7 @@ Live Dashboard shows the principal-baseline calculation, the two-micro-USDG roun
 Product validation materials: [competitor evidence](docs/COMPETITOR-EVIDENCE.md), [eight-person validation kit](docs/USER-VALIDATION-KIT.md), and [next milestones](docs/PRODUCT-MILESTONES.md). These are plans and dated research, not completed interviews or a claim of uniqueness.
 
 - `/`: Home, with Connect Wallet leading to Dashboard and “Try it yourself” opening the simulation modal.
-- `/dashboard`: a sidebar workspace for Overview, Your position, Market explorer and Advanced tools. Actual chain balances, participant status, recovery and wallet transaction reviews stay together. Read-only market and quote checks request no signatures; transactions open the wallet only after explicit review.
+- `/dashboard`: a sidebar workspace for Overview, Your position, Agentic Lending, Market explorer and Advanced tools. Actual chain balances, participant status, recovery and wallet transaction reviews stay together. Read-only market and quote checks request no signatures; transactions open the wallet only after explicit review.
 - `/learn`: plain-English concepts, earnings sources, compounding, timing, leverage and stock-token exposure.
 - `/docs`: current capability matrix, exact model mechanics, sources, saved records and execution boundaries.
 - `/live`: compatibility redirect to `/dashboard`; not a separate Wallet page.

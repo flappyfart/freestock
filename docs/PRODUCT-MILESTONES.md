@@ -14,6 +14,8 @@ Updated 9 September 2026 UTC. This is a delivery and validation plan, not a clai
 
 ## Next: validate the narrow customer need
 
+Agentic Lending now ships in recommendation mode: one verified account, an explicit stock/retention plan, a conversion minimum, an ETH gas budget, decision reasons and a manual-review handoff. It is rule-based and has no model connection, background execution or cross-pool allocator. Use this surface to test comprehension and the usefulness of waiting/holding/conversion advice. An all-in USDG cost comparison and neutral cash alternative still need the study worksheet described below.
+
 Use eight people who already manage a stablecoin lending position. Record their actual position size, available earnings, last earnings decision and real costs. Compare receiving USDG, reinvesting and buying stocks without predicting future stock returns. The current modal supports the stocks/reinvest/split demonstration; the cash alternative and proposed fee-limit controls in the study need a neutral comparison worksheet before sessions.
 
 Measure whether participants understand the distinction between deposited capital and available gains, choose stocks after seeing costs, set an allocation without help and return to the plan a week later. Use the explicit scoring and decision rules in the kit. Compliments and stated willingness to use the product are not repeat-use evidence.

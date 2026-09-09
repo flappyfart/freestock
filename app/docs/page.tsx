@@ -25,6 +25,7 @@ export default function Page() {
           <aside>
             <strong>Contents</strong>
             <a href="#status">Feature status</a>
+            <a href="#agentic-lending">Agentic Lending</a>
             <a href="#earnings-plan">Your earnings plan</a>
             <a href="#market-data">Pool coverage</a>
             <a href="#stock-lending">Stock lending</a>
@@ -96,15 +97,23 @@ export default function Page() {
                       <td>Run only when you advance a scenario; no background stock conversion</td>
                     </tr>
                     <tr>
+                      <td>Agentic Lending</td>
+                      <td>
+                        Rule-based, read-only recommendations for the verified USDG account. Local
+                        plan settings, live surplus checks, optional quote and ETH gas checks, and a
+                        handoff to manual purchase review.
+                      </td>
+                    </tr>
+                    <tr>
                       <td>Staking</td>
                       <td>Explained in Learn; no connected strategy</td>
                     </tr>
                     <tr>
                       <td>Dashboard</td>
                       <td>
-                        Sidebar navigation for Overview, Your position, Market explorer and Advanced
-                        tools; live balances, recovery and wallet-approved transaction review stay
-                        together
+                        Sidebar navigation for Overview, Your position, Agentic Lending, Market
+                        explorer and Advanced tools; live balances, recovery and wallet-approved
+                        transaction review stay together
                       </td>
                     </tr>
                     <tr>
@@ -117,6 +126,56 @@ export default function Page() {
                   </tbody>
                 </table>
               </div>
+            </section>
+            <section id="agentic-lending">
+              <h2>Agentic Lending: recommendation mode</h2>
+              <p>
+                Open <Link href="/dashboard?view=agentic">Agentic Lending in Dashboard</Link> to set
+                a destination, stock allocation, minimum available gains and maximum estimated
+                network fee in ETH. The first release uses explicit rules; it does not call an AI
+                language model, run a background trader or compare executable strategies across
+                multiple vaults.
+              </p>
+              <ol>
+                <li>
+                  Read the verified Freestock account’s balance and principal baseline. Direct
+                  wallet holdings are not the account’s earnings.
+                </li>
+                <li>
+                  Wait if account data is stale, a wallet action is pending, the position is below
+                  its baseline or available gains are below the chosen minimum.
+                </li>
+                <li>
+                  For Keep gains invested, recommend holding the vault shares. They already
+                  accumulate returns; this does not change the principal baseline.
+                </li>
+                <li>
+                  For stock purchases, request a fresh basket quote and transaction simulation when
+                  you choose Check quote &amp; gas. There is no signature or submission at this
+                  stage.
+                </li>
+                <li>
+                  If the estimated ETH network fee fits the selected limit, recommend opening the
+                  existing purchase form. The user obtains a fresh final quote and approves any
+                  transaction in their wallet.
+                </li>
+              </ol>
+              <p>
+                Recommendations reject stale account observations and chain timestamps after 45
+                seconds, expired stock quotes, mismatched allocations and inconsistent balances.
+                Available surplus excludes the rounding reserve and can include donations. The gas
+                limit applies to advice, not an onchain spending permission. Final costs may change;
+                an all-in conversion cost in USDG is not calculated. Pool fees are already included
+                in the stock quote.
+              </p>
+              <p>
+                Plans are saved only on this browser, separately for each wallet. Decision activity
+                records recommendation changes in the current session and is not a trade ledger.
+                Pause stops this view’s recommendations; it does not withdraw funds, cancel an
+                existing transaction or revoke any token approval. Closing the dashboard runs no
+                jobs. Pool switching, delegated execution, LP management and model-backed analysis
+                remain future work.
+              </p>
             </section>
             <section id="earnings-plan">
               <h2>Two separate decisions</h2>
