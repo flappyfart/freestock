@@ -154,6 +154,62 @@
 .earn-intro > .earn-link {
   margin-top: 20px;
 }
+.home-live-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 22px;
+  margin-top: 26px;
+}
+.earn-intro > .home-live-limit {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #56647c;
+  margin-top: 16px;
+}
+#try-it-yourself,
+#live-account,
+#practice-results {
+  scroll-margin-top: 24px;
+}
+#try-it-yourself {
+  border-radius: 24px;
+}
+#try-it-yourself .earn-feedback:empty {
+  display: none;
+}
+.home-live-account {
+  padding-block: 0 16px;
+}
+.practice-results {
+  border: 1px solid #dbe3ef;
+  border-radius: 22px;
+  background: #f5f8fcdc;
+  padding: 22px;
+  margin-block: 24px 36px;
+}
+.practice-results > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 18px;
+  color: #263957;
+}
+.practice-results > summary small {
+  display: block;
+  margin: 6px 0 0 22px;
+  color: #56647c;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.practice-results > .earn-section {
+  padding-bottom: 12px;
+}
+.practice-results > summary:focus-visible {
+  outline: 2px solid #2862de;
+  outline-offset: 5px;
+  border-radius: 8px;
+}
 .earn-stock-art {
   display: flex;
   align-items: center;

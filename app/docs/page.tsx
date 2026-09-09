@@ -14,8 +14,8 @@ export default function Page() {
             works today.
           </h1>
           <p>
-            Mechanics, data sources and the boundary between the practice product and the separate
-            wallet-approved pilot.
+            Mechanics, data sources and the difference between the home practice simulator and the
+            private wallet pilot.
           </p>
         </section>
         <div className="education-layout">
@@ -23,11 +23,11 @@ export default function Page() {
             <strong>Contents</strong>
             <a href="#status">Feature status</a>
             <a href="#market-data">Pool coverage</a>
-            <a href="#accounting">Position accounting</a>
-            <a href="#automation">Automation rules</a>
+            <a href="#accounting">Practice accounting</a>
+            <a href="#automation">Practice automation</a>
             <a href="#pricing">Token quantities</a>
             <a href="#storage">Saved records</a>
-            <a href="#execution">Live execution design</a>
+            <a href="#execution">Wallet pilot</a>
           </aside>
           <div className="education-body">
             <section id="status">
@@ -46,35 +46,51 @@ export default function Page() {
                       <td>Live read-only Morpho API, with a labeled saved-snapshot fallback</td>
                     </tr>
                     <tr>
-                      <td>Lending</td>
-                      <td>Saved USDG practice positions using a historical vault APY</td>
+                      <td>Try it yourself</td>
+                      <td>
+                        Home simulator with practice money, saved scenarios and illustrative stock
+                        purchases; these are not real positions
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Live USDG lending</td>
+                      <td>
+                        One vault for the enabled participant, with a 100 USDG deposit limit and
+                        wallet approval for each transaction
+                      </td>
                     </tr>
                     <tr>
                       <td>Leveraged LP</td>
                       <td>Editable return model; no execution or liquidation engine</td>
                     </tr>
                     <tr>
-                      <td>Single stocks and baskets</td>
-                      <td>Saved allocation rules and illustrative token purchases</td>
+                      <td>Live stock-token purchases</td>
+                      <td>
+                        Manually buy NVDA, AAPL, TSLA, GOOGL or SPY with available account gains;
+                        quotes and purchases are reviewed in Wallet
+                      </td>
                     </tr>
                     <tr>
-                      <td>Auto-convert and compound</td>
-                      <td>Run on explicit simulation advances; no background service</td>
+                      <td>Practice auto-convert and compound</td>
+                      <td>Run only when you advance a scenario; no background stock conversion</td>
                     </tr>
                     <tr>
                       <td>Staking</td>
                       <td>Explained in Learn; no connected strategy</td>
                     </tr>
                     <tr>
-                      <td>Wallet and route checks</td>
+                      <td>Wallet</td>
                       <td>
-                        Real balances, live AMM quotes, deposit simulation and unsigned account
-                        setup on the Live integration page
+                        Live balances, participant status, account recovery, transaction review and
+                        read-only refresh while the page is visible
                       </td>
                     </tr>
                     <tr>
-                      <td>Real deposits and trading</td>
-                      <td>Private wallet pilot for the declared participant; each transaction needs wallet approval</td>
+                      <td>Access</td>
+                      <td>
+                        Private pilot for the configured signed-in Norway participant; connecting a
+                        wallet does not grant access
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -142,9 +158,11 @@ export default function Page() {
             <section id="accounting">
               <h2>How a practice position earns</h2>
               <p>
-                Every account starts with 10,000 practice USDG. Creating a position moves capital
-                from the practice wallet. Nothing is transferred onchain. The retired prize account
-                is preserved separately and does not fund this new simulator.
+                The home section labeled “Try it yourself” uses practice money. Each practice
+                account starts with 10,000 practice USDG. Creating a scenario moves capital from the
+                practice wallet; it does not create or fund a real position. Saved practice
+                positions can be expanded on the home page. The retired prize account is preserved
+                separately and does not fund this simulator.
               </p>
               <h3>Lending scenario</h3>
               <p>
@@ -185,7 +203,11 @@ export default function Page() {
               </p>
             </section>
             <section id="automation">
-              <h2>Conversion and compounding rules</h2>
+              <h2>Practice conversion and compounding rules</h2>
+              <p>
+                These rules apply to the simulator. They do not authorize transactions in your live
+                account.
+              </p>
               <ol>
                 <li>Advance a position by 1, 7 or 30 modeled days.</li>
                 <li>Apply the modeled net result and recover any prior capital loss.</li>
@@ -206,8 +228,15 @@ export default function Page() {
               </p>
               <p>
                 The minimum is a per-position USDG threshold, not a guaranteed time interval. In
-                this version, closing the page runs no jobs and advancing time is always explicit. A
-                100% compounding rule sends new surplus back into DeFi; it does not buy stocks.
+                practice mode, closing the page runs no jobs and advancing time is always explicit.
+                A 100% compounding rule sends modeled surplus back into the practice position; it
+                does not buy stocks.
+              </p>
+              <p>
+                Live vault shares reflect the underlying return without a new wallet signature. The
+                pilot has no background auto-conversion service. Reserving gains as principal or
+                converting available gains into stock tokens requires a transaction that the owner
+                reviews and approves.
               </p>
             </section>
             <section id="pricing">
@@ -248,8 +277,8 @@ export default function Page() {
             <section id="storage">
               <h2>Saved state and transparent records</h2>
               <p>
-                Positions, allocation rules, practice holdings and activity are saved to your
-                signed-in account on the server. Duplicate retries reuse the original request
+                Practice positions, allocation rules, practice holdings and activity are saved to
+                your signed-in account on the server. Duplicate retries reuse the original request
                 identifier so the same action is not applied twice. Concurrent actions are checked
                 before saving.
               </p>
@@ -260,62 +289,59 @@ export default function Page() {
                 Compounding is an internal transfer, not additional income.
               </p>
               <p>
-                The practice account uses no real funds. The separate wallet pilot never receives your
-                private key; your wallet signs only after an explicit review. Its transaction recovery
-                references are saved in this browser, with all balances and receipts read from chain.
-                The availability self-check is informational and does not grant pilot access.
+                The practice account uses no real funds. Wallet keeps the live account separate: the
+                owner reviews and signs transactions in their connected wallet. Transaction recovery
+                references are saved in this browser. You can restore a live account from its
+                creation transaction reference, which is checked against the connected owner and
+                supported route. Live balances and receipts are read from chain. The availability
+                self-check is informational and does not grant pilot access.
               </p>
             </section>
             <section id="execution">
-              <h2>What a live version needs to do</h2>
+              <h2>The private wallet pilot</h2>
               <p>
-                Each supported route must read the user’s actual position, separate principal from
-                withdrawable net earnings, account for costs and losses, and preserve required debt
-                buffers. It must then withdraw surplus, obtain an executable stock quote or reinvest
-                it, submit the authorized transaction and reconcile the confirmed outcome.
+                Wallet is available on the home page and at <Link href="/live">/live</Link>. New
+                deposits and stock purchases are limited to the configured signed-in participant,
+                who declared Norway residence and location and non-US-person status. These
+                declarations are not identity verification or legal approval. General registration
+                for live actions is not enabled.
               </p>
               <p>
-                Automation needs explicit user permissions and limits for spending, slippage, costs
-                and conversion size. It should pause when liquidity, eligibility, quotes or token
-                status are unsuitable. This pilot uses atomic basket purchases: a failed leg reverts the whole harvest.
-                Each confirmed purchase records its actual spend and received token amount. Borrowed proceeds are never treated as earnings.
+                The pilot supports one USDG lending vault, a 100 USDG deposit limit and purchases of
+                NVIDIA (NVDA), Apple (AAPL), Tesla (TSLA), Alphabet (GOOGL) and SPY Stock Tokens.
+                The owner can create an account, deposit, reserve available gains as principal,
+                purchase selected tokens and withdraw. Every transaction requires wallet approval;
+                connecting or refreshing the page does not submit one.
               </p>
               <p>
-                The first owner-controlled account has passed 39 checks against a local copy of the
-                actual vault, router and NVIDIA pool. The test deposited fake USDG, advanced local
-                time, bought NVIDIA tokens from gains and withdrew the remaining assets. No real
-                funds or public transactions were involved. The builder has not deployed a public account or submitted real transactions; each participant must create their own account from their wallet.
-                A complete leveraged LP-to-stock strategy has not been verified here.{" "}
-                <a
-                  href="https://blog.uniswap.org/robinhood-chain-is-live"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Uniswap announcement ↗
-                </a>
+                The live account reads its actual assets and recorded principal before preparing an
+                action. Losses reduce the gains available for conversion. Donations to an account
+                also count as gains, so this balance model does not prove that every gain came from
+                borrower interest. Reserving gains increases recorded principal. Existing vault
+                shares continue earning, and any idle USDG in the account is deposited into the
+                vault as part of that approved action.
               </p>
               <p>
-                The intended launch audience is eligible users outside the US. Country availability,
-                issuer restrictions and transaction eligibility still apply; general registration is not activated. The private wallet pilot is limited to the
-                specifically enabled signed-in participant.
+                Stock purchases use current quotes and withdrawal availability, not the simulator’s
+                prices. Basket purchases execute atomically: if any leg fails its minimum output,
+                the whole purchase reverts. Confirmed purchases record actual USDG spent and tokens
+                received. A quote alone does not authorize a trade.
               </p>
               <p>
-                The private pilot starts with a 100 USDG deposit limit and NVIDIA, Apple, Tesla,
-                Alphabet and SPY. The participant declared Norway residence/location and non-US-person
-                status. These declarations are not an identity verification or legal approval. The account can reserve gains as principal or
-                purchase tokens, but it has no keeper or background spending permission. Vault
-                shares already accumulate the underlying return. Donations to an account also count
-                as gains; the balance model does not prove that every gain came from borrower
-                interest.
+                Live balances refresh while the page is visible. This is read-only monitoring, not
+                background transaction permission. Vault shares accrue their underlying return
+                without a new signature, but stock conversion and reserving gains remain manual,
+                wallet-approved actions. Background auto-conversion, staking and leveraged LP
+                execution are not implemented.
               </p>
               <p>
-                Basket purchases in this account would execute atomically: if any leg fails its
-                minimum output, all legs revert. Microsoft has no verified direct pool at the
-                selected fee. A quote alone does not authorize a trade, and withdrawal liquidity
-                must be checked again immediately before submission.
+                Local execution checks used fake funds against a local copy of the route. The
+                builder has not deployed a public account or submitted real transactions. A
+                participant must create and fund their own account through wallet-approved
+                transactions. Country, issuer and transaction restrictions still apply.
               </p>
               <Link href="/live" className="earn-link">
-                Open the live integration <ArrowUpRight size={17} />
+                Open Wallet <ArrowUpRight size={17} />
               </Link>
             </section>
           </div>

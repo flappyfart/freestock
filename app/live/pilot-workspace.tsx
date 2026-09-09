@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { formatUnits } from "ethers";
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import { type Prepared, type WalletProvider } from "../../lib/live/wallet-transaction";
@@ -11,6 +11,14 @@ import {
   JOURNAL_EVENT,
   type Journal,
 } from "../../lib/live/wallet-journal";
+import {
+  readAccountReference,
+  saveAccountReference,
+  forgetAccountReference,
+  accountRestoreCandidate,
+  rejectedUrlAccountFallback,
+  type AccountReferenceCandidate,
+} from "../../lib/live/account-reference";
 import { MechanicalSwitch } from "../mechanical-switch";
 import { EXPLORER_URL } from "../../lib/live/config";
 type Account = {
@@ -31,23 +39,35 @@ type Receipt = {
   hash: string;
   deployment?: string;
   account?: string;
-  events?: { name: string; assetAmount: string; tokenAmount?: string; token?: string }[];
+  events?: {
+    name: string;
+    assetAmount: string;
+    tokenAmount?: string;
+    token?: string;
+  }[];
   snapshot?: Account;
 };
 const fmt = (value: string, decimals = 6) => formatUnits(value, decimals);
-async function api<T>(path: string) {
-  const r = await fetch(path, { cache: "no-store" });
+async function api<T>(path: string, signal?: AbortSignal) {
+  const r = await fetch(path, { cache: "no-store", signal });
   const result = (await r.json()) as T & { error?: string };
-  if (!r.ok) throw Error(result.error ?? "This action could not be completed.");
+  if (!r.ok)
+    throw Object.assign(Error(result.error ?? "This action could not be completed."), {
+      status: r.status,
+    });
   return result;
 }
+export type PilotAvailability = "loading" | "enabled" | "unavailable" | "error";
 export default function PilotWorkspace({
   owner,
   provider,
+  availability,
 }: {
   owner: string;
   provider: WalletProvider;
+  availability: PilotAvailability;
 }) {
+  const enabled = availability === "enabled";
   const [account, setAccount] = useState<Account | null>(null),
     [deployment, setDeployment] = useState(""),
     [amount, setAmount] = useState("10"),
@@ -56,7 +76,10 @@ export default function PilotWorkspace({
     [receipt, setReceipt] = useState<Receipt | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [enabled, setEnabled] = useState(false),
+    [storageWarning, setStorageWarning] = useState<string | null>(null),
+    [restoreCandidate, setRestoreCandidate] = useState<AccountReferenceCandidate | null>(null),
+    [lastChecked, setLastChecked] = useState<number | null>(null),
+    [refreshWarning, setRefreshWarning] = useState<string | null>(null),
     [acknowledged, setAcknowledged] = useState(false),
     [now, setNow] = useState(0),
     [journal, setJournal] = useState<Journal | null>(null),
@@ -66,44 +89,159 @@ export default function PilotWorkspace({
       Object.fromEntries(ENABLED_STOCKS.map((s) => [s.symbol, 20])),
     );
   const alive = useRef(true),
-    inFlight = useRef(false);
+    inFlight = useRef(false),
+    readEpoch = useRef(0),
+    readAbort = useRef<AbortController | null>(null),
+    attemptedRestore = useRef(new Set<string>());
+  const verifyAccount = useCallback(
+    async (reference: string) => {
+      const epoch = readEpoch.current;
+      const controller = new AbortController();
+      readAbort.current = controller;
+      try {
+        const value = await api<Account>(
+          `/api/live/pilot/account?owner=${owner}&deployment=${encodeURIComponent(reference)}`,
+          controller.signal,
+        );
+        if (!alive.current || epoch !== readEpoch.current) return;
+        setAccount(value);
+        setDeployment(value.deployment);
+        setLastChecked(Date.now());
+        setRefreshWarning(null);
+        setStorageWarning(saveAccountReference(owner, value.deployment));
+        const url = new URL(window.location.href);
+        url.searchParams.set("deployment", value.deployment);
+        window.history.replaceState(null, "", url);
+        return value;
+      } finally {
+        if (readAbort.current === controller) readAbort.current = null;
+      }
+    },
+    // Keep the current owner in the callback boundary for every verified chain read.
+    // oxlint-disable-next-line react/react-compiler
+    [owner],
+  );
   useEffect(() => {
     alive.current = true;
+    const epoch = readEpoch.current + 1;
+    readEpoch.current = epoch;
+    const stopReading = () => {
+      readEpoch.current = epoch + 1;
+      readAbort.current?.abort();
+    };
     const restore = () => {
+      const search = new URLSearchParams(window.location.search);
+      let saved: Journal | null = null;
       try {
-        const search = new URLSearchParams(window.location.search);
-        const saved = readJournal(owner);
+        saved = readJournal(owner);
         setJournal(saved);
-        setPending(saved?.hash || search.get("transaction") || "");
-        setDeployment(
-          (previous) => previous || saved?.deployment || search.get("deployment") || "",
-        );
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not read wallet recovery data.");
       }
+      const stored = readAccountReference(owner);
+      setStorageWarning(stored.warning);
+      const candidate = accountRestoreCandidate(
+        saved?.deployment,
+        search.get("deployment"),
+        stored.deployment,
+      );
+      setPending(saved?.hash || search.get("transaction") || "");
+      setDeployment((previous) => previous || candidate?.deployment || "");
+      setRestoreCandidate((previous) => previous || candidate);
     };
     window.addEventListener(JOURNAL_EVENT, restore);
     window.addEventListener("storage", restore);
     window.dispatchEvent(new Event(JOURNAL_EVENT));
-    void api<{ walletPilotEnabled: boolean }>("/api/live/status")
-      .then((s) => {
-        if (!alive.current) return;
-        setEnabled(s.walletPilotEnabled);
-
-        setNow(Date.now());
-      })
-      .catch(() => {
-        if (alive.current)
-          setError("Could not read pilot availability. Withdrawal recovery remains available.");
-      });
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => {
       alive.current = false;
+      stopReading();
+      inFlight.current = false;
       window.clearInterval(timer);
       window.removeEventListener(JOURNAL_EVENT, restore);
       window.removeEventListener("storage", restore);
     };
   }, [owner]);
+  useEffect(() => {
+    if (
+      !restoreCandidate ||
+      account ||
+      pending ||
+      journal ||
+      busy ||
+      inFlight.current ||
+      attemptedRestore.current.has(restoreCandidate.deployment)
+    )
+      return;
+    const epoch = readEpoch.current;
+    attemptedRestore.current.add(restoreCandidate.deployment);
+    inFlight.current = true;
+    setBusy(true);
+    void verifyAccount(restoreCandidate.deployment)
+      .catch((e: unknown) => {
+        if (!alive.current || epoch !== readEpoch.current) return;
+        const status = (e as { status?: number }).status;
+        let hasPendingRequest = true;
+        try {
+          hasPendingRequest =
+            !!readJournal(owner) ||
+            !!new URLSearchParams(window.location.search).get("transaction");
+        } catch {
+          // An unreadable journal cannot authorize automatic fallback.
+        }
+        const fallback = rejectedUrlAccountFallback(
+          owner,
+          restoreCandidate,
+          status,
+          hasPendingRequest,
+        );
+        if (fallback && !attemptedRestore.current.has(fallback.deployment)) {
+          setDeployment(fallback.deployment);
+          setRestoreCandidate(fallback);
+          return;
+        }
+        if (status === 422) forgetAccountReference(owner, restoreCandidate.deployment);
+        setError(
+          `Could not restore this account automatically. ${e instanceof Error ? e.message : "Use the creation transaction to try again."}`,
+        );
+      })
+      .finally(() => {
+        if (!alive.current || epoch !== readEpoch.current) return;
+        inFlight.current = false;
+        setBusy(false);
+      });
+  }, [account, busy, journal, owner, pending, restoreCandidate, verifyAccount]);
+  useEffect(() => {
+    if (!account || pending || journal || plan) return;
+    const reference = account.deployment;
+    const epoch = readEpoch.current;
+    const refresh = async () => {
+      if (document.visibilityState !== "visible" || inFlight.current || !alive.current) return;
+      // Read the shared journal again: a different tab may have just opened a wallet request.
+      try {
+        if (readJournal(owner)) return;
+      } catch {
+        return;
+      }
+      inFlight.current = true;
+      setBusy(true);
+      try {
+        await verifyAccount(reference);
+      } catch (e) {
+        if (alive.current && epoch === readEpoch.current)
+          setRefreshWarning(
+            `Balances could not refresh. ${e instanceof Error ? e.message : "Try refreshing again."}`,
+          );
+      } finally {
+        if (alive.current && epoch === readEpoch.current) {
+          inFlight.current = false;
+          setBusy(false);
+        }
+      }
+    };
+    const timer = window.setInterval(() => void refresh(), 30000);
+    return () => window.clearInterval(timer);
+  }, [account, journal, owner, pending, plan, verifyAccount]);
   async function act(fn: () => Promise<void>) {
     if (inFlight.current) return;
     inFlight.current = true;
@@ -124,16 +262,10 @@ export default function PilotWorkspace({
     }
   }
   async function loadAccount() {
-    const value = await api<Account>(
-      `/api/live/pilot/account?owner=${owner}&deployment=${encodeURIComponent(deployment)}`,
-    );
-    if (!alive.current) return;
-    setAccount(value);
+    const value = await verifyAccount(deployment);
+    if (!value) return;
     setPlan(null);
     setReceipt(null);
-    const url = new URL(window.location.href);
-    url.searchParams.set("deployment", value.deployment);
-    window.history.replaceState(null, "", url);
   }
   async function prepare(action: string) {
     setPlan(null);
@@ -174,6 +306,8 @@ export default function PilotWorkspace({
         if (value.snapshot && value.deployment) {
           setAccount(value.snapshot);
           setDeployment(value.deployment);
+          setLastChecked(Date.now());
+          setStorageWarning(saveAccountReference(owner, value.deployment));
           url.searchParams.set("deployment", value.deployment);
         }
         window.history.replaceState(null, "", url);
@@ -248,10 +382,25 @@ export default function PilotWorkspace({
           reviewed the issuer terms.
         </span>
       </label>
-      {!enabled && (
+      {availability === "loading" && (
+        <p aria-live="polite">
+          Checking access before new actions… Existing accounts can still be restored.
+        </p>
+      )}
+      {(availability === "unavailable" || availability === "error") && (
         <p className="earn-warning">
-          New pilot actions are not enabled for this signed-in account. An existing verified account
-          can still be recovered and withdrawn from.
+          New actions require confirmed participant access. An existing verified account can still
+          be recovered and withdrawn from.
+        </p>
+      )}
+      {refreshWarning && (
+        <p className="earn-small" aria-live="polite">
+          {refreshWarning}
+        </p>
+      )}
+      {storageWarning && (
+        <p className="earn-small live-storage-note" aria-live="polite">
+          {storageWarning}
         </p>
       )}
       {!account ? (
@@ -286,14 +435,18 @@ export default function PilotWorkspace({
             </label>
             <p className="earn-small">
               Use the creation transaction from your wallet. This checks its code, owner and fixed
-              lending route. Bookmark this page after loading it to retain the account reference.
+              lending route. A verified account reference is saved in this browser for your next
+              visit. Keep the creation transaction or bookmark this page for recovery on another
+              device.
             </p>
             <button
               className="earn-button"
               disabled={busy || !deployment}
               onClick={() => void act(loadAccount)}
             >
-              Load and verify account
+              {busy && restoreCandidate && !account
+                ? "Checking account…"
+                : "Load and verify account"}
             </button>
           </article>
         </div>
@@ -349,11 +502,25 @@ export default function PilotWorkspace({
             >
               Your account <ArrowUpRight size={14} />
             </a>
-            <button className="earn-link" disabled={busy} onClick={() => void act(loadAccount)}>
+            <button
+              className="earn-link"
+              disabled={busy || !!pending || !!journal}
+              onClick={() => void act(loadAccount)}
+            >
               <RefreshCw size={14} />
               Refresh actual balances
             </button>
           </div>
+          {lastChecked && (
+            <p className="earn-small live-last-checked">
+              Last checked{" "}
+              <time dateTime={new Date(lastChecked).toISOString()}>
+                {new Date(lastChecked).toLocaleTimeString()}
+              </time>
+              . Refreshes every 30 seconds while this tab is visible and no review or wallet action
+              is in progress.
+            </p>
+          )}
           <div className="earn-builder">
             <label>
               USDG amount
@@ -416,7 +583,10 @@ export default function PilotWorkspace({
                       value={weights[s.symbol]}
                       disabled={busy}
                       onChange={(e) => {
-                        setWeights((v) => ({ ...v, [s.symbol]: Number(e.target.value) }));
+                        setWeights((v) => ({
+                          ...v,
+                          [s.symbol]: Number(e.target.value),
+                        }));
                         setPlan(null);
                       }}
                     />
@@ -489,7 +659,7 @@ export default function PilotWorkspace({
               !!journal ||
               !plan.canSubmit ||
               now >= Date.parse(plan.expiresAt) ||
-              (plan.action !== "withdraw" && !acknowledged)
+              (plan.action !== "withdraw" && (!enabled || !acknowledged))
             }
             onClick={() => void act(send)}
           >

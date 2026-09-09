@@ -1,0 +1,312 @@
+{
+  "startedAt": "2026-09-09T00:40:27.709Z",
+  "publicReadOnly": true,
+  "signatures": false,
+  "transactionsSent": false,
+  "sourceHashes": {
+    "lib/live/config.ts": "7160f8ecf181721a3fb10a1e0a8b56de47ad1158b2104ae7c3624b5b333ebe93",
+    "lib/live/account-plan.ts": "f38fde97849c8926bf441020838ef0e3f262a0735a75a30f3d28063f936b6ed5",
+    "lib/live/quote.ts": "5764c083682d3d5b893b17dd28f6e1d1d029296cb788750133e2301e4b9da779",
+    "lib/live/pilot-policy.ts": "21d0da727fdae3aae68c984cd0f04d74100a48a9034a5408c59aff0b4559a8dc",
+    "contracts/src/FreestockYieldAccount.sol": "b180737938b1d31085cc04522007fc761e3a82e6300d3e8e70e94593043853e5"
+  },
+  "errors": [],
+  "rpcCalls": 65,
+  "rpc": "https://rpc.mainnet.chain.robinhood.com",
+  "maxRpcLatencyMs": 416,
+  "chainId": 4663,
+  "blockTag": "0x376edcc",
+  "block": 58125772,
+  "blockHash": "0xf4fc6e017c3ca8f3967e69e49bb5cf335ac83daea7691ee76fa51546f5a3eb51",
+  "blockTime": "2026-09-09T00:40:27.000Z",
+  "contracts": [
+    {
+      "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "bytes": 170,
+      "keccak256": "0x864cc9ad53b338b82da1f7cab85ab0b3d5c8861acb422b6fec63cf36234f36a6"
+    },
+    {
+      "address": "0xBeEff033F34C046626B8D0A041844C5d1A5409dd",
+      "bytes": 21808,
+      "keccak256": "0x3492098028b641c5949beebf8c56898f1ed846f42b59978ed7c75249603c1f6e"
+    },
+    {
+      "address": "0xcaf681a66d020601342297493863e78c959e5cb2",
+      "bytes": 24497,
+      "keccak256": "0x6f36c378e272c6324c48f045182bcb54bd8ad654cf9ebd42e8893d52c4cb25dc"
+    },
+    {
+      "address": "0x1f7d7550b1b028f7571e69a784071f0205fd2efa",
+      "bytes": 24535,
+      "keccak256": "0xec72b1abd1f2faee020cfea9c646bd8994f9fb389054f6e574f103a895091739"
+    },
+    {
+      "address": "0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7",
+      "bytes": 8273,
+      "keccak256": "0x3db0868d945e9304c9bc6a8b2181948109ea617647142f3c4083e14393496a28"
+    }
+  ],
+  "vault": {
+    "address": "0xBeEff033F34C046626B8D0A041844C5d1A5409dd",
+    "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+    "decimals": "18",
+    "totalAssets": "443563519337526",
+    "totalSupply": "440767088445919542897133698",
+    "sendAssetsGate": "0x0000000000000000000000000000000000000000",
+    "receiveSharesGate": "0x0000000000000000000000000000000000000000",
+    "sendSharesGate": "0x0000000000000000000000000000000000000000",
+    "receiveAssetsGate": "0x0000000000000000000000000000000000000000",
+    "previewDeposit100USDG": "99369553452956862805"
+  },
+  "usdgDecimals": 6,
+  "routes": [
+    {
+      "symbol": "NVDA",
+      "token": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "fee": 500,
+      "code": {
+        "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+        "bytes": 283,
+        "keccak256": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630"
+      },
+      "decimals": 18,
+      "pool": "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3",
+      "poolCode": {
+        "address": "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3",
+        "bytes": 22142,
+        "keccak256": "0x20fbed0e49e9ac176e3220dc3c96a9b47d33c5f2b468f180afd7ff5ae00d4a8e"
+      },
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "activeLiquidityRaw": "12266569007058315316",
+      "quote1USDG": "4427013947016972",
+      "quote100USDG": "442701157034311878"
+    },
+    {
+      "symbol": "AAPL",
+      "token": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "fee": 500,
+      "code": {
+        "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+        "bytes": 283,
+        "keccak256": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630"
+      },
+      "decimals": 18,
+      "pool": "0xAae0d815EE56e4092a5E5C2911E676Fea50B2d6D",
+      "poolCode": {
+        "address": "0xAae0d815EE56e4092a5E5C2911E676Fea50B2d6D",
+        "bytes": 22142,
+        "keccak256": "0xa488ede24eef95af56b0e7c171832ce207f070212584786d40acbfcecbe9b1d0"
+      },
+      "token0": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "token1": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+      "activeLiquidityRaw": "504557534380681231",
+      "quote1USDG": "3153771002378177",
+      "quote100USDG": "315373626025759902"
+    },
+    {
+      "symbol": "TSLA",
+      "token": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "fee": 500,
+      "code": {
+        "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+        "bytes": 283,
+        "keccak256": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630"
+      },
+      "decimals": 18,
+      "pool": "0xc4f0172D6ac8DD294Dd1137D047d5E1893760236",
+      "poolCode": {
+        "address": "0xc4f0172D6ac8DD294Dd1137D047d5E1893760236",
+        "bytes": 22142,
+        "keccak256": "0x0fe17a6c047a8dcaab1751610749115c7c6bb647059f23f35255ab0c9ba02429"
+      },
+      "token0": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "activeLiquidityRaw": "143320054785545833",
+      "quote1USDG": "2729403243047560",
+      "quote100USDG": "272930477270801629"
+    },
+    {
+      "symbol": "GOOGL",
+      "token": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "fee": 500,
+      "code": {
+        "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+        "bytes": 283,
+        "keccak256": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630"
+      },
+      "decimals": 18,
+      "pool": "0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7",
+      "poolCode": {
+        "address": "0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7",
+        "bytes": 22142,
+        "keccak256": "0xecd896ff68596f6159c069b13382ccb1453ee5fa6e5d2b0a85ad09a566095f59"
+      },
+      "token0": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "activeLiquidityRaw": "815400861201703814",
+      "quote1USDG": "2949411722049118",
+      "quote100USDG": "294939227939037129"
+    },
+    {
+      "symbol": "SPY",
+      "token": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "fee": 500,
+      "code": {
+        "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+        "bytes": 283,
+        "keccak256": "0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630"
+      },
+      "decimals": 18,
+      "pool": "0xa7Bb1AC63BBaB0C44316E6c8C455213441689167",
+      "poolCode": {
+        "address": "0xa7Bb1AC63BBaB0C44316E6c8C455213441689167",
+        "bytes": 22142,
+        "keccak256": "0xaed14af326e94c7e4f2e8a267c0a93346c5d66c5aec0772a6b1a0ecdf5b9f7c5"
+      },
+      "token0": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+      "token1": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "activeLiquidityRaw": "1036152792899941176",
+      "quote1USDG": "1302364322314143",
+      "quote100USDG": "130235983279298381"
+    }
+  ],
+  "msftExcludedPool500": "0x0000000000000000000000000000000000000000",
+  "issuerAssets": {
+    "http": 200,
+    "assets": [
+      {
+        "symbol": "SPY",
+        "status": "ASSET_STATUS_ACTIVE",
+        "deployments": [
+          {
+            "contractAddress": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C",
+            "chainId": 4663,
+            "networkName": "Robinhood Chain"
+          }
+        ],
+        "currentMultiplier": "1.000000000000000000",
+        "tradingCapabilities": {
+          "market": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "extended": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "overnight": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          }
+        }
+      },
+      {
+        "symbol": "GOOGL",
+        "status": "ASSET_STATUS_ACTIVE",
+        "deployments": [
+          {
+            "contractAddress": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+            "chainId": 4663,
+            "networkName": "Robinhood Chain"
+          }
+        ],
+        "currentMultiplier": "1.000000000000000000",
+        "tradingCapabilities": {
+          "market": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "extended": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "overnight": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          }
+        }
+      },
+      {
+        "symbol": "NVDA",
+        "status": "ASSET_STATUS_ACTIVE",
+        "deployments": [
+          {
+            "contractAddress": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+            "chainId": 4663,
+            "networkName": "Robinhood Chain"
+          }
+        ],
+        "currentMultiplier": "1.000000000000000000",
+        "tradingCapabilities": {
+          "market": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "extended": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "overnight": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          }
+        }
+      },
+      {
+        "symbol": "AAPL",
+        "status": "ASSET_STATUS_ACTIVE",
+        "deployments": [
+          {
+            "contractAddress": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9",
+            "chainId": 4663,
+            "networkName": "Robinhood Chain"
+          }
+        ],
+        "currentMultiplier": "1.000566080061092436",
+        "tradingCapabilities": {
+          "market": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "extended": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "overnight": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          }
+        }
+      },
+      {
+        "symbol": "TSLA",
+        "status": "ASSET_STATUS_ACTIVE",
+        "deployments": [
+          {
+            "contractAddress": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+            "chainId": 4663,
+            "networkName": "Robinhood Chain"
+          }
+        ],
+        "currentMultiplier": "1.000000000000000000",
+        "tradingCapabilities": {
+          "market": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "extended": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          },
+          "overnight": {
+            "whole": "TRADING_STATUS_TRADABLE",
+            "fractional": "TRADING_STATUS_TRADABLE"
+          }
+        }
+      }
+    ]
+  },
+  "endBlock": 58125841,
+  "completedAt": "2026-09-09T00:40:35.693Z"
+}

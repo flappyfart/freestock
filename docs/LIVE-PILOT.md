@@ -2,13 +2,15 @@
 
 ## What works now
 
-`/live` connects an injected wallet using EIP-6963. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
+The homepage live account area and `/live` connect an injected wallet using EIP-6963. The homepage keeps a separately labeled “Try it yourself” practice box. Participant availability is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The separately labeled private pilot supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
 
 Preparation verifies chain 4663, exact deployment calldata, canonical deployment receipt/block, CREATE address, runtime bytes, constructor ownership and fixed dependencies. Deposits apply a 0.1% share minimum; stock legs have a 1% minimum-output allowance and a 120-second onchain deadline. A fresh actual-sender simulation and gas estimate precede each wallet prompt. Plans expire after 45 seconds and bind the nonce. Client validation repeats route, amount, recipient, expiry, sender and network checks. Receipts and token purchase events are reconciled against the verified account.
 
 Only the exact signed-in participant configured by `FREESTOCK_PILOT_USER_ID`, with country `NO` and non-US-person declaration `no`, receives entry/trading preparation. This is product authorization based on the participant's declarations, not issuer identity verification. Withdrawal preparation remains available for an existing verified account even if new pilot actions are disabled. Public availability self-checks do not grant access. All routes require Sites identity and return private, uncached responses.
 
 Pending wallet requests use a device-only owner/chain journal with unique request IDs, nonces and transaction/account references. Web Locks serialize updates across tabs. Unknown submission outcomes stay locked against automatic retries; late replies cannot replace successor requests. Recovery checks original sender/nonce and canonical receipts, including wallet cancellation or another transaction consuming that nonce. Journal state is not a balance ledger. No background trading runs.
+
+Verified deployment hashes are saved per chain and owner in browser storage. Pending journal and URL references take precedence, and every restored account is verified against the chain. Storage failures leave manual recovery available. Account balances refresh every 30 seconds while the tab is visible; reviews, active requests and unreconciled transactions pause automatic reads. No balances are persisted in this reference store.
 
 `ROBINHOOD_RPC_URL` optionally selects a dedicated HTTPS RPC. Otherwise reads use the official public RPC with its availability/rate limits. The server RPC wrapper allows only reads and simulations. The browser wallet alone submits transactions after user approval.
 
@@ -44,7 +46,7 @@ The user must connect a funded EOA wallet, review issuer terms, create their acc
 
 ## Verification performed on this version
 
-- 63 unit tests passed, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
+- 69 unit tests passed, including six account-reference storage/recovery tests, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
 - Lint, TypeScript and the production build passed.
 - 18 local read-only live API checks passed against current mainnet reads: authentication, input validation, balances, NVIDIA quote, MSFT route rejection, unfunded deposit preview and simulated account creation.
 - Existing practice API regression: 12 groups / 46 requests passed in an isolated local database. No hosted account was changed.
@@ -65,3 +67,9 @@ The user must connect a funded EOA wallet, review issuer terms, create their acc
 - [Base Prospectus](https://cdn.robinhood.com/assets/robinhood/legal/rhj_base_prospectus.pdf): pages 72, 119, 131 and 150–151 for purchaser, secondary-market and eligibility provisions.
 
 Additional Final Terms with Norway included: [AAPL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_apple.pdf#page=8), [TSLA](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_tesla.pdf#page=8), [GOOGL](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_alphabet_class_a.pdf#page=8), [SPY](https://cdn.robinhood.com/assets/robinhood/legal/rhj_final_terms_for_tokenised_debt_securities_linked_to_spdr_s_p_500_etf_trust.pdf#page=9).
+
+## Homepage launch readiness check
+
+`contracts/test/current-mainnet-readiness.json` records the fresh check. On 2026-09-09 at 00:40:27 UTC, 65 read-only RPC checks completed without error at block 58,125,772. Vault runtime matched the pinned dependency, the 100 USDG deposit preview remained positive, and all five selected fee-500 stock pools returned positive 1 and 100 USDG quotes. The issuer registry still listed all five tokens as active. This check submitted no public transactions and is not proof of future liquidity. The Apple multiplier was 1.000566080061092436, so quantities are labeled tokens rather than underlying shares.
+
+The deployed environment still uses the official public RPC fallback; dedicated production capacity is not configured. General registration, unattended conversion, staking and leveraged LP execution remain outside this private wallet pilot.

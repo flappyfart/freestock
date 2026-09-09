@@ -1,6 +1,6 @@
 import { COUNTRIES } from "./countries.ts";
 
-// Product scope, not live authorization. No country has been approved for real funds.
+// General registration policy, not authorization for the separately configured private pilot.
 export const LAUNCH_POLICY = Object.freeze({
   audience: "eligible-non-us-users",
   payoutAsset: "robinhood-stock-tokens",
@@ -101,6 +101,6 @@ export function assessAvailability(input: AvailabilityInput): AvailabilityResult
   return result(
     "pending",
     "Availability is not yet confirmed.",
-    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility. Real deposits and stock-token purchases are not available yet.",
+    "Your answers do not match the listed exclusions, but your country has not been approved for launch. This check does not verify eligibility or grant live access. The private wallet pilot is limited to its configured participant.",
   );
 }

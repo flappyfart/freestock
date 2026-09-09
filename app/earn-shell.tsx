@@ -6,7 +6,7 @@ import { MotionEffects } from "./motion-effects";
 import { AvailabilityCheck } from "./availability-check";
 export function EarnShell({
   children,
-  active = "Earn",
+  active = "Home",
 }: {
   children: React.ReactNode;
   active?: string;
@@ -24,11 +24,11 @@ export function EarnShell({
         </Link>
         <nav aria-label="Main navigation">
           {[
-            ["Earn", "/"],
-            ["Live integration", "/live"],
+            ["Home", "/"],
+            ["Wallet", "/live"],
             ["Learn", "/learn"],
             ["Docs", "/docs"],
-            ["Transparency", "/transparency"],
+            ["Practice activity", "/transparency"],
           ].map(([name, url]) => (
             <Link href={url} key={name} aria-current={active === name ? "page" : undefined}>
               {name}
@@ -36,7 +36,7 @@ export function EarnShell({
           ))}
         </nav>
         <span className="earn-status">
-          <i /> Practice mode
+          <i /> Private wallet pilot
         </span>
       </header>
       <main id="earn-main">{children}</main>
@@ -60,14 +60,15 @@ export function EarnShell({
             Product mechanics <ArrowRight size={16} />
           </Link>
           <Link href="/transparency">
-            Your earnings record <ArrowRight size={16} />
+            Practice activity <ArrowRight size={16} />
           </Link>
         </div>
         <div>
           <AvailabilityCheck />
           <p className="earn-small">
-            Practice funds only. Stock Tokens provide economic exposure, not ownership of underlying
-            shares. Independent product; no Robinhood affiliation or endorsement.
+            Your live account uses real funds. “Try it yourself” uses practice money. Stock Tokens
+            provide economic exposure, not ownership of underlying shares. Independent product; no
+            Robinhood affiliation or endorsement.
           </p>
           <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
             About Stock Tokens <ArrowUpRight size={14} />

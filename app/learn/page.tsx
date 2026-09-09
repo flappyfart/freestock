@@ -13,11 +13,12 @@ export default function Page() {
             go somewhere <em>you choose.</em>
           </h1>
           <p>
-            DeFi generates the earnings. You decide what happens next: buy stock tokens, grow your
-            DeFi position, or split between both.
+            Use available lending gains to buy selected Stock Tokens or keep more capital in your
+            lending position. Explore the idea with practice money, or use Wallet if your account is
+            enabled for the private pilot.
           </p>
-          <Link href="/" className="earn-button">
-            Try it with practice funds <ArrowUpRight size={17} />
+          <Link href="/#try-it-yourself" className="earn-button">
+            Try it yourself <ArrowUpRight size={17} />
           </Link>
         </section>
         <div className="education-layout">
@@ -29,7 +30,7 @@ export default function Page() {
             <a href="#timing">Can it happen in real time?</a>
             <a href="#leverage">Understanding leverage</a>
             <a href="#tokens">What you receive</a>
-            <a href="#possibilities">What’s possible</a>
+            <a href="#possibilities">What’s available today</a>
           </aside>
           <div className="education-body">
             <section id="flow">
@@ -40,9 +41,10 @@ export default function Page() {
                 Build exposure in another.
               </h2>
               <p>
-                Imagine putting 1,000 USDG into a lending strategy. If it generates 10 USDG of
-                available net earnings, that 10 could buy your chosen Stock Tokens. Your original
-                capital stays in the strategy unless you withdraw it or the strategy loses money.
+                Imagine putting 100 USDG into a lending strategy. If it generates 1 USDG of
+                available net earnings, that 1 could go toward your chosen Stock Tokens. Your
+                original capital stays in the strategy unless you withdraw it or the strategy loses
+                money.
               </p>
               <div className="learn-flow">
                 <div>
@@ -64,10 +66,10 @@ export default function Page() {
                 </div>
               </div>
               <p className="learn-callout">
-                The homepage uses practice funds. The separate Live integration page offers a
-                private wallet pilot for USDG lending and buying selected Stock Tokens with
-                available gains. Real actions require your wallet approval; borrowing, staking and
-                LP execution are not active.
+                On the home page, Wallet shows your live account. “Try it yourself” is the separate
+                simulator labeled Practice money; its scenarios and holdings are not real positions.
+                The private wallet pilot supports USDG lending and selected Stock Token purchases
+                from available gains. Every real transaction requires the owner’s wallet approval.
               </p>
             </section>
             <section id="strategies">
@@ -106,7 +108,8 @@ export default function Page() {
                   You supply assets to a trading pool and earn a share of eligible swap fees.
                   Trading changes the mix of assets you hold. You can end up worse off than if you
                   had simply held them. A concentrated position stops earning fees while outside its
-                  selected price range.{" "}
+                  selected price range. Freestock offers an LP practice model, but no LP or
+                  leveraged LP execution.{" "}
                   <a
                     href="https://support.uniswap.org/hc/en-us/articles/37113550065549-What-are-the-risks-when-providing-liquidity"
                     target="_blank"
@@ -120,9 +123,13 @@ export default function Page() {
             <section id="destinations">
               <span className="earn-eyebrow">03 / YOUR RULES</span>
               <h2>Convert. Compound. Or split.</h2>
+              <p>
+                These automatic rules belong to the home practice simulator. They run only when you
+                advance a scenario and do not authorize real transactions.
+              </p>
               <div className="learn-options">
                 <article>
-                  <h3>Auto-convert</h3>
+                  <h3>Practice auto-convert</h3>
                   <p>
                     Build up available earnings, then buy your chosen Stock Tokens when the
                     conversion minimum is reached. Choose one stock or a basket whose weights total
@@ -130,7 +137,7 @@ export default function Page() {
                   </p>
                 </article>
                 <article>
-                  <h3>Auto-compound</h3>
+                  <h3>Practice auto-compound</h3>
                   <p>
                     Reinvest available earnings into the same DeFi position. A larger position can
                     generate more earnings and also has more capital exposed to the strategy’s
@@ -138,7 +145,7 @@ export default function Page() {
                   </p>
                 </article>
                 <article>
-                  <h3>Split both ways</h3>
+                  <h3>Practice split</h3>
                   <p>
                     For example, reinvest 40% and direct 60% toward stocks. From 10 USDG of net
                     earnings, 4 stays in DeFi and 6 goes toward your chosen basket.
@@ -151,16 +158,22 @@ export default function Page() {
                 their proceeds would require a separate supported strategy.
               </p>
               <p className="earn-small">
-                Example amounts are illustrative, not a return forecast. In practice mode,
-                automation runs only when you advance the scenario.
+                Example amounts are illustrative, not a return forecast. The live pilot has no
+                background auto-conversion or automatic split rule.
+              </p>
+              <p>
+                In Wallet, vault shares already reflect the underlying return without a new
+                signature. Reserving gains increases recorded principal and deposits any idle
+                account USDG into the vault. Buying stock tokens uses available gains. Both actions
+                require the owner to review and approve a wallet transaction.
               </p>
             </section>
             <section id="timing">
               <span className="earn-eyebrow">04 / THE TIMING</span>
               <h2>
-                Real-time earnings.
+                Earnings can accrue.
                 <br />
-                Purchases when they can execute.
+                Purchases need approval.
               </h2>
               <p>
                 A lending position may accrue interest continuously, while staking rewards may
@@ -184,16 +197,16 @@ export default function Page() {
                 </article>
               </div>
               <p>
-                A future auto-conversion service could check frequently and execute once an amount
-                threshold is met. It would wait when withdrawals are queued, liquidity is
-                insufficient, a usable quote is missing, a token is halted, or costs exceed your
-                limits. The current wallet pilot bundles its basket trades atomically, so all legs
-                must meet their limits for the harvest to complete.
+                The live account refreshes its balances while the page is visible. Those read-only
+                updates do not request a signature or execute a purchase. You choose when to request
+                a stock purchase or reserve gains, then approve the transaction in your wallet. A
+                purchase needs enough withdrawal liquidity and a usable quote. Basket purchases are
+                atomic, so every leg must meet its minimum output for the purchase to complete.
               </p>
               <p>
-                Freestock therefore should not promise a stock purchase every second. Small earnings
-                can accumulate until a trade is worthwhile. Read-only prices alone do not execute a
-                purchase.{" "}
+                Background auto-conversion is not implemented. Small earnings can accumulate until
+                you choose to trade, and vault returns can change or turn negative. A moving balance
+                or price alone does not execute a purchase.{" "}
                 <a
                   href="https://docs.robinhood.com/chain/stock-token-apis/"
                   target="_blank"
@@ -238,7 +251,7 @@ export default function Page() {
                 Robinhood Stock Tokens are tokenized debt securities issued by Robinhood Assets
                 (Jersey) Limited. They provide economic exposure without legal or beneficial
                 ownership of the underlying shares. Country and user eligibility restrictions apply.{" "}
-                <a href="https://robinhood.com/rhj/stocktokens/" target="_blank" rel="noreferrer">
+                <a href="https://docs.robinhood.com/rhj/" target="_blank" rel="noreferrer">
                   Issuer explanation ↗
                 </a>
               </p>
@@ -248,23 +261,37 @@ export default function Page() {
               </p>
             </section>
             <section id="possibilities">
-              <span className="earn-eyebrow">07 / WHAT COMES NEXT</span>
-              <h2>A destination for many kinds of yield.</h2>
+              <span className="earn-eyebrow">07 / CURRENT ACCESS</span>
+              <h2>What you can use today.</h2>
               <p>
-                The design could support verified lending routes, eligible staking rewards and LP
-                fee harvesting. Each route needs its own deposit and withdrawal mechanics before its
-                net earnings can reach the same stock-purchase or compounding layer.
+                The private pilot is enabled for the configured signed-in participant, who declared
+                Norway residence and location and non-US-person status. Connecting a wallet does not
+                grant access, and these declarations do not verify identity or issuer eligibility.
+                The pilot uses one USDG lending vault with a 100 USDG deposit limit. Available
+                stock-token routes are NVDA, AAPL, TSLA, GOOGL and SPY.
               </p>
               <p>
-                The private wallet pilot supports deposits, stock purchases, reserving gains and
-                withdrawals, with every action approved in your wallet. Its five-stock route has
-                passed local execution tests with fake funds. The builder has not moved real funds.
-                Saved scenarios, the LP model and automation settings remain simulations; background
-                conversion, staking and leveraged positions are not active.
+                The owner can create an account, deposit, buy selected tokens with available gains,
+                reserve gains as principal and withdraw. Every transaction requires wallet approval.
+                You can restore an existing live account using its creation transaction reference;
+                the account must match the connected owner and supported route. The builder’s local
+                execution checks used fake funds. The builder has not deployed a public account or
+                submitted real transactions.
               </p>
-              <Link href="/docs" className="earn-link">
-                See the exact current mechanics <ArrowUpRight size={17} />
+              <p>
+                “Try it yourself” and saved practice positions use practice money. Staking,
+                leveraged LP execution and background auto-conversion are not implemented. Live
+                vault shares can accrue their underlying return without another signature; buying
+                stock tokens still requires your approval.
+              </p>
+              <Link href="/live" className="earn-link">
+                Open Wallet <ArrowUpRight size={17} />
               </Link>
+              <p>
+                <Link href="/docs" className="earn-link">
+                  See the exact current mechanics <ArrowUpRight size={17} />
+                </Link>
+              </p>
             </section>
           </div>
         </div>

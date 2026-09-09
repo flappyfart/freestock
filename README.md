@@ -1,12 +1,12 @@
 # freestock
 
-Private DeFi practice product with a real-chain integration workspace for a planned eligible non-US audience. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
+Private USDG lending and Stock Token wallet pilot with a separate practice account for exploring DeFi scenarios. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
 
-**The homepage remains a practice account.** `/live` adds a private, participant-restricted wallet pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
+**The homepage leads to your live account and keeps the simulator under “Try it yourself.”** `/live` offers the same private, participant-restricted wallet pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
 
 ## Working routes
 
-- `/`: persistent practice positions, allocation rules, simulation controls, holdings and read-only market catalogue.
+- `/`: live wallet account, “Try it yourself” practice box, collapsible saved practice results and read-only market catalogue.
 - `/live`: wallet connection, actual chain balances, Uniswap V3 quotes, direct deposit simulations and yield-account setup plus reviewed wallet transactions. The read-only checks request no signatures; the separately labeled wallet pilot opens a wallet confirmation only after an explicit review action.
 - `/learn`: plain-English explanations, earnings sources, timing, leverage, tokens and future possibilities.
 - `/docs`: current capability matrix, exact model mechanics, sources and execution boundaries.
@@ -37,7 +37,7 @@ Node 22.13+ and npm are required. Run `npm ci`, `npm run dev`, `npm run lint`, `
 
 `TEST_ORIGIN=http://localhost:3011 npm run test:api` only accepts local origins, refuses redirects, and creates isolated test identities. Use the same local D1 persistence directory for migrations and the test Worker. Tests cover account isolation, request validation, duplicate/concurrent actions, compounding, baskets, loss recovery, closure and retired routes. No hosted accounts are mutated by these checks.
 
-Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. The practice engine never handles real funds. The separate wallet pilot verifies the exact deployment, owner, dependencies and receipts. A specific signed-in participant is enabled through runtime configuration; country declarations are not identity verification or public launch approval.
+Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. The practice engine never handles real funds. The wallet pilot verifies the exact deployment, owner, dependencies and receipts. A specific signed-in participant is enabled through runtime configuration; country declarations are not identity verification or public launch approval.
 
 ## First live integration
 
@@ -46,3 +46,5 @@ See `docs/LIVE-PILOT.md` for verified dependencies, account semantics, fork evid
 Private pilot runtime settings: `FREESTOCK_PILOT_USER_ID` must equal the exact trusted Sites application identity, `FREESTOCK_PILOT_COUNTRY=NO`, and `FREESTOCK_PILOT_US_PERSON=no`. Configure these only for the declared participant. The public availability self-check never grants pilot access. Disabling entry/trading does not disable verified-account withdrawal preparation. No server signer exists. Transaction recovery stores only owner, request ID, nonce and transaction/account references on that browser; authoritative balances and confirmations come from the chain. Web Locks serialize cross-tab journal updates, and stale replies cannot overwrite successor requests.
 
 UI switches use the user-provided Uiverse.io design by reglobby: a blue off state, green on state and animated glowing orb, with accessible controls and reduced-motion support.
+
+Verified account creation references are remembered per wallet on this browser and rechecked against the chain on return. Live account balances refresh every 30 seconds while visible and idle. Reviews and pending wallet requests pause this refresh. Storage never substitutes for chain balances.

@@ -6,6 +6,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight, Check, Layers, RefreshCw } from "l
 import { EarnShell } from "./earn-shell";
 import { MechanicalSwitch } from "./mechanical-switch";
 import { LandingIntro } from "./landing-intro";
+import LiveWorkspace from "./live/live-workspace";
 import {
   STOCKS,
   modeledNetApr,
@@ -348,6 +349,8 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false);
+  const [showPracticeResults, setShowPracticeResults] = useState(false);
+  const [feedbackLocation, setFeedbackLocation] = useState<"form" | "results">("form");
   const [pendingRequest, setPendingRequest] = useState<{
     key: string;
     body: Record<string, unknown>;
@@ -391,6 +394,8 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
   }, []);
   async function command(body: Record<string, unknown>, retryKey?: string) {
     if (busy || (pendingRequest && !retryKey)) return;
+    setFeedbackLocation(body.type === "open" ? "form" : "results");
+    if (body.type !== "open") setShowPracticeResults(true);
     const key = retryKey ?? crypto.randomUUID();
     setBusy(true);
     setError("");
@@ -408,6 +413,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
         throw Error(v.error ?? "Action failed.");
       }
       setState(v.state);
+      if (body.type === "open") setShowPracticeResults(true);
       setPendingRequest(null);
       setNotice(
         v.replayed
@@ -446,53 +452,61 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  const feedback = (
+    <div className="earn-feedback" aria-live="polite">
+      {loading && <p>Loading your practice account and market data…</p>}
+      {error && (
+        <p role="alert">
+          {error}{" "}
+          {pendingRequest ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void command(pendingRequest.body, pendingRequest.key)}
+            >
+              Retry this action
+            </button>
+          ) : !state ? (
+            <>
+              {error.startsWith("Sign in") && (
+                <button
+                  type="button"
+                  className="earn-link"
+                  onClick={() => window.location.assign("/signin-with-chatgpt?return_to=%2F")}
+                >
+                  Sign in to practice
+                </button>
+              )}
+              <button type="button" onClick={() => void load()}>
+                Retry loading
+              </button>
+            </>
+          ) : null}
+        </p>
+      )}
+      {notice && (
+        <p className="earn-success">
+          <Check size={15} />
+          {notice}
+        </p>
+      )}
+    </div>
+  );
   return (
-    <EarnShell active={transparency ? "Transparency" : "Earn"}>
+    <EarnShell active={transparency ? "Practice activity" : "Home"}>
       {!transparency && <LandingIntro />}
       <div className="earn-wrap">
         <div className="earn-notice">
           <span>
-            <i /> PRACTICE FUNDS ONLY
+            <i /> {transparency ? "PRACTICE ACTIVITY" : "LIVE WALLET PILOT"}
           </span>
           <p>
-            Explore the full flow with 10,000 practice USDG. Real deposits, borrowing and stock
-            purchases are not enabled.
+            {transparency
+              ? "This ledger records practice money only. Your real balances and receipts are in your live account."
+              : "USDG lending and stock purchases for the configured Norway participant. Every real transaction needs your wallet approval."}
           </p>
         </div>
-        <div className="earn-feedback" aria-live="polite">
-          {loading && <p>Loading your practice account and market data…</p>}
-          {error && (
-            <p role="alert">
-              {error}{" "}
-              {pendingRequest ? (
-                <button
-                  disabled={busy}
-                  onClick={() => void command(pendingRequest.body, pendingRequest.key)}
-                >
-                  Retry this action
-                </button>
-              ) : !state ? (
-                <>
-                  {error.startsWith("Sign in") && (
-                    <button
-                      className="earn-link"
-                      onClick={() => window.location.assign("/signin-with-chatgpt?return_to=%2F")}
-                    >
-                      Sign in to practice
-                    </button>
-                  )}
-                  <button onClick={() => void load()}>Retry loading</button>
-                </>
-              ) : null}
-            </p>
-          )}
-          {notice && (
-            <p className="earn-success">
-              <Check size={15} />
-              {notice}
-            </p>
-          )}
-        </div>
+        {transparency && feedback}
         {!transparency ? (
           <>
             <section className="earn-top">
@@ -504,16 +518,25 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   Your next <em>stock.</em>
                 </h1>
                 <p>
-                  Put capital into a lending strategy. Use its earnings to buy stock tokens,
-                  reinvest for more DeFi exposure, or do a bit of both.
+                  Lend USDG, let returns accumulate, then use available gains to buy the stock
+                  tokens you choose. Start with NVIDIA, Apple, Tesla, Alphabet or SPY.
+                </p>
+                <div className="home-live-actions">
+                  <a className="earn-button" href="#live-account">
+                    Open live account <ArrowUpRight size={18} />
+                  </a>
+                  <a className="earn-link" href="#try-it-yourself">
+                    Try it yourself
+                  </a>
+                </div>
+                <p className="home-live-limit">
+                  Private Norway pilot · 100 USDG deposit limit · Returns vary and capital can lose
+                  value.
                 </p>
                 <Link className="earn-link" href="/learn">
                   New to this? Start here <ArrowUpRight size={17} />
                 </Link>
-                <div
-                  className="earn-stock-art"
-                  aria-label="NVIDIA, Apple and Microsoft stock tokens"
-                >
+                <div className="earn-stock-art" aria-label="NVIDIA and Apple stock tokens">
                   <img
                     className="earn-bubble earn-bubble-a"
                     src="/stocks/bubble-aapl.webp"
@@ -528,24 +551,19 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                     width="210"
                     height="210"
                   />
-                  <img
-                    className="earn-bubble earn-bubble-m"
-                    src="/stocks/bubble-msft.webp"
-                    alt="Microsoft stock bubble"
-                    width="160"
-                    height="160"
-                  />
                 </div>
                 <div className="earn-path">
                   <span>Earn in DeFi</span>
                   <ArrowRight size={18} />
-                  <span>Convert or compound</span>
+                  <span>Approve a stock purchase</span>
                   <ArrowRight size={18} />
                   <span>Your portfolio</span>
                 </div>
               </div>
               <form
                 className="earn-builder"
+                id="try-it-yourself"
+                aria-describedby="practice-explainer"
                 onSubmit={(e) => {
                   e.preventDefault();
                   void command({
@@ -561,9 +579,14 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 }}
               >
                 <div className="earn-row">
-                  <h2>Build a position</h2>
-                  <span className="earn-pill">Simulation</span>
+                  <h2>Try it yourself</h2>
+                  <span className="earn-pill">Practice money</span>
                 </div>
+                <p className="earn-small" id="practice-explainer">
+                  Explore with 10,000 practice USDG. These settings and results do not affect your
+                  wallet. Auto-convert and leveraged LP options here are simulations.
+                </p>
+                {feedbackLocation === "form" && feedback}
                 <fieldset className="earn-segment" aria-label="Position type" data-kind={kind}>
                   <button
                     type="button"
@@ -643,86 +666,110 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   className="earn-button earn-button-wide"
                   disabled={locked || (kind === "lend" && (!market || market.vault.apy === null))}
                 >
-                  {busy ? "Saving…" : "Create practice position"}
+                  {busy ? "Saving…" : "Try this position"}
                   <ArrowUpRight size={18} />
                 </button>
+                <a
+                  className="earn-link"
+                  href="#practice-results"
+                  onClick={() => setShowPracticeResults(true)}
+                >
+                  View your practice results <ArrowRight size={16} />
+                </a>
               </form>
             </section>
-            <section className="earn-section" id="positions">
-              <div className="section-title">
-                <div>
-                  <span className="earn-eyebrow">YOUR CAPITAL, AT WORK</span>
-                  <h2>My positions</h2>
-                </div>
-                <Link href="/transparency" className="earn-link">
-                  See every earnings step <ArrowUpRight size={16} />
-                </Link>
-              </div>
-              <div className="earn-stats">
-                <div>
-                  <span>DeFi capital</span>
-                  <strong>
-                    {money(capital)} <small>USDG</small>
-                  </strong>
-                </div>
-                <div>
-                  <span>Net modeled earnings</span>
-                  <strong>
-                    {money(earned)} <small>USDG</small>
-                  </strong>
-                </div>
-                <div>
-                  <span>Ready to convert</span>
-                  <strong>
-                    {money(ready)} <small>USDG</small>
-                  </strong>
-                </div>
-                <div>
-                  <span>Spent on stock tokens</span>
-                  <strong>
-                    {money(stockCost)} <small>USDG</small>
-                  </strong>
-                </div>
-              </div>
-              <div className="positions-grid">
-                {state?.positions.map((p) => (
-                  <PositionCard key={p.id} p={p} busy={locked} command={(v) => void command(v)} />
-                ))}
-              </div>
-              {state?.positions.length === 0 && (
-                <div className="earn-empty">
-                  <Layers size={24} />
-                  <h3>Your first position starts above.</h3>
-                  <p>Choose an earnings destination, then simulate a day, a week or a month.</p>
-                </div>
-              )}
+            <section id="live-account" className="home-live-account">
+              <LiveWorkspace embedded />
             </section>
-            <section className="earn-section">
-              <div className="section-title">
-                <div>
-                  <span className="earn-eyebrow">BUILD YOUR EXPOSURE</span>
-                  <h2>My stock tokens</h2>
+            <details
+              className="practice-results"
+              id="practice-results"
+              open={showPracticeResults}
+              onToggle={(e) => setShowPracticeResults(e.currentTarget.open)}
+            >
+              <summary>
+                <span>Your practice results</span>
+                <small>
+                  Simulated positions and stock tokens · separate from your live account
+                </small>
+              </summary>
+              {feedbackLocation === "results" && feedback}
+              <section className="earn-section" id="positions">
+                <div className="section-title">
+                  <div>
+                    <span className="earn-eyebrow">TRY IT YOURSELF</span>
+                    <h2>Practice positions</h2>
+                  </div>
+                  <Link href="/transparency" className="earn-link">
+                    See every earnings step <ArrowUpRight size={16} />
+                  </Link>
                 </div>
-                <span className="earn-small">Practice quantities · cost, not current value</span>
-              </div>
-              <div className="holdings-grid">
-                {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
-                  <article key={s.symbol}>
-                    <StockMark symbol={s.symbol} size={40} />
-                    <div>
-                      <h3>{s.symbol}</h3>
-                      <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} practice tokens</p>
-                      <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
-                    </div>
-                  </article>
-                ))}
-              </div>
-              {stockCost === 0 && (
-                <p className="earn-muted">
-                  Your chosen tokens appear here after a simulated earnings conversion.
-                </p>
-              )}
-            </section>
+                <div className="earn-stats">
+                  <div>
+                    <span>Practice DeFi capital</span>
+                    <strong>
+                      {money(capital)} <small>USDG</small>
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Net modeled earnings</span>
+                    <strong>
+                      {money(earned)} <small>USDG</small>
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Ready to convert</span>
+                    <strong>
+                      {money(ready)} <small>USDG</small>
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Spent on stock tokens</span>
+                    <strong>
+                      {money(stockCost)} <small>USDG</small>
+                    </strong>
+                  </div>
+                </div>
+                <div className="positions-grid">
+                  {state?.positions.map((p) => (
+                    <PositionCard key={p.id} p={p} busy={locked} command={(v) => void command(v)} />
+                  ))}
+                </div>
+                {state?.positions.length === 0 && (
+                  <div className="earn-empty">
+                    <Layers size={24} />
+                    <h3>Your first position starts above.</h3>
+                    <p>Choose an earnings destination, then simulate a day, a week or a month.</p>
+                  </div>
+                )}
+              </section>
+              <section className="earn-section">
+                <div className="section-title">
+                  <div>
+                    <span className="earn-eyebrow">BUILD YOUR EXPOSURE</span>
+                    <h2>Practice stock tokens</h2>
+                  </div>
+                  <span className="earn-small">Practice quantities · cost, not current value</span>
+                </div>
+                <div className="holdings-grid">
+                  {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
+                    <article key={s.symbol}>
+                      <StockMark symbol={s.symbol} size={40} />
+                      <div>
+                        <h3>{s.symbol}</h3>
+                        <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} practice tokens</p>
+                        <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                {stockCost === 0 && (
+                  <p className="earn-muted">
+                    Your chosen tokens appear here after a simulated earnings conversion.
+                  </p>
+                )}
+              </section>
+            </details>
             <section className="earn-section" id="markets">
               <div className="section-title">
                 <div>

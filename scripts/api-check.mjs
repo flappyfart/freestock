@@ -158,13 +158,19 @@ const open = {
 };
 async function main() {
   console.log(`Local DeFi API checks: ${ORIGIN}; isolated identities ${runId}`);
-  await check("health identifies practice earnings and no live transactions", async () => {
-    const v = expectStatus(await request("/api/health", { user: null }), 200);
-    assert.equal(v.mode, "simulation");
-    assert.equal(v.realDepositsEnabled, false);
-    assert.equal(v.realTradingEnabled, false);
-    assert.equal(v.automation, "simulation-step-only");
-  });
+  await check(
+    "health separates participant pilot from practice and general registration",
+    async () => {
+      const v = expectStatus(await request("/api/health", { user: null }), 200);
+      assert.equal(v.mode, "wallet-pilot-with-practice");
+      assert.equal(v.walletPilotStatusEndpoint, "/api/live/status");
+      assert.equal(v.earnings.practice, "explicit-time-simulation");
+      assert.equal(v.earnings.live, "chain-reads");
+      assert.equal(v.realDepositsEnabled, false);
+      assert.equal(v.realTradingEnabled, false);
+      assert.equal(v.automation, "simulation-step-only");
+    },
+  );
   await check("anonymous and incomplete identities cannot access accounts or mutate", async () => {
     expectStatus(await request("/api/earn/account", { user: null }), 401);
     await rejected(open, 401, { user: null });

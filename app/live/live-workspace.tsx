@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { formatUnits } from "ethers";
 import { ArrowUpRight, Check, RefreshCw, Wallet } from "lucide-react";
-import PilotWorkspace from "./pilot-workspace";
+import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
+import "./live-workspace.css";
 import { WalletConnectButton } from "./wallet-connect-button";
 import { EarnShell } from "../earn-shell";
 import { CHAIN_ID, RPC_URL, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
@@ -11,7 +12,10 @@ type Provider = {
   on?: (event: string, cb: (v: unknown) => void) => void;
   removeListener?: (event: string, cb: (v: unknown) => void) => void;
 };
-type Discovered = { info: { uuid: string; name: string; rdns: string }; provider: Provider };
+type Discovered = {
+  info: { uuid: string; name: string; rdns: string };
+  provider: Provider;
+};
 type Snapshot = {
   address: string;
   block: number;
@@ -42,11 +46,11 @@ type Preview = {
 };
 const format = (v: string, decimals = 6) => {
   const n = Number(formatUnits(v, decimals));
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: decimals === 18 ? 6 : 4 }).format(
-    n,
-  );
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: decimals === 18 ? 6 : 4,
+  }).format(n);
 };
-export default function LiveWorkspace() {
+export default function LiveWorkspace({ embedded = false }: { embedded?: boolean }) {
   const [providers, setProviders] = useState<Discovered[]>([]),
     [selected, setSelected] = useState<Discovered | null>(null),
     [connected, setConnected] = useState<string | null>(null),
@@ -57,8 +61,30 @@ export default function LiveWorkspace() {
     [input, setInput] = useState("10"),
     [symbol, setSymbol] = useState("NVDA"),
     [quote, setQuote] = useState<Quote | null>(null),
-    [preview, setPreview] = useState<Preview | null>(null);
+    [preview, setPreview] = useState<Preview | null>(null),
+    [availability, setAvailability] = useState<PilotAvailability>("loading"),
+    [availabilityAttempt, setAvailabilityAttempt] = useState(0);
   const generation = useRef(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/live/status", {
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw Error("Availability check failed.");
+        const value = (await response.json()) as {
+          walletPilotEnabled?: unknown;
+        };
+        if (typeof value.walletPilotEnabled !== "boolean") throw Error("Invalid availability.");
+        if (!controller.signal.aborted)
+          setAvailability(value.walletPilotEnabled ? "enabled" : "unavailable");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setAvailability("error");
+      });
+    return () => controller.abort();
+  }, [availabilityAttempt]);
   useEffect(() => {
     const listener = (event: Event) => {
       const detail = (event as CustomEvent<Discovered>).detail;
@@ -78,7 +104,11 @@ export default function LiveWorkspace() {
           ? all
           : [
               {
-                info: { uuid: "injected", name: "Browser wallet", rdns: "injected" },
+                info: {
+                  uuid: "injected",
+                  name: "Browser wallet",
+                  rdns: "injected",
+                },
                 provider: fallback,
               },
             ],
@@ -181,109 +211,220 @@ export default function LiveWorkspace() {
     if (!r.ok) throw Error(data.error ?? "Deposit preview unavailable.");
     if (id === generation.current) setPreview(data);
   }
-  return (
-    <EarnShell active="Live integration">
-      <div className="earn-wrap live-workspace">
-        <div className="earn-notice">
-          <span>
-            <i /> MAINNET CONNECTION
-          </span>
-          <p>
-            Real wallet balances and contract quotes. The private wallet pilot uses real funds only
-            when you explicitly approve a transaction.
+  const content = (
+    <div
+      className={embedded ? "live-workspace live-workspace-embedded" : "earn-wrap live-workspace"}
+    >
+      <section className={embedded ? "live-embedded-title" : "education-title"}>
+        <span className="earn-eyebrow">REAL FUNDS · ROBINHOOD CHAIN</span>
+        {embedded ? <h2>Your live account</h2> : <h1>Your live account</h1>}
+        <p>
+          Deposit USDG into lending, then use available gains to buy Stock Tokens for your wallet.
+          You review and approve every transaction.
+        </p>
+      </section>
+      <div className="live-availability" data-status={availability} aria-live="polite">
+        <strong>
+          {availability === "loading"
+            ? "Checking private account access…"
+            : availability === "enabled"
+              ? "Live actions available for your signed-in account"
+              : availability === "unavailable"
+                ? "Private participant access required"
+                : "Could not check live account access"}
+        </strong>
+        <p>
+          {availability === "loading"
+            ? "You can connect your wallet while availability is checked."
+            : availability === "enabled"
+              ? "Access is configured for the declared Norway participant. This does not verify identity or issuer eligibility."
+              : availability === "unavailable"
+                ? "New deposits and stock purchases are limited to the configured participant’s signed-in account. Connecting a wallet alone does not grant access."
+                : "New actions wait for a successful availability check. Existing account recovery remains available."}
+        </p>
+        {availability !== "loading" && availability !== "enabled" && (
+          <div className="live-actions">
+            <button
+              type="button"
+              className="earn-link"
+              onClick={() => {
+                setAvailability("loading");
+                setAvailabilityAttempt((value) => value + 1);
+              }}
+            >
+              Check access again
+            </button>
+            <button
+              type="button"
+              className="earn-link"
+              onClick={() => {
+                const returnTo = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+                window.location.assign(
+                  `/signin-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`,
+                );
+              }}
+            >
+              Sign in with the participant account
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="live-connection-first">
+        <section className="earn-builder wallet-connection-panel">
+          <div className="earn-row">
+            <h2>Connect your wallet</h2>
+            <Wallet size={20} />
+          </div>
+          <p className="earn-small">
+            Connection shares your public address. It does not approve tokens, send funds or request
+            a transaction signature.
           </p>
-        </div>
-        <section className="education-title">
-          <span className="earn-eyebrow">FROM PRACTICE TO ONCHAIN</span>
-          <h1>
-            Your wallet.
-            <br />A real <em>connection.</em>
-          </h1>
-          <p>
-            Inspect your USDG, vault shares and Stock Tokens on Robinhood Chain, and check an actual
-            trading-pool quote.
-          </p>
-        </section>
-        <div className="live-grid">
-          <section className="earn-builder wallet-connection-panel">
-            <div className="earn-row">
-              <h2>Connect your wallet</h2>
-              <Wallet size={20} />
-            </div>
-            <p className="earn-small">
-              Connection shares your public address. It does not approve tokens, send funds or
-              request a transaction signature.
+          {providers.length === 0 ? (
+            <p>
+              Open this page in a browser with an Ethereum wallet installed. You can keep using the
+              practice account in this browser.
             </p>
-            {providers.length === 0 ? (
-              <p>
-                Open this page in a browser with an Ethereum wallet installed. You can keep using
-                the practice account in this browser.
-              </p>
-            ) : (
-              providers.map((p) => (
-                <WalletConnectButton
-                  key={p.info.uuid}
-                  walletName={p.info.name}
-                  reconnect={selected?.info.uuid === p.info.uuid && !!connected}
+          ) : (
+            providers.map((p) => (
+              <WalletConnectButton
+                key={p.info.uuid}
+                walletName={p.info.name}
+                reconnect={selected?.info.uuid === p.info.uuid && !!connected}
+                disabled={busy}
+                onClick={() =>
+                  void act(async () => {
+                    setSelected(p);
+                    await readWallet(p.provider, true);
+                  })
+                }
+              />
+            ))
+          )}
+          {connected && (
+            <>
+              <code className="wallet-address">{connected}</code>
+              <span className="earn-pill">
+                {network === CHAIN_ID ? "Robinhood Chain · 4663" : `Network ${network}`}
+              </span>
+              {network !== CHAIN_ID ? (
+                <button
+                  className="earn-button"
+                  disabled={busy}
+                  onClick={() => void act(switchNetwork)}
+                >
+                  Switch to Robinhood Chain
+                </button>
+              ) : (
+                <button
+                  className="earn-link"
                   disabled={busy}
                   onClick={() =>
                     void act(async () => {
-                      setSelected(p);
-                      await readWallet(p.provider, true);
+                      if (selected) await readWallet(selected.provider);
                     })
                   }
-                />
-              ))
-            )}
-            {connected && (
-              <>
-                <code className="wallet-address">{connected}</code>
-                <span className="earn-pill">
-                  {network === CHAIN_ID ? "Robinhood Chain · 4663" : `Network ${network}`}
-                </span>
-                {network !== CHAIN_ID ? (
-                  <button
-                    className="earn-button"
-                    disabled={busy}
-                    onClick={() => void act(switchNetwork)}
-                  >
-                    Switch to Robinhood Chain
-                  </button>
-                ) : (
+                >
+                  <RefreshCw size={14} />
+                  Refresh balances
+                </button>
+              )}
+            </>
+          )}
+          <div aria-live="polite">
+            {busy && <p>Checking wallet and contract data…</p>}
+            {error && (
+              <p role="alert" className="earn-warning">
+                {error}
+                {error.startsWith("Sign in") && (
                   <button
                     className="earn-link"
-                    disabled={busy}
-                    onClick={() =>
-                      void act(async () => {
-                        if (selected) await readWallet(selected.provider);
-                      })
-                    }
+                    onClick={() => window.location.assign("/signin-with-chatgpt?return_to=%2Flive")}
                   >
-                    <RefreshCw size={14} />
-                    Refresh balances
+                    Sign in
                   </button>
                 )}
-              </>
+              </p>
             )}
-            <div aria-live="polite">
-              {busy && <p>Checking wallet and contract data…</p>}
-              {error && (
-                <p role="alert" className="earn-warning">
-                  {error}
-                  {error.startsWith("Sign in") && (
-                    <button
-                      className="earn-link"
-                      onClick={() =>
-                        window.location.assign("/signin-with-chatgpt?return_to=%2Flive")
-                      }
-                    >
-                      Sign in
-                    </button>
-                  )}
-                </p>
-              )}
+          </div>
+        </section>
+      </div>
+      {connected && selected && network === CHAIN_ID ? (
+        <PilotWorkspace
+          key={`${selected.info.uuid}-${connected}`}
+          owner={connected}
+          provider={selected.provider}
+          availability={availability}
+        />
+      ) : (
+        <section className="earn-section">
+          <h3>Connect to create or restore your account</h3>
+          <p>
+            The private participant account supports USDG lending and purchases of five Stock Tokens
+            using available gains. Deposits are limited to 100 USDG principal. Every transaction
+            needs your wallet approval; stock purchases are not automatic.
+          </p>
+        </section>
+      )}
+      {snapshot && (
+        <section className="earn-section">
+          <div className="section-title">
+            <h2>Onchain balances</h2>
+            <span className="earn-pill">
+              <Check size={13} /> Block {snapshot.block.toLocaleString()}
+            </span>
+          </div>
+          <div className="earn-stats">
+            <div>
+              <span>Wallet USDG</span>
+              <strong>{format(snapshot.usdg)}</strong>
             </div>
-          </section>
+            <div>
+              <span>ETH for gas</span>
+              <strong>{format(snapshot.eth, 18)}</strong>
+            </div>
+            <div>
+              <span>Vault shares</span>
+              <strong>{format(snapshot.vaultShares, 18)}</strong>
+            </div>
+            <div>
+              <span>Preview redemption value</span>
+              <strong>
+                {format(snapshot.vaultAssets)} <small>USDG</small>
+              </strong>
+            </div>
+          </div>
+          <p className="earn-small">
+            Redemption value is a contract preview, not a withdrawal guarantee. Existing vault value
+            is not labeled as earned interest because its original deposit history has not been
+            reconciled here.
+          </p>
+          <div className="holdings-grid">
+            {snapshot.stocks.map((s) => (
+              <article key={s.symbol}>
+                <div>
+                  <h3>{s.symbol}</h3>
+                  <p>{format(s.balance, 18)} tokens</p>
+                  <a
+                    className="earn-link"
+                    href={`${EXPLORER_URL}/token/${s.address}?a=${snapshot.address}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View on explorer <ArrowUpRight size={12} />
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="earn-small">
+            Observed {new Date(snapshot.observedAt).toLocaleString()}. Balances refresh only when
+            you request it; public RPC availability can vary.
+          </p>
+        </section>
+      )}
+      <details className="live-advanced-tools">
+        <summary>Advanced read-only checks</summary>
+        <div className="live-advanced-content">
           <section className="earn-builder">
             <h2>Check a real route</h2>
             <p className="earn-small">
@@ -380,81 +521,8 @@ export default function LiveWorkspace() {
             )}
           </section>
         </div>
-        {snapshot && (
-          <section className="earn-section">
-            <div className="section-title">
-              <h2>Onchain balances</h2>
-              <span className="earn-pill">
-                <Check size={13} /> Block {snapshot.block.toLocaleString()}
-              </span>
-            </div>
-            <div className="earn-stats">
-              <div>
-                <span>Wallet USDG</span>
-                <strong>{format(snapshot.usdg)}</strong>
-              </div>
-              <div>
-                <span>ETH for gas</span>
-                <strong>{format(snapshot.eth, 18)}</strong>
-              </div>
-              <div>
-                <span>Vault shares</span>
-                <strong>{format(snapshot.vaultShares, 18)}</strong>
-              </div>
-              <div>
-                <span>Preview redemption value</span>
-                <strong>
-                  {format(snapshot.vaultAssets)} <small>USDG</small>
-                </strong>
-              </div>
-            </div>
-            <p className="earn-small">
-              Redemption value is a contract preview, not a withdrawal guarantee. Existing vault
-              value is not labeled as earned interest because its original deposit history has not
-              been reconciled here.
-            </p>
-            <div className="holdings-grid">
-              {snapshot.stocks.map((s) => (
-                <article key={s.symbol}>
-                  <div>
-                    <h3>{s.symbol}</h3>
-                    <p>{format(s.balance, 18)} tokens</p>
-                    <a
-                      className="earn-link"
-                      href={`${EXPLORER_URL}/token/${s.address}?a=${snapshot.address}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View on explorer <ArrowUpRight size={12} />
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="earn-small">
-              Observed {new Date(snapshot.observedAt).toLocaleString()}. Balances refresh only when
-              you request it; public RPC availability can vary.
-            </p>
-          </section>
-        )}
-        {connected && selected && network === CHAIN_ID ? (
-          <PilotWorkspace
-            key={`${selected.info.uuid}-${connected}`}
-            owner={connected}
-            provider={selected.provider}
-          />
-        ) : (
-          <section className="earn-section">
-            <h2>Start the wallet pilot</h2>
-            <p>
-              Connect a wallet on Robinhood Chain to create or restore your stock-yield account. The
-              first participant has declared Norway residence and location and non-U.S.-person
-              status. Deposits are limited to 100 USDG principal. This uses real funds only after
-              explicit wallet approval.
-            </p>
-          </section>
-        )}
-      </div>
-    </EarnShell>
+      </details>
+    </div>
   );
+  return embedded ? content : <EarnShell active="Wallet">{content}</EarnShell>;
 }
