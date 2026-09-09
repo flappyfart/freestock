@@ -31,5 +31,6 @@ export async function GET() {
     realDepositsEnabled: pilot.enabled,
     realTradingEnabled: pilot.enabled,
     backgroundAutomationEnabled: false,
+    persistentActivityEnabled: true,
   });
 }

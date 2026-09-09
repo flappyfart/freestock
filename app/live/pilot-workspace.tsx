@@ -17,6 +17,7 @@ import {
   forgetAccountReference,
   accountRestoreCandidate,
   rejectedUrlAccountFallback,
+  cloudRestoreCandidate,
   type AccountReferenceCandidate,
 } from "../../lib/live/account-reference";
 import { MechanicalSwitch } from "../mechanical-switch";
@@ -29,6 +30,8 @@ import {
   type PilotReadState,
 } from "../../lib/live/agentic-lending";
 import "./pilot-dashboard.css";
+import { historyRequest, HISTORY_UPDATED } from "../../lib/live/history-client";
+import type { SavedLiveAccount } from "../../lib/live/history-model";
 type Account = AgentAccount & {
   account: string;
   deployment: string;
@@ -77,6 +80,7 @@ export default function PilotWorkspace({
   onReadState,
   agentIntent,
   onAgentIntentHandled,
+  onActivity,
 }: {
   owner: string;
   provider: WalletProvider;
@@ -85,6 +89,7 @@ export default function PilotWorkspace({
   onReadState: (value: PilotReadState) => void;
   agentIntent: AgentIntent | null;
   onAgentIntentHandled: (id: string) => void;
+  onActivity:()=>void;
 }) {
   const enabled = availability === "enabled";
   const [account, setAccount] = useState<Account | null>(null),
@@ -110,12 +115,52 @@ export default function PilotWorkspace({
     "deposit" | "harvest" | "compound" | "withdraw" | null
   >(null);
   const [agentNote, setAgentNote] = useState("");
+  const [savedPositions, setSavedPositions] = useState<SavedLiveAccount[]>([]);
+  const [historyWarning, setHistoryWarning] = useState("");
+  const remembered = useRef(new Set<string>()),
+    touched = useRef(false);
   const consumedIntent = useRef<string | null>(null);
   const alive = useRef(true),
     inFlight = useRef(false),
     readEpoch = useRef(0),
     readAbort = useRef<AbortController | null>(null),
     attemptedRestore = useRef(new Set<string>());
+  const rememberPosition = useCallback(
+    async (reference: string) => {
+      if (remembered.current.has(reference)) return;
+      try {
+        await historyRequest({ action: "remember", owner, deployment: reference });
+        if (alive.current) {
+          remembered.current.add(reference);
+          setHistoryWarning("");
+        }
+      } catch {
+        if (alive.current)
+          setHistoryWarning(
+            "Your position is verified, but it could not be saved to your profile. Keep its creation transaction and retry in Activity.",
+          );
+      }
+    },
+    [owner],
+  );
+  async function recordActivity(hash: string, reference: string, replaces?: string) {
+    if (!reference) return;
+    try {
+      await historyRequest({
+        action: "track",
+        owner,
+        deployment: reference,
+        hash,
+        ...(replaces ? { replaces } : {}),
+      });
+      if (alive.current) setHistoryWarning("");
+    } catch {
+      if (alive.current)
+        setHistoryWarning(
+          "The wallet result is unchanged, but activity could not be saved. Sync or import the transaction in Activity; do not submit it again.",
+        );
+    }
+  }
   const verifyAccount = useCallback(
     async (reference: string) => {
       const epoch = readEpoch.current;
@@ -132,6 +177,7 @@ export default function PilotWorkspace({
         setLastChecked(Date.now());
         setRefreshWarning(null);
         setStorageWarning(saveAccountReference(owner, value.deployment));
+        void rememberPosition(value.deployment);
         const url = new URL(window.location.href);
         url.searchParams.set("deployment", value.deployment);
         window.history.replaceState(null, "", url);
@@ -142,8 +188,47 @@ export default function PilotWorkspace({
     },
     // Keep the current owner in the callback boundary for every verified chain read.
     // oxlint-disable-next-line react/react-compiler
-    [owner],
+    [owner, rememberPosition],
   );
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        const result = await api<{ accounts: SavedLiveAccount[] }>(
+          `/api/live/history?owner=${owner}`,
+          controller.signal,
+        );
+        if (!alive.current || controller.signal.aborted) return;
+        setSavedPositions(result.accounts);
+        const search = new URLSearchParams(window.location.search);
+        const candidate = cloudRestoreCandidate(
+          owner,
+          result.accounts,
+          touched.current ||
+            inFlight.current ||
+            !!readJournal(owner) ||
+            !!search.get("transaction") ||
+            !!search.get("deployment") ||
+            !!readAccountReference(owner).deployment,
+        );
+        if (candidate) {
+          setDeployment((previous) => previous || candidate.deployment);
+          setRestoreCandidate((previous) => previous || candidate);
+        }
+      } catch {
+        if (!controller.signal.aborted && alive.current)
+          setHistoryWarning(
+            "Saved positions could not load. You can still restore from the creation transaction.",
+          );
+      }
+    };
+    void load();
+    window.addEventListener(HISTORY_UPDATED, load);
+    return () => {
+      controller.abort();
+      window.removeEventListener(HISTORY_UPDATED, load);
+    };
+  }, [owner]);
   useEffect(() => {
     alive.current = true;
     const epoch = readEpoch.current + 1;
@@ -266,6 +351,7 @@ export default function PilotWorkspace({
     return () => window.clearInterval(timer);
   }, [account, journal, owner, pending, plan, verifyAccount]);
   async function act(fn: () => Promise<void>) {
+    touched.current = true;
     if (inFlight.current) return;
     inFlight.current = true;
     setBusy(true);
@@ -322,6 +408,17 @@ export default function PilotWorkspace({
       );
       if (!alive.current || readJournal(owner)?.id !== savedJournal?.id) return;
       if (value.status !== "pending") {
+        const reference = value.deployment || account?.deployment || deployment;
+        // Profile persistence is independent of transaction recovery and must never
+        // make a mined transaction look failed or prevent the local journal clearing.
+        if (reference) {
+          void rememberPosition(reference);
+          void recordActivity(
+            hash,
+            reference,
+            savedJournal?.hash && savedJournal.hash !== hash ? savedJournal.hash : undefined,
+          );
+        }
         setReceipt(value);
         setPending("");
         const url = new URL(window.location.href);
@@ -369,6 +466,7 @@ export default function PilotWorkspace({
     const url = new URL(window.location.href);
     url.searchParams.set("transaction", hash);
     window.history.replaceState(null, "", url);
+    if (account?.deployment) void recordActivity(hash, account.deployment);
     await confirm(hash, true);
   }
   const depositAmount = (() => {
@@ -459,6 +557,42 @@ export default function PilotWorkspace({
         <span className="pd-network">Robinhood Chain</span>
       </header>
       {agentNote && <p className="pd-notice">{agentNote}</p>}
+      {historyWarning && (
+        <output className="pd-notice">
+          {historyWarning} <button type="button" onClick={onActivity}>Open Activity</button>
+        </output>
+      )}
+      {savedPositions.length > 0 && (
+        <label className="pd-saved-position">
+          Saved positions
+          <select
+            disabled={actionBlocked || !!plan}
+            value={account?.deployment ?? ""}
+            onChange={(e) => {
+              touched.current = true;
+              setDeployment(e.target.value);
+              void act(async () => {
+                await verifyAccount(e.target.value);
+                setPlan(null);
+                setReceipt(null);
+              });
+            }}
+          >
+            <option value="" disabled>
+              Choose a saved position
+            </option>
+            {savedPositions.map((p) => (
+              <option key={p.account} value={p.deployment}>
+                {p.account.slice(0, 8)}…{p.account.slice(-6)} · Steakhouse USDG
+              </option>
+            ))}
+          </select>
+          <span>
+            Saved to your sign-in. Connecting the same wallet on another device restores these
+            references.
+          </span>
+        </label>
+      )}
 
       {!hasPosition && (
         <ol className="pd-steps" aria-label="Position setup">
@@ -949,8 +1083,8 @@ export default function PilotWorkspace({
             Save receipt
           </a>
           <p className="pd-meta">
-            Save this receipt before leaving. The dashboard shows your latest confirmation in this
-            session; the explorer retains the onchain record.
+            Activity saves verified records to your signed-in profile. If saving is unavailable,
+            keep this receipt and sync it later. The explorer retains the onchain transaction.
           </p>
         </div>
       )}
@@ -1014,6 +1148,7 @@ export default function PilotWorkspace({
                 value={deployment}
                 placeholder="0x…"
                 onChange={(e) => {
+                  touched.current = true;
                   setDeployment(e.target.value);
                   setPlan(null);
                 }}

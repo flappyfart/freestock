@@ -1,0 +1,393 @@
+.portfolio-history {
+  display: grid;
+  gap: 24px;
+  color: #17304c;
+  padding-bottom: 36px;
+}
+.portfolio-empty {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: 36px;
+  background: #fff;
+  border: 1px solid #dce5f1;
+  border-radius: 24px;
+}
+.portfolio-empty h2,
+.portfolio-empty p {
+  margin: 0;
+  max-width: 580px;
+}
+.ph-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.ph-toolbar label,
+.ph-import label,
+.pd-saved-position {
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+}
+.ph-toolbar select,
+.ph-import input,
+.pd-saved-position select {
+  min-height: 46px;
+  padding: 11px 15px;
+  background: #fff;
+  color: #162c4a;
+  border: 1px solid #c1d1e5;
+  border-radius: 12px;
+  font: inherit;
+  min-width: 0;
+  max-width: 100%;
+}
+.pd-saved-position {
+  padding: 20px;
+  border: 1px solid #dce5f1;
+  border-radius: 16px;
+  background: #fff;
+}
+.pd-saved-position span {
+  font-size: 14px;
+  color: #566b84;
+}
+.ph-coverage {
+  background: #0b1c32;
+  color: #e5f0ff;
+  padding: 22px 25px;
+  border-radius: 20px;
+}
+.ph-coverage > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.ph-status-dot {
+  background: #62a8ff;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #3393ff80;
+}
+.ph-coverage p {
+  color: #a7c2df;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 10px 0 0;
+}
+.ph-warning {
+  margin: 0;
+  background: #fff4e5;
+  border: 1px solid #eace9d;
+  color: #754b18;
+  padding: 18px;
+  border-radius: 14px;
+}
+.ph-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.ph-metrics > div {
+  border: 1px solid #dce5f1;
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  display: grid;
+  gap: 14px;
+}
+.ph-metrics span {
+  color: #5a6d83;
+  font-size: 14px;
+}
+.ph-metrics strong {
+  font-size: clamp(23px, 2.5vw, 32px);
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.ph-metrics small {
+  font-size: 14px;
+  color: #6b7d93;
+}
+.ph-feed,
+.ph-stock-receipts,
+.ph-import,
+.ph-pilot-guide {
+  background: #fff;
+  border: 1px solid #dce5f1;
+  border-radius: 22px;
+  overflow: hidden;
+}
+.ph-feed > header {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e4eaf3;
+}
+.earn .ph-feed h2,
+.earn .ph-stock-receipts h2 {
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+.ph-feed > header p,
+.ph-stock-receipts > p {
+  margin: 8px 0 0;
+  color: #5a6d83;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.ph-export {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #1561ca;
+}
+.ph-transactions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ph-transactions > li {
+  display: flex;
+  align-items: start;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid #e4eaf3;
+}
+.ph-transaction-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid #d8e7fc;
+  border-radius: 13px;
+  background: #f2f7ff;
+  color: #1969d3;
+}
+.ph-transaction-main {
+  min-width: 0;
+  flex: 1;
+}
+.ph-transaction-title {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.earn .ph-transaction-title h3 {
+  font-size: 17px;
+  margin: 0;
+}
+.ph-state {
+  font-size: 13px;
+  border-radius: 99px;
+  padding: 5px 10px;
+  background: #fff5df;
+  color: #896010;
+  text-transform: capitalize;
+}
+.ph-state[data-state='confirmed'] {
+  background: #e8f6ef;
+  color: #25714f;
+}
+.ph-state[data-state='reverted'],
+.ph-state[data-state='replaced'] {
+  background: #f0f2f6;
+  color: #5b6c82;
+}
+.ph-date {
+  font-size: 13px;
+  color: #6c7c91;
+  margin: 7px 0 13px;
+}
+.ph-event {
+  font-size: 16px;
+  line-height: 1.65;
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+.ph-transactions details {
+  margin-top: 15px;
+  font-size: 14px;
+}
+.ph-transactions summary {
+  cursor: pointer;
+  color: #2367b9;
+}
+.ph-transactions dl {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+.ph-transactions dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.ph-transactions dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ph-transactions a {
+  color: #145dc0;
+}
+.ph-transactions details p,
+.ph-footnote {
+  font-size: 14px;
+  color: #61748b;
+  line-height: 1.7;
+}
+.ph-no-activity {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 44px 24px;
+  color: #667c96;
+}
+.ph-no-activity h3,
+.ph-no-activity p {
+  margin: 0;
+  max-width: 480px;
+}
+.ph-pagination {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  font-size: 14px;
+}
+.ph-pagination button {
+  background: #f5f8fc;
+  color: #245c9d;
+  border: 1px solid #d5e2f2;
+  border-radius: 99px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+.ph-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ph-stock-receipts {
+  padding: 24px;
+}
+.ph-stock-receipts dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 0;
+}
+.ph-stock-receipts dl > div {
+  border: 1px solid #dce6f2;
+  border-radius: 14px;
+  padding: 15px 20px;
+  display: grid;
+  gap: 9px;
+}
+.ph-stock-receipts dt {
+  color: #2364b5;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ph-stock-receipts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+}
+.ph-stock-receipts small {
+  color: #6b7d93;
+  font-size: 13px;
+}
+.ph-import,
+.ph-pilot-guide {
+  padding: 24px;
+}
+.ph-import > summary,
+.ph-pilot-guide > summary {
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 550;
+}
+.ph-import p,
+.ph-pilot-guide p,
+.ph-pilot-guide li {
+  line-height: 1.7;
+  font-size: 16px;
+  color: #506783;
+}
+.ph-import form {
+  display: grid;
+  gap: 18px;
+}
+.ph-import .dashboard-button {
+  justify-self: start;
+}
+.ph-pilot-guide ol {
+  padding-left: 24px;
+  display: grid;
+  gap: 15px;
+  margin: 24px 0;
+}
+.ph-pilot-guide strong {
+  color: #153f6e;
+}
+.portfolio-history :is(input, select, button, a, summary):focus-visible {
+  outline: 3px solid #327bf0;
+  outline-offset: 4px;
+}
+@media (max-width: 900px) {
+  .ph-metrics {
+    grid-template-columns: 1fr;
+  }
+  .ph-metrics > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+}
+@media (max-width: 600px) {
+  .ph-toolbar,
+  .ph-toolbar label {
+    width: 100%;
+  }
+  .ph-toolbar .dashboard-button {
+    width: 100%;
+  }
+  .ph-transactions > li {
+    padding: 20px 16px;
+    gap: 10px;
+  }
+  .ph-transaction-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+  .ph-transactions dl > div {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .ph-coverage,
+  .ph-import,
+  .ph-pilot-guide,
+  .ph-feed > header,
+  .ph-stock-receipts {
+    padding: 20px;
+  }
+}

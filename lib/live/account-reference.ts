@@ -53,7 +53,7 @@ export function forgetAccountReference(
 
 export type AccountReferenceCandidate = {
   deployment: string;
-  source: "journal" | "url" | "saved";
+  source: "journal" | "url" | "saved" | "cloud";
 };
 export function accountRestoreCandidate(
   journalDeployment: string | null | undefined,
@@ -63,6 +63,20 @@ export function accountRestoreCandidate(
   if (journalDeployment) return { deployment: journalDeployment, source: "journal" };
   if (urlDeployment) return { deployment: urlDeployment, source: "url" };
   return savedDeployment ? { deployment: savedDeployment, source: "saved" } : null;
+}
+export function cloudRestoreCandidate(
+  owner: string,
+  references: { wallet: string; chainId: number; deployment: string }[],
+  hasPriorityReference: boolean,
+): AccountReferenceCandidate | null {
+  if (hasPriorityReference) return null;
+  const matches = references.filter(
+    (r) =>
+      r.chainId === 4663 &&
+      r.wallet.toLowerCase() === owner.toLowerCase() &&
+      HASH.test(r.deployment),
+  );
+  return matches.length === 1 ? { deployment: matches[0].deployment, source: "cloud" } : null;
 }
 export function rejectedUrlAccountFallback(
   owner: string,

@@ -97,6 +97,30 @@ export default function Page() {
                 transaction because vault shares already accumulate underlying returns.
               </p>
             </section>
+            <section id="portfolio-history">
+              <h2>Follow what actually happened.</h2>
+              <p>
+                <Link href="/dashboard?view=activity">Portfolio Activity</Link>{' '}
+                keeps verified positions and transaction records with your
+                signed-in profile. Return with the same wallet to see saved
+                deposits, withdrawals, reserved gains and stock purchases.
+                Purchases show the tokens actually received, rather than the
+                earlier quote.
+              </p>
+              <p>
+                Use Sync from chain to import older account events, or import a
+                transaction hash when an approval or failed transaction is
+                missing. The coverage indicator tells you whether more history
+                remains. Page totals describe the listed transactions; they are
+                not your current wallet holdings, total interest or profit.
+              </p>
+              <p>
+                The first live run guide walks through a deposit, a decision
+                about available gains, and a withdrawal. Each action still needs
+                your wallet approval. Saving activity and connecting your wallet
+                never move funds.
+              </p>
+            </section>
             <section id="strategies">
               <span className="earn-eyebrow">02 / THE SOURCES</span>
               <h2>“Earn” can mean different things.</h2>

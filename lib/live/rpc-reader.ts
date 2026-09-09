@@ -10,6 +10,7 @@ const READ_METHODS = new Set([
   "eth_getTransactionByHash",
   "eth_getTransactionReceipt",
   "eth_getTransactionCount",
+  "eth_getLogs",
 ]);
 const TRANSIENT_HTTP = new Set([408, 429, 500, 502, 503, 504]);
 export type RpcDiagnostic = {

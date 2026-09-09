@@ -13,6 +13,7 @@ import {
   BookOpen,
   ChevronRight,
   ScanLine,
+  History,
 } from "lucide-react";
 import { readJournal, JOURNAL_EVENT } from "../../lib/live/wallet-journal";
 import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
@@ -23,6 +24,7 @@ import { StockLendingMarkets } from "../stock-lending-markets";
 import { MarketDirectory } from "../market-directory";
 import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
 import { AgenticLending } from "./agentic-lending";
+import { PortfolioHistory } from "./portfolio-history";
 import {
   type AgentIntent,
   type PilotReadState,
@@ -63,17 +65,22 @@ const format = (v: string, decimals = 6) => {
     maximumFractionDigits: decimals === 18 ? 6 : 4,
   }).format(n);
 };
-type DashboardView = "overview" | "position" | "agentic" | "markets" | "advanced";
+type DashboardView = "overview" | "position" | "agentic" | "activity" | "markets" | "advanced";
 const dashboardSections = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "position", label: "Your position", icon: Wallet },
   { id: "agentic", label: "Agentic Lending", icon: ScanLine },
+  { id: "activity", label: "Activity", icon: History },
   { id: "markets", label: "Market explorer", icon: Layers3 },
   { id: "advanced", label: "Advanced tools", icon: SlidersHorizontal },
 ] as const;
 const dashboardCopy: Record<DashboardView, { title: string; description: string }> = {
   overview: { title: "Overview", description: "Your wallet, lending position and next step." },
   position: { title: "Your position", description: "Manage your USDG lending account." },
+  activity: {
+    title: "Portfolio activity",
+    description: "Your saved positions and verified transaction history.",
+  },
   agentic: {
     title: "Agentic Lending",
     description: "Your lending plan. A reason for every next move.",
@@ -252,8 +259,10 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     // Connecting opens the position; a URL receipt alone must not lock navigation after recovery.
     // oxlint-disable-next-line react/react-compiler -- Synchronize navigation with a newly connected wallet.
     setView(
-      new URLSearchParams(window.location.search).get("view") === "agentic"
-        ? "agentic"
+      ["agentic", "activity"].includes(
+        new URLSearchParams(window.location.search).get("view") ?? "",
+      )
+        ? (new URLSearchParams(window.location.search).get("view") as DashboardView)
         : "position",
     );
     inspect();
@@ -555,6 +564,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               onReadState={setPilotState}
               agentIntent={agentIntent}
               onAgentIntentHandled={intentHandled}
+              onActivity={()=>navigate("activity")}
             />
           )}
         </div>
@@ -586,6 +596,15 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           />
         </div>
 
+        {currentView === "activity" && (
+          <PortfolioHistory
+            key={pilotScope}
+            owner={connected}
+            position={activePilot?.account ?? null}
+            onConnect={requestConnect}
+            onPosition={() => navigate("position")}
+          />
+        )}
         {currentView === "markets" && (
           <section
             className="dashboard-markets dashboard-view"

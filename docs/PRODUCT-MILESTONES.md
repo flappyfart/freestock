@@ -9,7 +9,7 @@ Updated 9 September 2026 UTC. This is a delivery and validation plan, not a clai
 - Demo conversions still use an amount threshold and fixed illustrative prices, excluding conversion costs. Full reinvestment does not automatically buy stocks from a prior pending balance. Existing saved-state and idempotency formats are preserved.
 - Live account review shows position value, principal baseline, available surplus, rounding reserve and a recovery shortfall when below the baseline. Direct transfers count as surplus, so this is not an interest-provenance ledger.
 - Purchase review shows estimated and minimum stock receipts, included pool fee and separate ETH gas estimate. The displayed pool fee and quote/minimum relationship are validated against the reviewed transaction. Existing owner-only permissions are unchanged.
-- Confirmed purchases show actual received tokens, amount spent, block/time, an explorer link and a downloadable receipt. The latest receipt is session-only; the chain retains the transaction record.
+- Confirmed purchases show actual received tokens, amount spent, block/time, an explorer link and a downloadable receipt. Portfolio Activity saves user-scoped positions and chain-reconciled records, with bounded historical import and page exports.
 - Learn and Docs explain the delivered behavior and its limits. The dated [competitor comparison](COMPETITOR-EVIDENCE.md) and [validation kit](USER-VALIDATION-KIT.md) are ready for planning. No participants have been contacted.
 
 ## Next: validate the narrow customer need
@@ -24,7 +24,7 @@ Measure whether participants understand the distinction between deposited capita
 
 The owner completes an explicitly approved deposit, gain conversion or gain reservation, and withdrawal, with receipts reconciled to the account. Builder-run local-fork tests are not evidence of this funded production lifecycle. Use current quotes and actual ETH fees; no background job or agent may move funds without separate user authorization.
 
-Build a persistent, chain-reconciled conversion history before describing an earnings ledger. Attribute received stocks to confirmed account events, not the wallet's entire holdings. Support pending, replaced, reverted and reorganized transactions without duplicate spending.
+Persistent, chain-reconciled transaction history is implemented, including pending, replaced, reverted and reorganized transactions. Stock receipts are attributed to account events, not the wallet's entire holdings. This does not establish a lifetime earnings ledger: direct transfers are outside the event scan and totals cover the displayed page. Validate the owner-approved funded lifecycle next.
 
 ## After validation: bounded automation
 

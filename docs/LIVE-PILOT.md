@@ -73,3 +73,11 @@ Additional selected-token Final Terms: [AAPL](https://cdn.robinhood.com/assets/r
 `contracts/test/current-mainnet-readiness.json` records the fresh check. On 2026-09-09 at 00:40:27 UTC, 65 read-only RPC checks completed without error at block 58,125,772. Vault runtime matched the pinned dependency, the 100 USDG deposit preview remained positive, and all five selected fee-500 stock pools returned positive 1 and 100 USDG quotes. The issuer registry still listed all five tokens as active. This check submitted no public transactions and is not proof of future liquidity. The Apple multiplier was 1.000566080061092436, so quantities are labeled tokens rather than underlying shares.
 
 The deployed environment still uses the official public RPC fallback; dedicated production capacity is not configured. General registration, unattended conversion, staking and leveraged LP execution remain outside this private wallet pilot.
+
+## Portfolio history update — 2026-09-09
+
+Dashboard Activity now saves verified position references and transaction records to the signed-in profile. A saved reference is freshly verified against the connected owner and chain before use. Pending request journals remain device-local; server history does not grant transaction authority or provide a cross-device signing lock.
+
+Bounded imports reconcile account events with canonical receipts and checkpoints. Imports can resume after partial scans or chain reorganizations. Nonce-linked replacements retain their actual outcomes without counting earlier requests twice. Approvals, failed requests and replacements may need a transaction hash imported separately; direct transfers are outside the account-event scan. Totals and exports cover the displayed page, not lifetime interest or current holdings. Storage failures do not turn a confirmed financial transaction into a failed one and should be retried through Activity.
+
+The first-live-run guide prepares an owner-approved deposit, a decision about actual available gains, and a withdrawal. This update does not prove a real-money lifecycle or enable background execution. The history tests use controlled RPC fixtures and an in-memory SQLite database.

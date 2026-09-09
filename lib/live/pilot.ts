@@ -91,7 +91,13 @@ export async function verifiedAccount(ownerInput: string, deploymentInput: strin
     BigInt(String(values[4][0])) !== DEPOSIT_LIMIT
   )
     throw new LiveError("The account ownership or fixed configuration does not match.", 422);
-  return { owner, account, deployment };
+  return {
+    owner,
+    account,
+    deployment,
+    deploymentBlock: Number(hex(receipt.blockNumber)),
+    deploymentBlockHash: String(receipt.blockHash),
+  };
 }
 async function balances(owner: string, account: string, block: string) {
   const [principal, value, gains, usd, stock, allowance, stocks, header] = await Promise.all([

@@ -498,6 +498,43 @@ export default function Page() {
             </section>
             <section id="storage">
               <h2>Saved state and transparent records</h2>
+              <h3>Live portfolio activity</h3>
+              <p>
+                <Link href="/dashboard?view=activity">Dashboard Activity</Link>{' '}
+                saves verified live positions and transaction records to your
+                signed-in profile. Connect the same wallet to restore a saved
+                position on another device. Each position is checked against the
+                chain again; a saved reference does not authorize a transaction
+                or prove a balance.
+              </p>
+              <p>
+                Sync from chain imports account events in bounded batches from
+                the account’s creation. Continue importing until the coverage
+                indicator reaches the checked block. Deposits, withdrawals,
+                reserved gains and stock purchases come from account events.
+                Older approvals, failed transactions and replacements may need
+                their transaction hashes imported separately. Direct transfers
+                are not included in this event history.
+              </p>
+              <p>
+                Records use transaction hashes and event indexes to avoid
+                duplicate amounts. Sync checks canonical block hashes and
+                rechecks affected history after a chain reversal. Confirmed does
+                not mean irreversible. During an interrupted import or provider
+                outage, saved records can be incomplete or stale; use the
+                displayed coverage and status.
+              </p>
+              <p>
+                Totals and JSON exports cover the current page of up to 50
+                transactions. Stock receipts show tokens acquired through this
+                account, not current holdings or lifetime profit. The displayed
+                execution fee uses gas consumed times effective gas price; other
+                chain fee components may be separate. A failed history save
+                should be retried through Activity, not by sending the financial
+                transaction again. Pending wallet recovery remains device-local
+                and does not create a cross-device signing lock.
+              </p>
+              <h3>Simulated records</h3>
               <p>
                 Simulated positions, allocation rules, simulated holdings and activity are saved to
                 your signed-in account on the server. Duplicate retries reuse the original request
@@ -562,8 +599,8 @@ export default function Page() {
               </p>
               <p>
                 A confirmed conversion shows actual tokens received, USDG spent, block and time,
-                with an explorer link and a downloadable JSON receipt. Only the latest confirmation
-                is displayed during that session; this is not a persistent receipt history. Wallet
+                with an explorer link and a downloadable JSON receipt. Saved records are available
+                in Dashboard Activity, with sync and transaction import for older records. Wallet
                 holdings include tokens acquired elsewhere. Refreshed position balances are current
                 reads, not a reconstruction of balances at the receipt block.
               </p>
