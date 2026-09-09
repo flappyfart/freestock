@@ -101,8 +101,9 @@ export default function Page() {
                     <tr>
                       <td>Dashboard</td>
                       <td>
-                        Live balances, participant status, account recovery, transaction review and
-                        read-only refresh while the page is visible
+                        Sidebar navigation for Overview, Your position, Market explorer and Advanced
+                        tools; live balances, recovery and wallet-approved transaction review stay
+                        together
                       </td>
                     </tr>
                     <tr>

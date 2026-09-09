@@ -7,7 +7,7 @@ Private USDG lending and Stock Token wallet pilot with a simulation modal for ex
 ## Working routes
 
 - `/`: Home, with Connect Wallet leading to Dashboard and “Try it yourself” opening the simulation modal.
-- `/dashboard`: create and manage live positions, with actual chain balances, participant status, account recovery and reviewed wallet transactions. Read-only checks request no signatures; transactions open the wallet only after explicit review.
+- `/dashboard`: a sidebar workspace for Overview, Your position, Market explorer and Advanced tools. Actual chain balances, participant status, recovery and wallet transaction reviews stay together. Read-only market and quote checks request no signatures; transactions open the wallet only after explicit review.
 - `/learn`: plain-English concepts, earnings sources, compounding, timing, leverage and stock-token exposure.
 - `/docs`: current capability matrix, exact model mechanics, sources, saved records and execution boundaries.
 - `/live`: compatibility redirect to `/dashboard`; not a separate Wallet page.
