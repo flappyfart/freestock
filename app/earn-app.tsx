@@ -564,7 +564,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   <h2>Build a position</h2>
                   <span className="earn-pill">Simulation</span>
                 </div>
-                <div className="earn-segment">
+                <fieldset className="earn-segment" aria-label="Position type" data-kind={kind}>
                   <button
                     type="button"
                     aria-pressed={kind === "lend"}
@@ -575,7 +575,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   <button type="button" aria-pressed={kind === "lp"} onClick={() => setKind("lp")}>
                     Leveraged LP model
                   </button>
-                </div>
+                </fieldset>
                 {kind === "lend" ? (
                   <div className="selected-vault">
                     <div>
