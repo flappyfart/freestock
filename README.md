@@ -16,7 +16,7 @@ Freestock brings USDG lending, stock selections, rule-based lending recommendati
 2. **Deposit USDG.** An exact approval and a separate deposit put USDG into the configured Steakhouse vault. You hold the account's ownership; the backend does not hold your keys.
 3. **Choose where gains go.** Select a stock or basket, or retain gains. Your deposited principal has a separate accounting baseline. The simulation also lets you explore a split between stocks and reinvestment.
 4. **Review a recommendation.** Agentic Lending checks the available surplus, your conversion minimum, stock allocation and estimated ETH gas budget. It explains whether to wait, retain gains or review a purchase.
-5. **Approve and track.** Review a fresh quote in your wallet. Confirmed stock purchases send tokens to your wallet. Portfolio Activity reconciles receipts with chain state and supports saved positions and exports.
+5. **Approve and track.** Review a fresh quote in Freestock, then approve the transaction in your wallet. Confirmed stock purchases send tokens to your wallet. Portfolio Activity reconciles receipts with chain state and supports saved positions and exports.
 
 ## What is available
 
