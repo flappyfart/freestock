@@ -1,11 +1,18 @@
-"use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { formatUnits, parseUnits } from "ethers";
-import { ArrowUpRight, Check, Pause, Play, RefreshCw, ScanLine } from "lucide-react";
-import { ENABLED_STOCKS } from "../../lib/live/basket";
-import { readJournal } from "../../lib/live/wallet-journal";
-import type { Prepared } from "../../lib/live/wallet-transaction";
+'use client';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { formatUnits, parseUnits } from 'ethers';
+import {
+  ArrowUpRight,
+  Check,
+  Pause,
+  Play,
+  RefreshCw,
+  ScanLine,
+} from 'lucide-react';
+import { ENABLED_STOCKS } from '../../lib/live/basket';
+import { readJournal } from '../../lib/live/wallet-journal';
+import type { Prepared } from '../../lib/live/wallet-transaction';
 import {
   defaultAgentPlan,
   agentPurchaseAmount,
@@ -16,8 +23,8 @@ import {
   type AgentQuote,
   type AgentIntent,
   type PilotReadState,
-} from "../../lib/live/agentic-lending";
-import "./agentic-lending.css";
+} from '../../lib/live/agentic-lending';
+import './agentic-lending.css';
 
 type Props = {
   scope: string;
@@ -41,32 +48,40 @@ export function AgenticLending({
   onPosition,
   onReview,
 }: Props) {
-  const [plan, setPlan] = useState<AgentPlan>(() => structuredClone(defaultAgentPlan));
-  const [minimum, setMinimum] = useState("1"),
-    [gas, setGas] = useState("0.00005");
+  const [plan, setPlan] = useState<AgentPlan>(() =>
+    structuredClone(defaultAgentPlan),
+  );
+  const [minimum, setMinimum] = useState('1'),
+    [gas, setGas] = useState('0.00005');
   const [quote, setQuote] = useState<AgentQuote | null>(null);
   const [now, setNow] = useState(0),
     [working, setWorking] = useState(false);
-  const [message, setMessage] = useState(""),
-    [error, setError] = useState("");
-  const [history, setHistory] = useState<{ at: string; title: string; reason: string }[]>([]);
+  const [message, setMessage] = useState(''),
+    [error, setError] = useState('');
+  const [history, setHistory] = useState<
+    { at: string; title: string; reason: string }[]
+  >([]);
   const request = useRef<AbortController | null>(null);
-  const lastDecision = useRef("");
-  const storageKey = `freestock:agentic-plan:4663:${owner?.toLowerCase() ?? "preview"}`;
+  const lastDecision = useRef('');
+  const storageKey = `freestock:agentic-plan:4663:${owner?.toLowerCase() ?? 'preview'}`;
   const account = correctNetwork ? (readState?.account ?? null) : null;
   let currentPlan = plan,
-    formError = "";
+    formError = '';
   try {
     currentPlan = validateAgentPlan({
       ...plan,
       minimumGains:
-        plan.destination === "retain" ? plan.minimumGains : parseUnits(minimum, 6).toString(),
+        plan.destination === 'retain'
+          ? plan.minimumGains
+          : parseUnits(minimum, 6).toString(),
       maximumGasWei:
-        plan.destination === "retain" ? plan.maximumGasWei : parseUnits(gas, 18).toString(),
+        plan.destination === 'retain'
+          ? plan.maximumGasWei
+          : parseUnits(gas, 18).toString(),
     });
   } catch {
     formError =
-      "Choose stock weights totaling 100%, a positive USDG minimum up to 100, and a positive ETH gas limit up to 1.";
+      'Choose stock weights totaling 100%, a positive USDG minimum, and a positive ETH gas limit up to 1.';
   }
   const fingerprint = formError
     ? JSON.stringify([plan, minimum, gas])
@@ -98,7 +113,9 @@ export function AgenticLending({
         setMinimum(formatUnits(value.minimumGains, 6));
         setGas(formatUnits(value.maximumGasWei, 18));
       } catch {
-        setMessage("Saved settings could not be loaded. Review this new plan before using it.");
+        setMessage(
+          'Saved settings could not be loaded. Review this new plan before using it.',
+        );
       }
     };
     // oxlint-disable-next-line react/react-compiler -- Restore externally persisted preferences when the wallet storage scope changes.
@@ -106,10 +123,10 @@ export function AgenticLending({
     const sync = (event: StorageEvent) => {
       if (event.key === storageKey || event.key === null) restore();
     };
-    window.addEventListener("storage", sync);
+    window.addEventListener('storage', sync);
     return () => {
       request.current?.abort();
-      window.removeEventListener("storage", sync);
+      window.removeEventListener('storage', sync);
     };
   }, [storageKey]);
   useEffect(() => {
@@ -125,10 +142,10 @@ export function AgenticLending({
     // oxlint-disable-next-line react/react-compiler -- Invalidate external quotes immediately when the plan or active view changes.
     setQuote(null);
     setWorking(false);
-    setError("");
+    setError('');
   }, [fingerprint, active]);
   const decision = evaluateLending({
-    owner: owner ?? "",
+    owner: owner ?? '',
     account,
     plan: currentPlan,
     blocked: readState?.blocked,
@@ -141,55 +158,79 @@ export function AgenticLending({
       !active ||
       !account ||
       formError ||
-      decision.code === "busy" ||
+      decision.code === 'busy' ||
       decision.code === lastDecision.current
     )
       return;
     lastDecision.current = decision.code;
     setHistory((rows) =>
       [
-        { at: new Date().toISOString(), title: decision.title, reason: decision.reason },
+        {
+          at: new Date().toISOString(),
+          title: decision.title,
+          reason: decision.reason,
+        },
         ...rows,
       ].slice(0, 12),
     );
-  }, [active, account, formError, decision.code, decision.title, decision.reason]);
+  }, [
+    active,
+    account,
+    formError,
+    decision.code,
+    decision.title,
+    decision.reason,
+  ]);
   function savePlan(value = currentPlan) {
     try {
       const valid = validateAgentPlan(value);
       window.localStorage.setItem(storageKey, JSON.stringify(valid));
-      setMessage("Plan saved on this browser. This grants no permission to move funds.");
-      setError("");
+      setMessage(
+        'Plan saved on this browser. This grants no permission to move funds.',
+      );
+      setError('');
     } catch {
-      setError("The plan could not be saved. Check the settings and browser storage access.");
+      setError(
+        'The plan could not be saved. Check the settings and browser storage access.',
+      );
     }
   }
   async function checkCost() {
-    if (!account || !owner || formError || !decision.canQuote || !enabled || request.current)
+    if (
+      !account ||
+      !owner ||
+      formError ||
+      !decision.canQuote ||
+      !enabled ||
+      request.current
+    )
       return;
     const controller = new AbortController(),
       captured = fingerprint,
       observedAccount = account.account;
     try {
-      if (readJournal(owner)) throw Error("Resolve the pending wallet action first.");
+      if (readJournal(owner))
+        throw Error('Resolve the pending wallet action first.');
       request.current = controller;
       setWorking(true);
-      setError("");
+      setError('');
       setQuote(null);
       const query = new URLSearchParams({
         owner,
         deployment: account.deployment,
-        action: "harvest",
+        action: 'harvest',
         amount: formatUnits(agentPurchaseAmount(account), 6),
         allocations: JSON.stringify(currentPlan.allocations),
       });
       const response = await fetch(`/api/live/pilot/prepare?${query}`, {
-        cache: "no-store",
+        cache: 'no-store',
         signal: controller.signal,
       });
       const prepared = (await response.json()) as Prepared & { error?: string };
       if (!response.ok)
         throw Error(
-          prepared.error ?? "The purchase could not be estimated. No action has been taken.",
+          prepared.error ??
+            'The purchase could not be estimated. No action has been taken.',
         );
       if (
         controller.signal.aborted ||
@@ -202,13 +243,15 @@ export function AgenticLending({
         return;
       if (readJournal(owner))
         throw Error(
-          "A wallet action started elsewhere. Resolve it before checking this plan again.",
+          'A wallet action started elsewhere. Resolve it before checking this plan again.',
         );
       setQuote({ prepared, fingerprint: captured });
       setNow(Date.now());
     } catch (e) {
       if (!controller.signal.aborted)
-        setError(e instanceof Error ? e.message : "The cost check is unavailable.");
+        setError(
+          e instanceof Error ? e.message : 'The cost check is unavailable.',
+        );
     } finally {
       if (request.current === controller) {
         request.current = null;
@@ -219,7 +262,8 @@ export function AgenticLending({
   function review() {
     if (!account || !owner || !quote || formError) return;
     try {
-      if (readJournal(owner)) throw Error("Resolve the pending wallet action first.");
+      if (readJournal(owner))
+        throw Error('Resolve the pending wallet action first.');
       const freshDecision = evaluateLending({
         owner,
         account,
@@ -241,11 +285,14 @@ export function AgenticLending({
         expiresAt: quote.prepared.expiresAt,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Refresh this recommendation.");
+      setError(e instanceof Error ? e.message : 'Refresh this recommendation.');
     }
   }
   return (
-    <section className="agentic-workspace" aria-label="Agentic Lending recommendations">
+    <section
+      className="agentic-workspace"
+      aria-label="Agentic Lending recommendations"
+    >
       <div className="agentic-mode">
         <span>
           <ScanLine size={17} /> Recommendation mode
@@ -276,10 +323,11 @@ export function AgenticLending({
               onChange={(e) =>
                 setPlan({
                   ...plan,
-                  destination: e.target.value as AgentPlan["destination"],
+                  destination: e.target.value as AgentPlan['destination'],
                   allocations:
-                    e.target.value === "retain" &&
-                    plan.allocations.reduce((n, a) => n + a.weightBps, 0) !== 10000
+                    e.target.value === 'retain' &&
+                    plan.allocations.reduce((n, a) => n + a.weightBps, 0) !==
+                      10000
                       ? defaultAgentPlan.allocations
                       : plan.allocations,
                 })
@@ -289,7 +337,7 @@ export function AgenticLending({
               <option value="retain">Keep gains invested</option>
             </select>
           </label>
-          {plan.destination === "stocks" && (
+          {plan.destination === 'stocks' && (
             <>
               <fieldset className="agentic-weights">
                 <legend>Stock purchase allocation</legend>
@@ -303,8 +351,8 @@ export function AgenticLending({
                       step="1"
                       aria-label={`${stock.symbol} allocation percent`}
                       value={
-                        (plan.allocations.find((a) => a.symbol === stock.symbol)?.weightBps ?? 0) /
-                        100
+                        (plan.allocations.find((a) => a.symbol === stock.symbol)
+                          ?.weightBps ?? 0) / 100
                       }
                       onChange={(e) => {
                         const bps = Number(e.target.value) * 100;
@@ -314,9 +362,12 @@ export function AgenticLending({
                             const weight =
                               s.symbol === stock.symbol
                                 ? bps
-                                : (plan.allocations.find((a) => a.symbol === s.symbol)?.weightBps ??
-                                  0);
-                            return weight > 0 ? [{ symbol: s.symbol, weightBps: weight }] : [];
+                                : (plan.allocations.find(
+                                    (a) => a.symbol === s.symbol,
+                                  )?.weightBps ?? 0);
+                            return weight > 0
+                              ? [{ symbol: s.symbol, weightBps: weight }]
+                              : [];
                           }),
                         });
                       }}
@@ -325,8 +376,9 @@ export function AgenticLending({
                   </label>
                 ))}
                 <p>
-                  Total {plan.allocations.reduce((n, a) => n + a.weightBps, 0) / 100}% · must equal
-                  100%
+                  Total{' '}
+                  {plan.allocations.reduce((n, a) => n + a.weightBps, 0) / 100}%
+                  · must equal 100%
                 </p>
               </fieldset>
               <label>
@@ -334,7 +386,6 @@ export function AgenticLending({
                 <input
                   type="number"
                   min="0.000001"
-                  max="100"
                   step="0.000001"
                   required
                   value={minimum}
@@ -354,15 +405,17 @@ export function AgenticLending({
                 />
               </label>
               <p className="agentic-note">
-                This limits the ETH gas estimate used for advice. Pool fees are included in stock
-                quotes. An all-in cost percentage in USDG is not calculated.
+                This limits the ETH gas estimate used for advice. Pool fees are
+                included in stock quotes. An all-in cost percentage in USDG is
+                not calculated.
               </p>
             </>
           )}
-          {plan.destination === "retain" && (
+          {plan.destination === 'retain' && (
             <p className="agentic-note">
-              Vault shares already accumulate returns. This plan recommends holding them; it does
-              not raise your principal baseline or create another source of yield.
+              Vault shares already accumulate returns. This plan recommends
+              holding them; it does not raise your principal baseline or create
+              another source of yield.
             </p>
           )}
           {formError && (
@@ -370,7 +423,11 @@ export function AgenticLending({
               {formError}
             </p>
           )}
-          <button className="dashboard-button" disabled={!!formError} type="submit">
+          <button
+            className="dashboard-button"
+            disabled={!!formError}
+            type="submit"
+          >
             <Check size={16} /> Save plan
           </button>
           <button
@@ -384,7 +441,7 @@ export function AgenticLending({
             }}
           >
             {plan.paused ? <Play size={15} /> : <Pause size={15} />}
-            {plan.paused ? "Resume recommendations" : "Pause recommendations"}
+            {plan.paused ? 'Resume recommendations' : 'Pause recommendations'}
           </button>
           {message && <output className="agentic-note">{message}</output>}
         </form>
@@ -399,20 +456,20 @@ export function AgenticLending({
             </span>
             <h2>
               {!owner
-                ? "Connect your lending wallet"
+                ? 'Connect your lending wallet'
                 : !correctNetwork
-                  ? "Use Robinhood Chain"
+                  ? 'Use Robinhood Chain'
                   : formError
-                    ? "Complete your lending plan"
+                    ? 'Complete your lending plan'
                     : decision.title}
             </h2>
             <p>
               {!owner
-                ? "Set your plan here, then connect to check it against your actual position."
+                ? 'Set your plan here, then connect to check it against your actual position.'
                 : !correctNetwork
-                  ? "Open Your position to switch to Robinhood Chain and load your account."
+                  ? 'Open Your position to switch to Robinhood Chain and load your account.'
                   : formError
-                    ? "Set valid amounts and a stock allocation totaling 100%."
+                    ? 'Set valid amounts and a stock allocation totaling 100%.'
                     : decision.reason}
             </p>
             <div className="agentic-decision-actions">
@@ -422,7 +479,7 @@ export function AgenticLending({
                 </button>
               ) : !correctNetwork ||
                 !account ||
-                ["setup", "stale", "busy"].includes(decision.code) ? (
+                ['setup', 'stale', 'busy'].includes(decision.code) ? (
                 <button className="dashboard-button" onClick={onPosition}>
                   Open your position <ArrowUpRight size={16} />
                 </button>
@@ -432,11 +489,15 @@ export function AgenticLending({
                   onClick={() => void checkCost()}
                   disabled={working || !enabled}
                 >
-                  {working ? "Checking quote and gas…" : "Check quote & gas"}
+                  {working ? 'Checking quote and gas…' : 'Check quote & gas'}
                   <RefreshCw size={16} />
                 </button>
               ) : decision.canReview && !formError ? (
-                <button className="dashboard-button" onClick={review} disabled={!enabled}>
+                <button
+                  className="dashboard-button"
+                  onClick={review}
+                  disabled={!enabled}
+                >
                   Review purchase <ArrowUpRight size={16} />
                 </button>
               ) : null}
@@ -445,7 +506,7 @@ export function AgenticLending({
                   className="agentic-text-button"
                   onClick={() => {
                     setQuote(null);
-                    setError("");
+                    setError('');
                   }}
                 >
                   Check again
@@ -454,7 +515,9 @@ export function AgenticLending({
             </div>
             {!!owner && !enabled && (
               <p className="agentic-note">
-                Sign in to review live transaction estimates and stock purchases. Purchase checks are capped at 100 USDG per action.
+                Connect your wallet to review live transaction estimates and
+                stock purchases. Each purchase must fit your available gains and
+                pass a fresh liquidity check.
               </p>
             )}
             {error && (
@@ -469,17 +532,23 @@ export function AgenticLending({
               <div>
                 <dt>Position value</dt>
                 <dd>
-                  {account ? `${formatUnits(account.assetValue, 6)} USDG` : "Awaiting position"}
+                  {account
+                    ? `${formatUnits(account.assetValue, 6)} USDG`
+                    : 'Awaiting position'}
                 </dd>
               </div>
               <div>
                 <dt>Principal baseline</dt>
-                <dd>{account ? `${formatUnits(account.principal, 6)} USDG` : "—"}</dd>
+                <dd>
+                  {account ? `${formatUnits(account.principal, 6)} USDG` : '—'}
+                </dd>
               </div>
               <div>
                 <dt>Available after rounding reserve</dt>
                 <dd>
-                  {account ? `${formatUnits(account.spendableWithRoundingBuffer, 6)} USDG` : "—"}
+                  {account
+                    ? `${formatUnits(account.spendableWithRoundingBuffer, 6)} USDG`
+                    : '—'}
                 </dd>
               </div>
               <div>
@@ -487,7 +556,7 @@ export function AgenticLending({
                 <dd>
                   {quote
                     ? `${formatUnits(quote.prepared.estimatedGasCostWei, 18)} ETH`
-                    : "Needs a fresh quote"}
+                    : 'Needs a fresh quote'}
                 </dd>
               </div>
             </dl>
@@ -495,20 +564,21 @@ export function AgenticLending({
               <div className="agentic-quote" key={p.symbol}>
                 <strong>{p.symbol}</strong>
                 <span>
-                  {formatUnits(p.amountIn, 6)} USDG → estimated {formatUnits(p.amountOut, 18)}{" "}
-                  tokens
+                  {formatUnits(p.amountIn, 6)} USDG → estimated{' '}
+                  {formatUnits(p.amountOut, 18)} tokens
                 </span>
                 <small>
-                  Minimum {formatUnits(p.minimumOut, 18)} · {p.fee / 10000}% pool fee included
+                  Minimum {formatUnits(p.minimumOut, 18)} · {p.fee / 10000}%
+                  pool fee included
                 </small>
               </div>
             ))}
             <p className="agentic-note">
-              Surplus can include direct transfers. It is not a total of interest earned or a
-              guarantee of capital.{" "}
+              Surplus can include direct transfers. It is not a total of
+              interest earned or a guarantee of capital.{' '}
               {account && (
                 <>
-                  Block {account.block.toLocaleString()} · checked{" "}
+                  Block {account.block.toLocaleString()} · checked{' '}
                   <time dateTime={account.observedAt}>
                     {new Date(account.observedAt).toLocaleTimeString()}
                   </time>
@@ -528,7 +598,9 @@ export function AgenticLending({
           <ol>
             {history.map((item, i) => (
               <li key={`${item.at}-${i}`}>
-                <time dateTime={item.at}>{new Date(item.at).toLocaleTimeString()}</time>
+                <time dateTime={item.at}>
+                  {new Date(item.at).toLocaleTimeString()}
+                </time>
                 <div>
                   <strong>{item.title}</strong>
                   <p>{item.reason}</p>
@@ -537,12 +609,16 @@ export function AgenticLending({
             ))}
           </ol>
         ) : (
-          <p>Changes in your position’s recommendation will appear here after it is connected.</p>
+          <p>
+            Changes in your position’s recommendation will appear here after it
+            is connected.
+          </p>
         )}
         <p className="agentic-note">
-          Position balances refresh while the dashboard is open and idle. Quotes are checked when
-          you request them. Recommendations run while this view is open; closing it runs no
-          background jobs. <Link href="/docs#agentic-lending">How Agentic Lending works ↗</Link>
+          Position balances refresh while the dashboard is open and idle. Quotes
+          are checked when you request them. Recommendations run while this view
+          is open; closing it runs no background jobs.{' '}
+          <Link href="/docs#agentic-lending">How Agentic Lending works ↗</Link>
         </p>
       </section>
     </section>

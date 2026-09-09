@@ -6,13 +6,15 @@ This guide describes the current implementation. Freestock has a browser applica
 
 ## Identity and trust boundaries
 
-The hosted application receives authenticated identity from the Sites platform through [`app/chatgpt-auth.ts`](../app/chatgpt-auth.ts). [`lib/http.ts`](../lib/http.ts) centralizes identity, same-origin checks and private, non-cacheable JSON responses. Mutation endpoints additionally validate input size and supported command shapes.
+The wallet is the user's account identity. [`wallet-auth-service.ts`](../lib/wallet-auth-service.ts) verifies a free EIP-191 signature over the exact server-issued sign-in message. The message includes the website origin, wallet, chain 4663, nonce and five-minute expiry. A short-lived HttpOnly browser cookie binds the challenge to the browser that requested it. Nonce consumption and session creation are atomic, so concurrent replay cannot create additional sessions.
 
-Application identity scopes saved records; it does not prove ownership of a wallet. Contract ownership and deployment are verified from chain state. The contract enforces the owner's authority when a transaction executes.
+The server creates a seven-day opaque session in a host-only `HttpOnly; Secure; SameSite=Lax` cookie. D1 stores only its SHA-256 token hash, wallet and expiry. Login rotates the previous session; Disconnect revokes it. [`lib/http.ts`](../lib/http.ts) derives identity from this session and never trusts client-supplied platform identity headers. Identity is `wallet:4663:<lowercase-address>`.
 
-**Standalone hosts must replace or protect the authentication boundary.** The origin must reject or overwrite client-supplied authentication headers and accept identity only from a trusted gateway, or use a separately implemented session system. The local API fixtures intentionally inject identity headers into a local test server; they are not a production login mechanism.
+Every owner-specific live endpoint requires the requested owner/address to match the authenticated wallet. Contract creation, ownership, runtime and dependencies are independently checked onchain. A sign-in signature never authorizes spending or a financial transaction and does not establish stock-provider eligibility. Every transaction still requires the owner's wallet approval.
 
-Live wallet actions are available to signed-in application users. Sign-in does not verify provider eligibility or wallet ownership. No single-participant allowlist remains. Every submitted financial action is still enforced by the owner-only contract. The dashboard rechecks a hashed session scope on focus, page restore and visibility changes; a changed sign-in reloads profile data and reviews while retaining the wallet-scoped recovery journal.
+The dashboard compares its connected wallet with the server-authenticated wallet and rechecks on focus, page restore and authentication changes. A changed session clears profile views and reviews while retaining the owner-scoped recovery journal. Old platform-profile history is not silently merged: known deployment references can be restored, reverified and saved under the wallet identity.
+
+The simulator can initialize a separate anonymous browser session through `POST /api/demo/session`. Its cookie grants access only to simulated records and never authenticates a live-wallet endpoint. It contains no real money and requires no wallet connection.
 
 ## A live transaction, end to end
 
@@ -53,15 +55,17 @@ The plan is saved locally for the wallet; the recommendation activity view is se
 
 ## Storage and accounting
 
-| Location | Data | Boundary |
-| --- | --- | --- |
-| D1 `earn_accounts`, `earn_commands` | Simulation balances, positions and idempotency records | Simulated money; scoped to application identity |
-| D1 `live_accounts` | Verified account references and scan checkpoints | Scoped to identity, chain and wallet |
-| D1 `live_transactions` | Reconciled transaction records | Saved history, not a custody ledger |
-| D1 `accounts`, `commands` | Legacy prize-model records | Retained compatibility data; old command endpoint retired |
-| Browser local storage | Account references, lending plans and transaction journal | Device-local; not authoritative chain state |
-| Browser memory | Current quotes, reviews and recommendation activity | Temporary session state |
-| Owner wallet | Keys and transaction authorization | Never stored by the backend |
+| Location                            | Data                                                                   | Boundary                                                                           |
+| ----------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| D1 `earn_accounts`, `earn_commands` | Simulation balances, positions and idempotency records                 | Simulated money; scoped to a browser demo identity or authenticated wallet profile |
+| D1 `wallet_challenges`              | Short-lived messages, browser-binding hashes and consumed nonce claims | Authentication only; no spending permission                                        |
+| D1 `wallet_sessions`                | Session-token hashes, wallet addresses and expiry                      | Bearer tokens are never stored directly                                            |
+| D1 `live_accounts`                  | Verified account references and scan checkpoints                       | Scoped to identity, chain and wallet                                               |
+| D1 `live_transactions`              | Reconciled transaction records                                         | Saved history, not a custody ledger                                                |
+| D1 `accounts`, `commands`           | Legacy prize-model records                                             | Retained compatibility data; old command endpoint retired                          |
+| Browser local storage               | Account references, lending plans and transaction journal              | Device-local; not authoritative chain state                                        |
+| Browser memory                      | Current quotes, reviews and recommendation activity                    | Temporary session state                                                            |
+| Owner wallet                        | Keys and transaction authorization                                     | Never stored by the backend                                                        |
 
 The [D1 migrations](../drizzle) define the persisted schema. [`earn-engine.ts`](../lib/earn-engine.ts) uses integer/BigInt accounting for the simulation. [`earn-store.ts`](../lib/earn-store.ts) combines command idempotency and version checks to avoid duplicated or conflicting simulation updates. Simulation command bodies are limited to 4 KB. The model's rates, stock prices and leveraged-LP outcomes are illustrative; they do not execute transactions or model all real costs.
 
@@ -78,27 +82,32 @@ The [D1 migrations](../drizzle) define the persisted schema. [`earn-engine.ts`](
 
 ## API reference
 
-Paths are relative to the application origin. “Identity” means platform-authenticated application identity; hosting access controls may also apply to routes without an identity requirement.
+Paths are relative to the application origin. “Identity” means a server-verified wallet-signature session. Owner-specific routes reject a different wallet with HTTP 403 before RPC or storage work. Responses are private and uncached.
 
-| Endpoint | Access | Purpose |
-| --- | --- | --- |
-| `GET /api/health` | Hosting policy | Product and launch status |
-| `GET /api/markets` | Hosting policy | Tracked USDG market catalogue; dated fallback where supported |
-| `GET /api/stock-lending/markets` | Hosting policy | Five tracked stock-loan markets, read-only |
-| `GET /api/earn/account` | Identity | Load or initialize simulation account |
-| `POST /api/earn/commands` | Identity + same origin | Idempotent simulation commands |
-| `GET /api/live/status` | Hosting policy; identity affects flags | Chain health, live access and hashed session scope |
-| `GET /api/live/wallet` | Identity | Read wallet balances |
-| `GET /api/live/quote` | Identity | Quote a supported stock purchase |
-| `GET /api/live/deposit-preview` | Identity | Read direct-vault deposit preview |
-| `GET /api/live/account-plan` | Identity | Prepare unsigned account creation |
-| `GET /api/live/pilot/account` | Identity | Verify and read a personal account |
-| `GET /api/live/pilot/prepare` | Identity + action policy | Prepare/simulate deployment, approval, deposit, harvest, compound or withdrawal |
-| `GET /api/live/pilot/receipt` | Identity | Reconcile a transaction with chain state |
-| `GET /api/live/history` | Identity | List saved accounts or a page of activity |
-| `POST /api/live/history` | Identity + same origin | Remember, track or sync references; 2 KB body limit |
-| `GET /api/account` | Identity | Legacy account compatibility |
-| `POST /api/commands` | Retired | Returns HTTP 410 |
+| Endpoint                         | Access                                 | Purpose                                                                         |
+| -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------- |
+| `POST /api/auth/challenge`       | Same origin, JSON, 2 KB limit          | Issue a five-minute wallet confirmation challenge                               |
+| `POST /api/auth/verify`          | Same origin + bound challenge          | Verify the exact signature and create/rotate the session                        |
+| `GET /api/auth/session`          | Session cookie                         | Return authenticated wallet and expiry, never the bearer token                  |
+| `POST /api/auth/logout`          | Same origin                            | Revoke session and expire cookies                                               |
+| `POST /api/demo/session`         | Same origin                            | Initialize a simulation-only browser session                                    |
+| `GET /api/health`                | Hosting policy                         | Product and launch status                                                       |
+| `GET /api/markets`               | Hosting policy                         | Tracked USDG market catalogue; dated fallback where supported                   |
+| `GET /api/stock-lending/markets` | Hosting policy                         | Five tracked stock-loan markets, read-only                                      |
+| `GET /api/earn/account`          | Demo or wallet session                 | Load or initialize simulation account                                           |
+| `POST /api/earn/commands`        | Demo or wallet session + same origin   | Idempotent simulation commands                                                  |
+| `GET /api/live/status`           | Hosting policy; identity affects flags | Chain health, live access and hashed session scope                              |
+| `GET /api/live/wallet`           | Identity                               | Read wallet balances                                                            |
+| `GET /api/live/quote`            | Identity                               | Quote a supported stock purchase                                                |
+| `GET /api/live/deposit-preview`  | Identity                               | Read direct-vault deposit preview                                               |
+| `GET /api/live/account-plan`     | Identity                               | Prepare unsigned account creation                                               |
+| `GET /api/live/pilot/account`    | Identity                               | Verify and read a personal account                                              |
+| `GET /api/live/pilot/prepare`    | Identity + action policy               | Prepare/simulate deployment, approval, deposit, harvest, compound or withdrawal |
+| `GET /api/live/pilot/receipt`    | Identity                               | Reconcile a transaction with chain state                                        |
+| `GET /api/live/history`          | Identity                               | List saved accounts or a page of activity                                       |
+| `POST /api/live/history`         | Identity + same origin                 | Remember, track or sync references; 2 KB body limit                             |
+| `GET /api/account`               | Identity                               | Legacy account compatibility                                                    |
+| `POST /api/commands`             | Retired                                | Returns HTTP 410                                                                |
 
 Read the [route handlers](../app/api) for exact query parameters and validation. Live preparation produces unsigned data. None of these endpoints signs or broadcasts a financial transaction.
 

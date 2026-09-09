@@ -6,7 +6,7 @@
 
 - Node.js 22.13 or newer and npm.
 - A Cloudflare-compatible Worker runtime with a D1 binding named `DB` for persisted features.
-- A trusted authentication gateway for a hosted deployment. The current application integrates Sites identity.
+- HTTPS for hosted wallet-session cookies. Wallet authentication is implemented in the Worker; no separate application-login provider is required.
 - RPC connectivity for live read and preparation endpoints. Running the simulation does not require a funded wallet.
 
 ```sh
@@ -20,14 +20,14 @@ The stack is React + TypeScript on Vinext/Vite, with a Worker backend and D1. [`
 
 ## Runtime configuration
 
-| Setting | Purpose |
-| --- | --- |
-| `DB` | D1 binding used for simulation and saved live history |
+| Setting             | Purpose                                                                   |
+| ------------------- | ------------------------------------------------------------------------- |
+| `DB`                | D1 binding used for simulation and saved live history                     |
 | `ROBINHOOD_RPC_URL` | Optional RPC override; defaults to the configured public mainnet endpoint |
 
 Use ignored local environment files or your host's secret/configuration facility for actual values. Do not commit provider credentials, user identities, wallet keys or local database state. The server needs no wallet private key: signing happens in the browser wallet.
 
-Application identity comes from [`app/chatgpt-auth.ts`](../app/chatgpt-auth.ts). A standalone public origin must not trust arbitrary client-supplied identity headers. Place it behind a gateway that authenticates users and strips/replaces those headers, or implement a server-validated session system before exposing persisted account APIs. Wallet verification alone does not secure application identity or its saved records.
+Application identity comes from the verified wallet session in [`lib/wallet-auth.ts`](../lib/wallet-auth.ts). Never trust browser-supplied `oai-*` identity headers. Deploy the wallet challenge/session migration before serving this release. Cookies are host-only, HttpOnly and Secure; local browser tests use a trustworthy localhost origin. Wallet sign-in authenticates an address, while live routes separately enforce exact owner matching and onchain account verification.
 
 ## Local database and production-style preview
 
@@ -40,6 +40,7 @@ npm run build
 npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_tiresome_siren.sql
 npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_faulty_betty_brant.sql
 npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_polite_mystique.sql
+npx wrangler d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0003_wallet_sessions.sql
 npm run start -- --port 3011 --persist-to .wrangler/state
 ```
 
@@ -61,9 +62,10 @@ With a local Worker running and migrations applied:
 ```sh
 TEST_ORIGIN=http://localhost:3011 npm run test:api
 TEST_ORIGIN=http://localhost:3011 node scripts/live-api-check.mjs
+TEST_ORIGIN=http://localhost:3011 node scripts/wallet-auth-api-check.mjs
 ```
 
-The API scripts enforce local HTTP origins and use test identity headers. The live API check verifies that distinct signed-in profiles have access and anonymous requests do not. Some live checks require healthy external RPC/quote services. Do not point these fixture runners at the hosted product or treat their injected headers as an authentication design.
+The API scripts refuse hosted origins and generate disposable local wallet identities. They sign only free local authentication messages; they never submit public financial transactions or use personal wallet keys. They verify wallet session isolation, denial of anonymous/forged identity headers, private responses and exact owner binding. Live read checks require healthy external RPC/quote services. The simulator has an independent browser session that cannot access live-wallet routes.
 
 ```sh
 npm run verify:integrations

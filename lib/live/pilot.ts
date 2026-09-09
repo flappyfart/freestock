@@ -1,42 +1,42 @@
-import { withRpcReads } from "./chain";
-import { Interface, getCreateAddress, formatUnits } from "ethers";
-import artifact from "../../contracts/artifacts/FreestockYieldAccount.artifact.json" with { type: "json" };
+import { withRpcReads } from './chain';
+import { Interface, getCreateAddress, formatUnits, MaxUint256 } from 'ethers';
+import artifact from '../../contracts/artifacts/FreestockYieldAccount.artifact.json' with { type: 'json' };
 import {
   accountPlan,
   matchesAccountRuntime,
-  DEPOSIT_LIMIT,
-  PILOT_ROUTER,
+  accountDeploymentVersion,
+  canDeployDirectly,
   PILOT_STOCKS,
-} from "./account-plan";
-import { amount, address, pin, read, rpc } from "./chain";
-import { VAULT, USDG, ERC20_ABI, VAULT_ABI, LiveError } from "./config";
-import { stockQuote } from "./quote";
-import { allocateBasket } from "./basket";
-import { pilotPolicy } from "./pilot-policy";
-import { positionBudget } from "./position-budget";
+} from './account-plan';
+import { amount, address, pin, read, rpc } from './chain';
+import { VAULT, USDG, ERC20_ABI, VAULT_ABI, LiveError } from './config';
+import { stockQuote } from './quote';
+import { allocateBasket } from './basket';
+import { pilotPolicy } from './pilot-policy';
+import { positionBudget } from './position-budget';
 const accountAbi = new Interface(artifact.abi),
   tokenAbi = new Interface(ERC20_ABI),
   vaultAbi = new Interface(VAULT_ABI);
 type Row = Record<string, unknown>;
 export function txHash(value: unknown) {
-  if (typeof value !== "string" || !/^0x[\da-f]{64}$/i.test(value))
-    throw new LiveError("Enter a valid transaction hash.", 400);
+  if (typeof value !== 'string' || !/^0x[\da-f]{64}$/i.test(value))
+    throw new LiveError('Enter a valid transaction hash.', 400);
   return value;
 }
 function object(value: unknown): Row {
-  if (!value || typeof value !== "object" || Array.isArray(value))
-    throw new LiveError("Invalid transaction response.", 503);
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new LiveError('Invalid transaction response.', 503);
   return value as Row;
 }
 function hex(value: unknown) {
-  if (typeof value !== "string" || !/^0x[\da-f]+$/i.test(value))
-    throw new LiveError("Invalid chain quantity.", 503);
+  if (typeof value !== 'string' || !/^0x[\da-f]+$/i.test(value))
+    throw new LiveError('Invalid chain quantity.', 503);
   return BigInt(value);
 }
 const same = (a: unknown, b: string) =>
-  typeof a === "string" && a.toLowerCase() === b.toLowerCase();
+  typeof a === 'string' && a.toLowerCase() === b.toLowerCase();
 function parsedCall(abi: Interface, input: unknown) {
-  if (typeof input !== "string") return null;
+  if (typeof input !== 'string') return null;
   try {
     return abi.parseTransaction({ data: input });
   } catch {
@@ -44,87 +44,124 @@ function parsedCall(abi: Interface, input: unknown) {
   }
 }
 async function mined(hash: string) {
-  const value = await rpc("eth_getTransactionReceipt", [txHash(hash)]);
+  const value = await rpc('eth_getTransactionReceipt', [txHash(hash)]);
   if (!value) return null;
   const receipt = object(value),
-    transaction = object(await rpc("eth_getTransactionByHash", [hash]));
+    transaction = object(await rpc('eth_getTransactionByHash', [hash]));
   if (
     !same(receipt.transactionHash, hash) ||
     !same(transaction.hash, hash) ||
     hex(transaction.chainId) !== 4663n
   )
-    throw new LiveError("Transaction identity mismatch.", 503);
-  const block = object(await rpc("eth_getBlockByNumber", [receipt.blockNumber, false]));
+    throw new LiveError('Transaction identity mismatch.', 503);
+  const block = object(
+    await rpc('eth_getBlockByNumber', [receipt.blockNumber, false]),
+  );
   if (!same(block.hash, String(receipt.blockHash)))
-    throw new LiveError("The transaction block changed. Refresh its confirmation.", 409);
+    throw new LiveError(
+      'The transaction block changed. Refresh its confirmation.',
+      409,
+    );
   return { receipt, transaction, block };
 }
-export async function verifiedAccount(ownerInput: string, deploymentInput: string, block: string) {
+export async function verifiedAccount(
+  ownerInput: string,
+  deploymentInput: string,
+  block: string,
+) {
   const owner = address(ownerInput),
     deployment = txHash(deploymentInput);
   const result = await mined(deployment);
-  if (!result) throw new LiveError("Account deployment is still pending.", 409);
+  if (!result) throw new LiveError('Account deployment is still pending.', 409);
   const { receipt, transaction } = result;
-  const expected = accountPlan(owner);
+  const version = accountDeploymentVersion(owner, transaction.input);
+  const expected = version ? accountPlan(owner, version) : null;
   if (
     hex(receipt.status) !== 1n ||
     transaction.to !== null ||
     !same(transaction.from, owner) ||
-    !same(transaction.input, expected.transaction.data) ||
+    !expected ||
     hex(transaction.value) !== 0n
   )
     throw new LiveError(
-      "This is not a successful freestock account deployment from the connected wallet.",
+      'This is not a successful freestock account deployment from the connected wallet.',
       422,
     );
   const account = address(receipt.contractAddress);
-  const derived = getCreateAddress({ from: owner, nonce: hex(transaction.nonce) });
-  if (account !== derived || !matchesAccountRuntime(await rpc("eth_getCode", [account, block])))
-    throw new LiveError("The account code does not match the tested deployment.", 422);
-  const names = ["owner", "asset", "vault", "router", "depositCap"];
-  const values = await Promise.all(names.map((n) => read(account, accountAbi, n, [], block)));
+  const derived = getCreateAddress({
+    from: owner,
+    nonce: hex(transaction.nonce),
+  });
+  if (
+    account !== derived ||
+    !matchesAccountRuntime(await rpc('eth_getCode', [account, block]), version!)
+  )
+    throw new LiveError(
+      'The account code does not match the tested deployment.',
+      422,
+    );
+  const names = ['owner', 'asset', 'vault', 'router', 'depositCap'];
+  const values = await Promise.all(
+    names.map((n) => read(account, accountAbi, n, [], block)),
+  );
   if (
     !same(values[0][0], owner) ||
-    !same(values[1][0], USDG) ||
-    !same(values[2][0], VAULT) ||
-    !same(values[3][0], PILOT_ROUTER) ||
-    BigInt(String(values[4][0])) !== DEPOSIT_LIMIT
+    !same(values[1][0], expected!.asset) ||
+    !same(values[2][0], expected!.vault) ||
+    !same(values[3][0], expected!.router) ||
+    String(values[4][0]) !== expected!.depositLimit
   )
-    throw new LiveError("The account ownership or fixed configuration does not match.", 422);
+    throw new LiveError(
+      'The account ownership or fixed configuration does not match.',
+      422,
+    );
   return {
     owner,
     account,
     deployment,
+    accountVersion: version!,
+    depositCap: expected!.depositLimit,
     deploymentBlock: Number(hex(receipt.blockNumber)),
     deploymentBlockHash: String(receipt.blockHash),
   };
 }
 async function balances(owner: string, account: string, block: string) {
-  const [principal, value, gains, usd, stock, allowance, stocks, header] = await Promise.all([
-    read(account, accountAbi, "principal", [], block),
-    read(account, accountAbi, "totalAssets", [], block),
-    read(account, accountAbi, "availableYield", [], block),
-    read(USDG, tokenAbi, "balanceOf", [owner], block),
-    read(PILOT_STOCKS[0].address, tokenAbi, "balanceOf", [owner], block),
-    read(USDG, tokenAbi, "allowance", [owner, account], block),
-    Promise.all(
-      PILOT_STOCKS.map(async (s) => ({
-        symbol: s.symbol,
-        address: s.address,
-        balance: String((await read(s.address, tokenAbi, "balanceOf", [owner], block))[0]),
-      })),
-    ),
-    rpc("eth_getBlockByNumber", [block, false]),
-  ]);
+  const [principal, value, gains, usd, stock, allowance, stocks, header] =
+    await Promise.all([
+      read(account, accountAbi, 'principal', [], block),
+      read(account, accountAbi, 'totalAssets', [], block),
+      read(account, accountAbi, 'availableYield', [], block),
+      read(USDG, tokenAbi, 'balanceOf', [owner], block),
+      read(PILOT_STOCKS[0].address, tokenAbi, 'balanceOf', [owner], block),
+      read(USDG, tokenAbi, 'allowance', [owner, account], block),
+      Promise.all(
+        PILOT_STOCKS.map(async (s) => ({
+          symbol: s.symbol,
+          address: s.address,
+          balance: String(
+            (await read(s.address, tokenAbi, 'balanceOf', [owner], block))[0],
+          ),
+        })),
+      ),
+      rpc('eth_getBlockByNumber', [block, false]),
+    ]);
   const available = BigInt(String(gains[0]));
-  const budget = positionBudget(BigInt(String(principal[0])), BigInt(String(value[0])));
+  const budget = positionBudget(
+    BigInt(String(principal[0])),
+    BigInt(String(value[0])),
+  );
   if (budget.surplus !== available)
-    throw new LiveError("Position balances are inconsistent. Refresh before continuing.", 503);
+    throw new LiveError(
+      'Position balances are inconsistent. Refresh before continuing.',
+      503,
+    );
   return {
     chainId: 4663,
     vault: VAULT,
     observedAt: new Date().toISOString(),
-    blockTime: new Date(Number(hex(object(header).timestamp)) * 1000).toISOString(),
+    blockTime: new Date(
+      Number(hex(object(header).timestamp)) * 1000,
+    ).toISOString(),
     principal: String(principal[0]),
     assetValue: String(value[0]),
     availableGains: available.toString(),
@@ -140,7 +177,10 @@ export async function pilotSnapshot(owner: string, deployment: string) {
   return withRpcReads(async () => {
     const block = await pin(),
       verified = await verifiedAccount(owner, deployment, block);
-    return { ...verified, ...(await balances(verified.owner, verified.account, block)) };
+    return {
+      ...verified,
+      ...(await balances(verified.owner, verified.account, block)),
+    };
   });
 }
 type Transaction = {
@@ -154,14 +194,26 @@ type Transaction = {
 };
 export async function preparePilot(userId: string, query: URLSearchParams) {
   return withRpcReads(async () => {
-    const owner = address(query.get("owner")),
-      action = query.get("action") ?? "";
-    if (!["deploy", "approve", "deposit", "harvest", "compound", "withdraw"].includes(action))
-      throw new LiveError("Choose a supported account action.", 400);
+    const owner = address(query.get('owner')),
+      action = query.get('action') ?? '';
+    if (
+      ![
+        'deploy',
+        'approve',
+        'deposit',
+        'harvest',
+        'compound',
+        'withdraw',
+      ].includes(action)
+    )
+      throw new LiveError('Choose a supported account action.', 400);
     // Withdrawal preparation stays available even if pilot entry/trading is later disabled.
     const policy = pilotPolicy(userId);
-    if (!policy.enabled && action !== "withdraw")
-      throw new LiveError("Sign in to enable live wallet actions.", 403);
+    if (!policy.enabled && action !== 'withdraw')
+      throw new LiveError(
+        'Confirm wallet ownership to enable live actions.',
+        403,
+      );
     const block = await pin();
     let transaction: Transaction,
       summary: string,
@@ -178,71 +230,110 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
       fee: number;
       weightBps: number;
     }[] = [];
-    if (action === "deploy") {
-      if ((await rpc("eth_getCode", [owner, block])) !== "0x")
+    if (action === 'deploy') {
+      if (!canDeployDirectly(await rpc('eth_getCode', [owner, block])))
         throw new LiveError(
-          "Use a wallet that deploys directly from its own address.",
+          'Use a wallet that deploys directly from its own address.',
           422,
         );
       transaction = accountPlan(owner).transaction;
       summary =
-        "Create your own stock-yield account. This spends ETH for deployment gas; it does not deposit USDG.";
+        'Create your own stock-yield account. This spends ETH for deployment gas; it does not deposit USDG.';
     } else {
-      const verified = await verifiedAccount(owner, query.get("deployment") ?? "", block);
+      const verified = await verifiedAccount(
+        owner,
+        query.get('deployment') ?? '',
+        block,
+      );
       account = verified.account;
       const state = await balances(owner, account, block);
-      transaction = { from: owner, to: account, data: "0x", value: "0x0", chainId: "0x1237" };
-      if (action === "withdraw") {
+      transaction = {
+        from: owner,
+        to: account,
+        data: '0x',
+        value: '0x0',
+        chainId: '0x1237',
+      };
+      if (action === 'withdraw') {
         assets = BigInt(state.assetValue);
-        if (assets <= 0n) throw new LiveError("The account has no USDG value to withdraw.", 422);
+        if (assets <= 0n)
+          throw new LiveError(
+            'The account has no USDG value to withdraw.',
+            422,
+          );
         const minAssets = assets > 2n ? assets - 2n : assets;
-        transaction.data = accountAbi.encodeFunctionData("withdrawAll", [minAssets]);
+        transaction.data = accountAbi.encodeFunctionData('withdrawAll', [
+          minAssets,
+        ]);
         summary =
-          "Withdraw the entire account to your wallet. If the simulated withdrawal value falls by more than 0.000002 USDG, the transaction reverts.";
+          'Withdraw the entire account to your wallet. If the simulated withdrawal value falls by more than 0.000002 USDG, the transaction reverts.';
       } else {
-        assets = amount(query.get("amount"));
-        if (action === "approve" || action === "deposit") {
-          if (BigInt(state.principal) + assets > DEPOSIT_LIMIT)
-            throw new LiveError("This deposit would exceed the 100 USDG principal limit.", 422);
+        assets = amount(query.get('amount'));
+        if (action === 'approve' || action === 'deposit') {
+          if (BigInt(state.principal) + assets > BigInt(verified.depositCap))
+            throw new LiveError(
+              'This older account has a fixed 100 USDG limit. Use a new account for larger deposits.',
+              422,
+            );
           if (BigInt(state.walletUsdg) < assets)
-            throw new LiveError("The wallet does not have enough USDG.", 422);
-          if (action === "approve") {
+            throw new LiveError('The wallet does not have enough USDG.', 422);
+          if (action === 'approve') {
+            if (assets === MaxUint256)
+              throw new LiveError(
+                'Choose an exact deposit amount, not an unlimited allowance.',
+                400,
+              );
             transaction.to = USDG;
-            transaction.data = tokenAbi.encodeFunctionData("approve", [account, assets]);
+            transaction.data = tokenAbi.encodeFunctionData('approve', [
+              account,
+              assets,
+            ]);
             summary =
-              "Allow only this USDG amount to be deposited into your verified account. This is not an unlimited approval.";
+              'Allow only this USDG amount to be deposited into your verified account. This is not an unlimited approval.';
           } else {
             if (BigInt(state.allowance) < assets)
-              throw new LiveError("Approve this USDG amount for your account first.", 422);
+              throw new LiveError(
+                'Approve this USDG amount for your account first.',
+                422,
+              );
             const shares = BigInt(
-              String((await read(VAULT, vaultAbi, "previewDeposit", [assets], block))[0]),
+              String(
+                (
+                  await read(VAULT, vaultAbi, 'previewDeposit', [assets], block)
+                )[0],
+              ),
             );
-            if (shares <= 2n) throw new LiveError("Deposit too small.", 422);
-            transaction.data = accountAbi.encodeFunctionData("deposit", [
+            if (shares <= 2n) throw new LiveError('Deposit too small.', 422);
+            transaction.data = accountAbi.encodeFunctionData('deposit', [
               assets,
               (shares * 9990n) / 10000n,
             ]);
             summary =
-              "Move USDG from your wallet into the verified lending account. The deposit accepts at most 0.1% fewer shares than the current preview.";
+              'Move USDG from your wallet into the verified lending account. The deposit accepts at most 0.1% fewer shares than the current preview.';
           }
         } else {
           if (assets > BigInt(state.spendableWithRoundingBuffer))
             throw new LiveError(
-              "This amount exceeds gains available above principal, after the rounding buffer.",
+              'This amount exceeds gains available above principal, after the rounding buffer.',
               422,
             );
-          if (action === "compound") {
-            transaction.data = accountAbi.encodeFunctionData("compound", [assets]);
+          if (action === 'compound') {
+            transaction.data = accountAbi.encodeFunctionData('compound', [
+              assets,
+            ]);
             summary =
-              "Reserve these gains as new principal. The underlying vault shares already accumulate lending returns.";
+              'Reserve these gains as new principal. The underlying vault shares already accumulate lending returns.';
           } else {
-            const raw = query.get("allocations") ?? '[{"symbol":"NVDA","weightBps":10000}]';
-            if (raw.length > 1024) throw new LiveError("Allocation is too large.", 400);
+            const raw =
+              query.get('allocations') ??
+              '[{"symbol":"NVDA","weightBps":10000}]';
+            if (raw.length > 1024)
+              throw new LiveError('Allocation is too large.', 400);
             let allocationInput: unknown;
             try {
               allocationInput = JSON.parse(raw);
             } catch {
-              throw new LiveError("Invalid stock basket.", 400);
+              throw new LiveError('Invalid stock basket.', 400);
             }
             const allocation = allocateBasket(allocationInput, assets);
             purchases = await Promise.all(
@@ -252,9 +343,11 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
               })),
             );
             const latest = await pin();
-            const header = object(await rpc("eth_getBlockByNumber", [latest, false]));
+            const header = object(
+              await rpc('eth_getBlockByNumber', [latest, false]),
+            );
             const deadline = hex(header.timestamp) + 120n;
-            transaction.data = accountAbi.encodeFunctionData("harvest", [
+            transaction.data = accountAbi.encodeFunctionData('harvest', [
               purchases.map((p) => p.tokenOut),
               purchases.map((p) => p.fee),
               purchases.map((p) => BigInt(p.amountIn)),
@@ -263,7 +356,7 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
               deadline,
             ]);
             summary =
-              "Withdraw only available gains and buy the selected Stock Tokens for your wallet, with a 1% minimum-output allowance per stock. All basket purchases revert together if any purchase cannot meet its limits.";
+              'Withdraw only available gains and buy the selected Stock Tokens for your wallet, with a 1% minimum-output allowance per stock. All basket purchases revert together if any purchase cannot meet its limits.';
           }
         }
       }
@@ -272,39 +365,42 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
       from: transaction.from,
       ...(transaction.to ? { to: transaction.to } : {}),
       data: transaction.data,
-      value: "0x0",
+      value: '0x0',
     };
-    const simulation = await rpc("eth_call", [call, "latest"]);
-    if (action === "deploy") {
+    const simulation = await rpc('eth_call', [call, 'latest']);
+    if (action === 'deploy') {
       if (!matchesAccountRuntime(simulation))
-        throw new LiveError("Account setup simulation did not match the tested contract.", 503);
-    } else if (action === "approve") {
+        throw new LiveError(
+          'Account setup simulation did not match the tested contract.',
+          503,
+        );
+    } else if (action === 'approve') {
       if (
-        typeof simulation !== "string" ||
-        tokenAbi.decodeFunctionResult("approve", simulation)[0] !== true
+        typeof simulation !== 'string' ||
+        tokenAbi.decodeFunctionResult('approve', simulation)[0] !== true
       )
-        throw new LiveError("Token approval simulation failed.", 422);
-    } else if (action === "deposit") {
+        throw new LiveError('Token approval simulation failed.', 422);
+    } else if (action === 'deposit') {
       if (
-        typeof simulation !== "string" ||
-        BigInt(accountAbi.decodeFunctionResult("deposit", simulation)[0]) <= 0n
+        typeof simulation !== 'string' ||
+        BigInt(accountAbi.decodeFunctionResult('deposit', simulation)[0]) <= 0n
       )
-        throw new LiveError("Deposit simulation failed.", 422);
-    } else if (simulation !== "0x")
-      throw new LiveError("Unexpected account simulation result.", 503);
+        throw new LiveError('Deposit simulation failed.', 422);
+    } else if (simulation !== '0x')
+      throw new LiveError('Unexpected account simulation result.', 503);
     const [gasRaw, priceRaw, ethRaw] = await Promise.all([
-      rpc("eth_estimateGas", [call]),
-      rpc("eth_gasPrice", []),
-      rpc("eth_getBalance", [owner, "latest"]),
+      rpc('eth_estimateGas', [call]),
+      rpc('eth_gasPrice', []),
+      rpc('eth_getBalance', [owner, 'latest']),
     ]);
     const gas = (hex(gasRaw) * 120n + 99n) / 100n,
       cost = gas * hex(priceRaw);
     transaction.gas = `0x${gas.toString(16)}`;
-    const nonce = hex(await rpc("eth_getTransactionCount", [owner, "pending"]));
+    const nonce = hex(await rpc('eth_getTransactionCount', [owner, 'pending']));
     transaction.nonce = `0x${nonce.toString(16)}`;
     return {
       action,
-      deployment: action === "deploy" ? "" : (query.get("deployment") ?? ""),
+      deployment: action === 'deploy' ? '' : (query.get('deployment') ?? ''),
       owner,
       account,
       assets: assets.toString(),
@@ -313,7 +409,7 @@ export async function preparePilot(userId: string, query: URLSearchParams) {
       tokenOut,
       purchases,
       transaction,
-      simulation: "passed",
+      simulation: 'passed',
       gasLimit: gas.toString(),
       estimatedGasCostWei: cost.toString(),
       hasGasBalance: hex(ethRaw) >= cost,
@@ -335,39 +431,50 @@ export async function pilotReceipt(
       hash = txHash(hashInput);
     await pin();
     const result = await mined(hash);
-    if (!result) return { status: "pending", hash };
+    if (!result) return { status: 'pending', hash };
     const { transaction, receipt } = result;
     if (
       nonceInput &&
-      (!/^0x[\da-f]+$/i.test(nonceInput) || hex(transaction.nonce) !== BigInt(nonceInput))
+      (!/^0x[\da-f]+$/i.test(nonceInput) ||
+        hex(transaction.nonce) !== BigInt(nonceInput))
     )
-      throw new LiveError("This replacement transaction uses a different nonce.", 422);
+      throw new LiveError(
+        'This replacement transaction uses a different nonce.',
+        422,
+      );
     if (!same(transaction.from, owner))
-      throw new LiveError("The transaction was sent by a different wallet.", 422);
-    if (hex(receipt.status) !== 1n) return { status: "reverted", hash };
+      throw new LiveError(
+        'The transaction was sent by a different wallet.',
+        422,
+      );
+    if (hex(receipt.status) !== 1n) return { status: 'reverted', hash };
     if (
       nonceInput &&
       same(transaction.to, owner) &&
-      transaction.input === "0x" &&
+      transaction.input === '0x' &&
       hex(transaction.value) === 0n
     )
-      return { status: "cancelled", hash };
+      return { status: 'cancelled', hash };
     if (
       nonceInput &&
       transaction.to === null &&
-      !same(transaction.input, accountPlan(owner).transaction.data)
+      !accountDeploymentVersion(owner, transaction.input)
     )
-      return { status: "replaced", hash };
-    if (nonceInput && transaction.to !== null && !deployment) return { status: "replaced", hash };
+      return { status: 'replaced', hash };
+    if (nonceInput && transaction.to !== null && !deployment)
+      return { status: 'replaced', hash };
     const deploymentHash = transaction.to === null ? hash : txHash(deployment);
     const block = await pin(),
       verified = await verifiedAccount(owner, deploymentHash, block);
     const replaced = async () => ({
-      status: "replaced",
+      status: 'replaced',
       hash,
       deployment: deploymentHash,
       account: verified.account,
-      snapshot: { ...verified, ...(await balances(owner, verified.account, block)) },
+      snapshot: {
+        ...verified,
+        ...(await balances(owner, verified.account, block)),
+      },
     });
     if (
       nonceInput &&
@@ -376,64 +483,95 @@ export async function pilotReceipt(
       !same(transaction.to, verified.account)
     )
       return replaced();
-    const events: { name: string; assetAmount: string; token?: string; tokenAmount?: string }[] =
-      [];
+    const events: {
+      name: string;
+      assetAmount: string;
+      token?: string;
+      tokenAmount?: string;
+    }[] = [];
     if (transaction.to !== null) {
       if (same(transaction.to, USDG)) {
         const parsed = parsedCall(tokenAbi, transaction.input);
         if (
-          parsed?.name !== "approve" ||
+          parsed?.name !== 'approve' ||
           !same(parsed.args[0], verified.account) ||
-          BigInt(parsed.args[1]) > DEPOSIT_LIMIT ||
+          BigInt(parsed.args[1]) > BigInt(verified.depositCap) ||
           hex(transaction.value) !== 0n
         ) {
           if (nonceInput) return replaced();
-          throw new LiveError("The approval does not match this account.", 422);
+          throw new LiveError('The approval does not match this account.', 422);
         }
-        events.push({ name: "Approval", assetAmount: String(parsed.args[1]) });
+        events.push({ name: 'Approval', assetAmount: String(parsed.args[1]) });
       } else {
-        if (!same(transaction.to, verified.account) || hex(transaction.value) !== 0n) {
+        if (
+          !same(transaction.to, verified.account) ||
+          hex(transaction.value) !== 0n
+        ) {
           if (nonceInput) return replaced();
-          throw new LiveError("The transaction targets a different account.", 422);
+          throw new LiveError(
+            'The transaction targets a different account.',
+            422,
+          );
         }
         const parsed = parsedCall(accountAbi, transaction.input);
-        if (!parsed || !["deposit", "compound", "harvest", "withdrawAll"].includes(parsed.name)) {
+        if (
+          !parsed ||
+          !['deposit', 'compound', 'harvest', 'withdrawAll'].includes(
+            parsed.name,
+          )
+        ) {
           if (nonceInput) return replaced();
-          throw new LiveError("Unsupported account action.", 422);
+          throw new LiveError('Unsupported account action.', 422);
         }
-        if (!Array.isArray(receipt.logs)) throw new LiveError("Missing receipt logs.", 503);
+        if (!Array.isArray(receipt.logs))
+          throw new LiveError('Missing receipt logs.', 503);
         for (const log of receipt.logs) {
           const row = object(log);
           if (
             !same(row.address, verified.account) ||
             !Array.isArray(row.topics) ||
-            typeof row.data !== "string"
+            typeof row.data !== 'string'
           )
             continue;
-          const event = accountAbi.parseLog({ topics: row.topics.map(String), data: row.data });
+          const event = accountAbi.parseLog({
+            topics: row.topics.map(String),
+            data: row.data,
+          });
           if (!event) continue;
-          if (event.name === "StockPurchased")
+          if (event.name === 'StockPurchased')
             events.push({
               name: event.name,
               assetAmount: String(event.args[1]),
               token: String(event.args[0]),
               tokenAmount: String(event.args[2]),
             });
-          else events.push({ name: event.name, assetAmount: String(event.args[0]) });
+          else
+            events.push({
+              name: event.name,
+              assetAmount: String(event.args[0]),
+            });
         }
         if (events.length === 0)
-          throw new LiveError("The confirmed transaction has no account events.", 503);
+          throw new LiveError(
+            'The confirmed transaction has no account events.',
+            503,
+          );
       }
     }
     return {
-      status: "confirmed",
+      status: 'confirmed',
       hash,
       block: Number(hex(receipt.blockNumber)),
-      confirmedAt: new Date(Number(hex(result.block.timestamp)) * 1000).toISOString(),
+      confirmedAt: new Date(
+        Number(hex(result.block.timestamp)) * 1000,
+      ).toISOString(),
       deployment: deploymentHash,
       account: verified.account,
       events,
-      snapshot: { ...verified, ...(await balances(owner, verified.account, block)) },
+      snapshot: {
+        ...verified,
+        ...(await balances(owner, verified.account, block)),
+      },
     };
   });
 }

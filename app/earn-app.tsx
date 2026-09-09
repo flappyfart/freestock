@@ -1,10 +1,22 @@
-"use client";
+'use client';
 /* oxlint-disable next/no-img-element -- Local optimized WebP artwork and vector marks have explicit dimensions. */
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, Layers, RefreshCw } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../components/ui/dialog";
-import type { DemoView } from "./demo/demo-provider";
-import { MechanicalSwitch } from "./mechanical-switch";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Layers,
+  RefreshCw,
+} from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '../components/ui/dialog';
+import type { DemoView } from './demo/demo-provider';
+import { MechanicalSwitch } from './mechanical-switch';
 import {
   STOCKS,
   modeledNetApr,
@@ -12,16 +24,20 @@ import {
   type Position,
   type Stock,
   type Allocation,
-} from "../lib/earn-engine";
-import type { MarketCatalogue } from "../lib/markets";
+} from '../lib/earn-engine';
+import type { MarketCatalogue } from '../lib/markets';
 // Older saved ledger text is relabeled for display without rewriting account history.
 const simulationLabel = (text: string) =>
-  text.replace(/\bpractice\b/gi, (word) => (word[0] === "P" ? "Simulated" : "simulated"));
-const money = (micro: number) =>
-  new Intl.NumberFormat("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(
-    micro / 1e6,
+  text.replace(/\bpractice\b/gi, (word) =>
+    word[0] === 'P' ? 'Simulated' : 'simulated',
   );
-const percent = (n: number | null) => (n === null ? "Unavailable" : `${(n * 100).toFixed(2)}%`);
+const money = (micro: number) =>
+  new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(micro / 1e6);
+const percent = (n: number | null) =>
+  n === null ? 'Unavailable' : `${(n * 100).toFixed(2)}%`;
 type Preferences = {
   allocation: Allocation;
   auto: boolean;
@@ -29,7 +45,7 @@ type Preferences = {
   compoundBps: number;
 };
 function StockMark({ symbol, size = 24 }: { symbol: Stock; size?: number }) {
-  return symbol === "SPY" ? (
+  return symbol === 'SPY' ? (
     <span
       className="stock-text-mark"
       style={{ width: size, height: size }}
@@ -41,7 +57,13 @@ function StockMark({ symbol, size = 24 }: { symbol: Stock; size?: number }) {
     <img src={`/stocks/${symbol}.svg`} alt="" width={size} height={size} />
   );
 }
-function PayoutPicker({ value, change }: { value: Preferences; change: (v: Preferences) => void }) {
+function PayoutPicker({
+  value,
+  change,
+}: {
+  value: Preferences;
+  change: (v: Preferences) => void;
+}) {
   const [basket, setBasket] = useState(value.allocation.length > 1);
   const split = value.compoundBps > 0 && value.compoundBps < 10000;
   const total = value.allocation.reduce((n, a) => n + a.bps, 0);
@@ -51,20 +73,20 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
         <legend>Where should your earnings go?</legend>
         {[
           {
-            label: "Buy stocks",
-            description: "Build your stock portfolio",
+            label: 'Buy stocks',
+            description: 'Build your stock portfolio',
             bps: 0,
             selected: value.compoundBps === 0,
           },
           {
-            label: "Reinvest",
-            description: "Grow this DeFi position",
+            label: 'Reinvest',
+            description: 'Grow this DeFi position',
             bps: 10000,
             selected: value.compoundBps === 10000,
           },
           {
-            label: "Split both",
-            description: "Stocks plus reinvestment",
+            label: 'Split both',
+            description: 'Stocks plus reinvestment',
             bps: split ? value.compoundBps : 5000,
             selected: split,
           },
@@ -80,7 +102,12 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                 // Keep valid stock picks, but do not hide an unfinished basket that prevents saving.
                 allocation:
                   option.bps === 10000 && total !== 10000
-                    ? [{ symbol: value.allocation[0]?.symbol ?? "NVDA", bps: 10000 }]
+                    ? [
+                        {
+                          symbol: value.allocation[0]?.symbol ?? 'NVDA',
+                          bps: 10000,
+                        },
+                      ]
                     : value.allocation,
               })
             }
@@ -99,9 +126,13 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             max="99"
             step="1"
             value={value.compoundBps / 100}
-            onChange={(e) => change({ ...value, compoundBps: Number(e.target.value) * 100 })}
+            onChange={(e) =>
+              change({ ...value, compoundBps: Number(e.target.value) * 100 })
+            }
           />
-          <small>{100 - value.compoundBps / 100}% goes toward your stock picks.</small>
+          <small>
+            {100 - value.compoundBps / 100}% goes toward your stock picks.
+          </small>
         </label>
       )}
       {value.compoundBps < 10000 && (
@@ -110,8 +141,8 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             label="Stock basket"
             description={
               basket
-                ? "Split each purchase across several stocks."
-                : "Put each purchase into one stock."
+                ? 'Split each purchase across several stocks.'
+                : 'Put each purchase into one stock.'
             }
             checked={basket}
             onChange={(checked) => {
@@ -120,11 +151,16 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                 ...value,
                 allocation: checked
                   ? [
-                      { symbol: "NVDA", bps: 3400 },
-                      { symbol: "AAPL", bps: 3300 },
-                      { symbol: "SPY", bps: 3300 },
+                      { symbol: 'NVDA', bps: 3400 },
+                      { symbol: 'AAPL', bps: 3300 },
+                      { symbol: 'SPY', bps: 3300 },
                     ]
-                  : [{ symbol: value.allocation[0]?.symbol ?? "NVDA", bps: 10000 }],
+                  : [
+                      {
+                        symbol: value.allocation[0]?.symbol ?? 'NVDA',
+                        bps: 10000,
+                      },
+                    ],
               });
             }}
           />
@@ -132,11 +168,13 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             <label>
               Stock token
               <select
-                value={value.allocation[0]?.symbol ?? "NVDA"}
+                value={value.allocation[0]?.symbol ?? 'NVDA'}
                 onChange={(e) =>
                   change({
                     ...value,
-                    allocation: [{ symbol: e.target.value as Stock, bps: 10000 }],
+                    allocation: [
+                      { symbol: e.target.value as Stock, bps: 10000 },
+                    ],
                   })
                 }
               >
@@ -149,7 +187,9 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             </label>
           ) : (
             <fieldset className="basket-weights">
-              <legend>Share of the stock-purchase budget · {total / 100}% of 100%</legend>
+              <legend>
+                Share of the stock-purchase budget · {total / 100}% of 100%
+              </legend>
               {STOCKS.map((s) => (
                 <label key={s.symbol}>
                   <StockMark symbol={s.symbol} size={24} />
@@ -160,7 +200,10 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                     min="0"
                     max="100"
                     step="1"
-                    value={(value.allocation.find((a) => a.symbol === s.symbol)?.bps ?? 0) / 100}
+                    value={
+                      (value.allocation.find((a) => a.symbol === s.symbol)
+                        ?.bps ?? 0) / 100
+                    }
                     onChange={(e) => {
                       const bps = Number(e.target.value) * 100;
                       change({
@@ -169,8 +212,12 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                           const weight =
                             stock.symbol === s.symbol
                               ? bps
-                              : (value.allocation.find((a) => a.symbol === stock.symbol)?.bps ?? 0);
-                          return weight > 0 ? [{ symbol: stock.symbol, bps: weight }] : [];
+                              : (value.allocation.find(
+                                  (a) => a.symbol === stock.symbol,
+                                )?.bps ?? 0);
+                          return weight > 0
+                            ? [{ symbol: stock.symbol, bps: weight }]
+                            : [];
                         }),
                       });
                     }}
@@ -186,8 +233,8 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             label="Auto-convert"
             description={
               value.auto
-                ? "Buy your stock picks when the simulated minimum is reached."
-                : "Convert earnings when you choose."
+                ? 'Buy your stock picks when the simulated minimum is reached.'
+                : 'Convert earnings when you choose.'
             }
             checked={value.auto}
             onChange={(checked) => change({ ...value, auto: checked })}
@@ -201,18 +248,23 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
                 max="1000"
                 step="1"
                 value={value.threshold / 1e6}
-                onChange={(e) => change({ ...value, threshold: Number(e.target.value) * 1e6 })}
+                onChange={(e) =>
+                  change({ ...value, threshold: Number(e.target.value) * 1e6 })
+                }
               />
-              <small>Wait until the earnings reserved for stocks reach this amount.</small>
+              <small>
+                Wait until the earnings reserved for stocks reach this amount.
+              </small>
             </label>
           )}
           <details className="earn-cost-note">
             <summary>Why wait before converting?</summary>
             <p className="earn-small">
-              Larger, less frequent purchases can reduce fees as a share of your earnings. More
-              stocks can require more swaps. This simulation excludes gas, spread and trading fees;
-              its minimum is an amount threshold, not a cost check. Live purchases show a fresh
-              quote and ETH gas estimate for you to review.
+              Larger, less frequent purchases can reduce fees as a share of your
+              earnings. More stocks can require more swaps. This simulation
+              excludes gas, spread and trading fees; its minimum is an amount
+              threshold, not a cost check. Live purchases show a fresh quote and
+              ETH gas estimate for you to review.
             </p>
           </details>
         </>
@@ -221,21 +273,28 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
         <>
           <EarningsPlan value={value} />
           <p className="earn-small">
-            New earnings reinvest when you advance time. Any earnings already waiting from an
-            earlier plan stay available for a separate manual conversion or reinvestment.
+            New earnings reinvest when you advance time. Any earnings already
+            waiting from an earlier plan stay available for a separate manual
+            conversion or reinvestment.
           </p>
         </>
       )}
       <p className="earn-small">
-        Rules run when you advance the simulation. Compounding reinvests in DeFi; stock purchases
-        use fixed illustrative prices. No background trading.
+        Rules run when you advance the simulation. Compounding reinvests in
+        DeFi; stock purchases use fixed illustrative prices. No background
+        trading.
       </p>
     </div>
   );
 }
-function EarningsPlan({ value }: { value: Pick<Preferences, "allocation" | "compoundBps"> }) {
+function EarningsPlan({
+  value,
+}: {
+  value: Pick<Preferences, 'allocation' | 'compoundBps'>;
+}) {
   const valid =
-    value.compoundBps === 10000 || value.allocation.reduce((sum, a) => sum + a.bps, 0) === 10000;
+    value.compoundBps === 10000 ||
+    value.allocation.reduce((sum, a) => sum + a.bps, 0) === 10000;
   return (
     <div className="earn-plan-summary" aria-live="polite">
       <strong>Your earnings plan</strong>
@@ -247,7 +306,10 @@ function EarningsPlan({ value }: { value: Pick<Preferences, "allocation" | "comp
                 <div key={a.symbol}>
                   <dt>{a.symbol} tokens</dt>
                   <dd>
-                    {(((10000 - value.compoundBps) * a.bps) / 1e6).toLocaleString("en-US", {
+                    {(
+                      ((10000 - value.compoundBps) * a.bps) /
+                      1e6
+                    ).toLocaleString('en-US', {
                       maximumFractionDigits: 2,
                     })}
                     %
@@ -262,13 +324,14 @@ function EarningsPlan({ value }: { value: Pick<Preferences, "allocation" | "comp
             )}
           </dl>
           <small>
-            Share of new simulated earnings after loss recovery, before conversion costs. These
-            percentages do not allocate your deposit.
+            Share of new simulated earnings after loss recovery, before
+            conversion costs. These percentages do not allocate your deposit.
           </small>
         </>
       ) : (
         <p className="earn-small">
-          Set your stock-purchase weights to a total of 100% to complete this plan.
+          Set your stock-purchase weights to a total of 100% to complete this
+          plan.
         </p>
       )}
     </div>
@@ -296,9 +359,12 @@ function PositionCard({
     <article className="position-card">
       <div className="earn-row">
         <span className="earn-eyebrow">
-          {p.id.toUpperCase()} / {p.kind === "lend" ? "LENDING" : `${p.leverage}× LP MODEL`}
+          {p.id.toUpperCase()} /{' '}
+          {p.kind === 'lend' ? 'LENDING' : `${p.leverage}× LP MODEL`}
         </span>
-        <span className="earn-pill">{p.closed ? "Closed" : `${p.days} simulated days`}</span>
+        <span className="earn-pill">
+          {p.closed ? 'Closed' : `${p.days} simulated days`}
+        </span>
       </div>
       <h3>{p.name}</h3>
       <div className="position-metrics">
@@ -318,28 +384,32 @@ function PositionCard({
       <EarningsPlan value={p} />
       <p className="earn-small">
         {p.compoundBps === 10000
-          ? "New earnings reinvest; previous pending earnings stay available"
+          ? 'New earnings reinvest; previous pending earnings stay available'
           : p.auto
             ? `Auto-convert at ${money(p.threshold)} USDG`
-            : "Manual stock conversion"}{" "}
+            : 'Manual stock conversion'}{' '}
         · {money(p.compounded)} USDG compounded
       </p>
       {p.lossCarry > 0 && (
         <p className="earn-warning">
-          {money(p.lossCarry)} USDG of capital losses must be recovered before new stock purchases.
+          {money(p.lossCarry)} USDG of capital losses must be recovered before
+          new stock purchases.
         </p>
       )}
       {!p.closed && (
         <div className="position-simulation">
           <label>
             Advance scenario
-            <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+            <select
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+            >
               <option value={1}>1 day</option>
               <option value={7}>7 days</option>
               <option value={30}>30 days</option>
             </select>
           </label>
-          {p.kind === "lp" && (
+          {p.kind === 'lp' && (
             <label>
               LP value change (%)
               <input
@@ -355,7 +425,14 @@ function PositionCard({
           <button
             className="earn-button"
             disabled={busy || p.capital === 0}
-            onClick={() => command({ type: "advance", positionId: p.id, days, shockPct: shock })}
+            onClick={() =>
+              command({
+                type: 'advance',
+                positionId: p.id,
+                days,
+                shockPct: shock,
+              })
+            }
           >
             Simulate <ArrowRight size={15} />
           </button>
@@ -364,7 +441,7 @@ function PositionCard({
       <div className="position-actions">
         <button
           disabled={busy || p.pending < 1e6}
-          onClick={() => command({ type: "convert", positionId: p.id })}
+          onClick={() => command({ type: 'convert', positionId: p.id })}
         >
           Convert earnings
         </button>
@@ -372,11 +449,14 @@ function PositionCard({
           <>
             <button
               disabled={busy || p.pending <= 0 || p.capital <= 0}
-              onClick={() => command({ type: "compound", positionId: p.id })}
+              onClick={() => command({ type: 'compound', positionId: p.id })}
             >
               Compound now
             </button>
-            <button disabled={busy} onClick={() => command({ type: "close", positionId: p.id })}>
+            <button
+              disabled={busy}
+              onClick={() => command({ type: 'close', positionId: p.id })}
+            >
               Withdraw capital
             </button>
           </>
@@ -402,7 +482,7 @@ function PositionCard({
           className="position-edit"
           onSubmit={(e) => {
             e.preventDefault();
-            command({ type: "configure", positionId: p.id, ...preferences });
+            command({ type: 'configure', positionId: p.id, ...preferences });
           }}
         >
           <PayoutPicker value={preferences} change={setPreferences} />
@@ -410,21 +490,22 @@ function PositionCard({
             Save rules
           </button>
           <p className="earn-small">
-            Applies to future purchases. Existing stock holdings stay as they are.
+            Applies to future purchases. Existing stock holdings stay as they
+            are.
           </p>
         </form>
       )}
       <details className="position-assumptions">
         <summary>Scenario assumptions</summary>
         <p>
-          {p.kind === "lend"
+          {p.kind === 'lend'
             ? `${percent(p.apy)} seven-day historical APY held constant; observed ${new Date(p.rateAsOf).toLocaleString()}. ${p.rateSource}.`
             : `${p.feeApr}% fee APR on ${p.leverage}× exposure − ${p.borrowApr}% borrowing APR on debt − ${p.costApr}% cost APR on exposure = ${modeledNetApr(p).toFixed(2)}% modeled net APR before price changes.`}
         </p>
         <p>
-          Unconverted earnings sit idle. Leverage resets to its selected level at each step without
-          rebalancing costs. This model does not execute or simulate liquidations; real losses can
-          occur earlier.
+          Unconverted earnings sit idle. Leverage resets to its selected level
+          at each step without rebalancing costs. This model does not execute or
+          simulate liquidations; real losses can occur earlier.
         </p>
       </details>
     </article>
@@ -442,25 +523,25 @@ export default function DemoWorkspace({
   onClose: () => void;
 }) {
   const requestInFlight = useRef(false);
-  const [marketError, setMarketError] = useState("");
+  const [marketError, setMarketError] = useState('');
   const [state, setState] = useState<EarnState | null>(null),
     [market, setMarket] = useState<MarketCatalogue | null>(null);
   const [loading, setLoading] = useState(true),
-    [error, setError] = useState(""),
-    [notice, setNotice] = useState(""),
+    [error, setError] = useState(''),
+    [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false);
   const [pendingRequest, setPendingRequest] = useState<{
     key: string;
     body: Record<string, unknown>;
   } | null>(null);
-  const [kind, setKind] = useState<"lend" | "lp">("lend"),
+  const [kind, setKind] = useState<'lend' | 'lp'>('lend'),
     [amount, setAmount] = useState(1000);
   const [leverage, setLeverage] = useState(2),
     [feeApr, setFeeApr] = useState(10),
     [borrowApr, setBorrowApr] = useState(6),
     [costApr, setCostApr] = useState(1);
   const [preferences, setPreferences] = useState<Preferences>({
-    allocation: [{ symbol: "NVDA", bps: 10000 }],
+    allocation: [{ symbol: 'NVDA', bps: 10000 }],
     auto: true,
     threshold: 5e6,
     compoundBps: 0,
@@ -470,13 +551,19 @@ export default function DemoWorkspace({
     requestInFlight.current = true;
     setLoading(true);
     try {
-      const r = await fetch("/api/earn/account");
+      const session = await fetch('/api/demo/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
+      if (!session.ok) throw Error('Could not open the demo. Please retry.');
+      const r = await fetch('/api/earn/account');
       const v = (await r.json()) as { error?: string; state: EarnState };
-      if (!r.ok) throw Error(v.error ?? "Account unavailable.");
+      if (!r.ok) throw Error(v.error ?? 'Account unavailable.');
       setState(v.state);
-      setError("");
+      setError('');
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load your account.");
+      setError(e instanceof Error ? e.message : 'Could not load your account.');
     } finally {
       requestInFlight.current = false;
       setLoading(false);
@@ -488,22 +575,27 @@ export default function DemoWorkspace({
     void load();
   }, [open, load, pendingRequest]);
   useEffect(() => {
-    if (!open || view !== "setup") return;
+    if (!open || view !== 'setup') return;
     let active = true;
-    void fetch("/api/markets")
+    void fetch('/api/markets')
       .then(async (r) => {
         if (!r.ok)
-          throw Error("Lending rates are unavailable. Try again shortly or explore the LP model.");
+          throw Error(
+            'Lending rates are unavailable. Try again shortly or explore the LP model.',
+          );
         return r.json() as Promise<MarketCatalogue>;
       })
       .then((value) => {
         if (active) {
           setMarket(value);
-          setMarketError("");
+          setMarketError('');
         }
       })
       .catch((e) => {
-        if (active) setMarketError(e instanceof Error ? e.message : "Market data unavailable.");
+        if (active)
+          setMarketError(
+            e instanceof Error ? e.message : 'Market data unavailable.',
+          );
       });
     return () => {
       active = false;
@@ -514,32 +606,39 @@ export default function DemoWorkspace({
     requestInFlight.current = true;
     const key = retryKey ?? crypto.randomUUID();
     setBusy(true);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
-      const r = await fetch("/api/earn/commands", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "idempotency-key": key },
+      const r = await fetch('/api/earn/commands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'idempotency-key': key },
         body: JSON.stringify(body),
       });
-      const v = (await r.json()) as { error?: string; state: EarnState; replayed?: boolean };
+      const v = (await r.json()) as {
+        error?: string;
+        state: EarnState;
+        replayed?: boolean;
+      };
       if (!r.ok) {
         if (r.status >= 500 || retryKey) setPendingRequest({ key, body });
         else setPendingRequest(null);
-        throw Error(v.error ?? "Action failed.");
+        throw Error(v.error ?? 'Action failed.');
       }
-      setError("");
+      setError('');
       setState(v.state);
       setPendingRequest(null);
       setNotice(
         v.replayed
-          ? "Your saved action is confirmed. Nothing was applied twice."
-          : "Demo account saved. Balances and earnings are up to date.",
+          ? 'Your saved action is confirmed. Nothing was applied twice.'
+          : 'Demo account saved. Balances and earnings are up to date.',
       );
-      if (body.type === "open") onViewChange("results");
+      if (body.type === 'open') onViewChange('results');
     } catch (e) {
-      if (e instanceof TypeError || e instanceof SyntaxError) setPendingRequest({ key, body });
-      setError(e instanceof Error ? e.message : "Could not confirm this action.");
+      if (e instanceof TypeError || e instanceof SyntaxError)
+        setPendingRequest({ key, body });
+      setError(
+        e instanceof Error ? e.message : 'Could not confirm this action.',
+      );
     } finally {
       requestInFlight.current = false;
       setBusy(false);
@@ -549,7 +648,10 @@ export default function DemoWorkspace({
   const capital = state?.positions.reduce((n, p) => n + p.capital, 0) ?? 0,
     earned = state?.positions.reduce((n, p) => n + p.earned, 0) ?? 0,
     ready = state?.positions.reduce((n, p) => n + p.pending, 0) ?? 0;
-  const stockCost = Object.values(state?.holdings ?? {}).reduce((n, h) => n + (h?.cost ?? 0), 0);
+  const stockCost = Object.values(state?.holdings ?? {}).reduce(
+    (n, h) => n + (h?.cost ?? 0),
+    0,
+  );
   function exportLedger() {
     if (!state) return;
     const url = URL.createObjectURL(
@@ -557,7 +659,7 @@ export default function DemoWorkspace({
         [
           JSON.stringify(
             {
-              mode: "simulation",
+              mode: 'simulation',
               exportedAt: new Date().toISOString(),
               ...state,
               entries: state.entries.map((entry) => ({
@@ -570,12 +672,12 @@ export default function DemoWorkspace({
             2,
           ),
         ],
-        { type: "application/json" },
+        { type: 'application/json' },
       ),
     );
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "freestock-demo-ledger.json";
+    a.download = 'freestock-demo-ledger.json';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -584,42 +686,18 @@ export default function DemoWorkspace({
       {loading && <p>Loading your demo account…</p>}
       {error && (
         <p role="alert">
-          {error}{" "}
+          {error}{' '}
           {pendingRequest ? (
             <button
               type="button"
               disabled={busy}
-              onClick={() => void command(pendingRequest.body, pendingRequest.key)}
+              onClick={() =>
+                void command(pendingRequest.body, pendingRequest.key)
+              }
             >
               Retry this action
             </button>
           ) : null}
-          {error.startsWith("Sign in") && pendingRequest && (
-            <span>
-              Sign in in a new tab, then retry this saved action here.{" "}
-              <a
-                className="earn-link"
-                href="/signin-with-chatgpt?return_to=%2F%3Fdemo%3Dresults"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Sign in again
-              </a>
-            </span>
-          )}
-          {error.startsWith("Sign in") && !pendingRequest && (
-            <button
-              type="button"
-              className="earn-link"
-              onClick={() =>
-                window.location.assign(
-                  `/signin-with-chatgpt?return_to=${encodeURIComponent(`/?demo=${view}`)}`,
-                )
-              }
-            >
-              Sign in to try it
-            </button>
-          )}
           {!state && !pendingRequest && (
             <button type="button" onClick={() => void load()}>
               Retry loading
@@ -645,8 +723,8 @@ export default function DemoWorkspace({
           details.cancel();
           setError(
             pendingRequest
-              ? "Retry your pending action before closing so its result can be confirmed."
-              : "Your action is saving. This will only take a moment.",
+              ? 'Retry your pending action before closing so its result can be confirmed.'
+              : 'Your action is saving. This will only take a moment.',
           );
         } else onClose();
       }}
@@ -654,7 +732,9 @@ export default function DemoWorkspace({
       <DialogContent className="earn demo-modal" showCloseButton={canClose}>
         <div className="demo-modal-heading">
           <span className="earn-eyebrow">THE FREESTOCK DEMO</span>
-          <DialogTitle className="demo-modal-title">Try it yourself</DialogTitle>
+          <DialogTitle className="demo-modal-title">
+            Try it yourself
+          </DialogTitle>
           <DialogDescription className="demo-modal-description">
             Explore with simulated money. Your real wallet is never affected.
           </DialogDescription>
@@ -663,15 +743,15 @@ export default function DemoWorkspace({
           <nav aria-label="Simulation views" className="demo-tabs">
             {(
               [
-                ["setup", "Create position"],
-                ["results", "Your results"],
-                ["activity", "Activity"],
+                ['setup', 'Create position'],
+                ['results', 'Your results'],
+                ['activity', 'Activity'],
               ] as const
             ).map(([key, label]) => (
               <button
                 key={key}
                 type="button"
-                aria-current={view === key ? "page" : undefined}
+                aria-current={view === key ? 'page' : undefined}
                 disabled={busy}
                 onClick={() => onViewChange(key)}
               >
@@ -680,12 +760,13 @@ export default function DemoWorkspace({
             ))}
           </nav>
           <span className="demo-balance">
-            {state ? money(state.wallet) : "…"} <small>simulated USDG available</small>
+            {state ? money(state.wallet) : '…'}{' '}
+            <small>simulated USDG available</small>
           </span>
         </div>
         <div className="demo-modal-body" key={view}>
           {feedback}
-          {view === "setup" ? (
+          {view === 'setup' ? (
             <div className="demo-setup-layout">
               <aside className="demo-guide">
                 <span className="earn-pill">No real funds</span>
@@ -695,8 +776,13 @@ export default function DemoWorkspace({
                   <li>Pick a stock, basket, or compound.</li>
                   <li>Advance time and explore the results.</li>
                 </ol>
-                <p>Start with 10,000 simulated USDG. Saved scenarios stay in this demo.</p>
-                {marketError && <output className="earn-warning">{marketError}</output>}
+                <p>
+                  Start with 10,000 simulated USDG. Saved scenarios stay in this
+                  demo.
+                </p>
+                {marketError && (
+                  <output className="earn-warning">{marketError}</output>
+                )}
               </aside>
               <form
                 className="earn-builder"
@@ -705,7 +791,7 @@ export default function DemoWorkspace({
                 onSubmit={(e) => {
                   e.preventDefault();
                   void command({
-                    type: "open",
+                    type: 'open',
                     kind,
                     amount: Math.round(amount * 1e6),
                     ...preferences,
@@ -721,46 +807,67 @@ export default function DemoWorkspace({
                   <span className="earn-pill">Simulated money</span>
                 </div>
                 <p className="earn-small" id="demo-explainer">
-                  Explore with 10,000 simulated USDG. These settings and results do not affect your
-                  wallet. Auto-convert and leveraged LP options here are simulations.
+                  Explore with 10,000 simulated USDG. These settings and results
+                  do not affect your wallet. Auto-convert and leveraged LP
+                  options here are simulations.
                 </p>
 
-                <h3 className="earn-setting-title">How should your capital earn?</h3>
-                <fieldset className="earn-segment" aria-label="Position type" data-kind={kind}>
+                <h3 className="earn-setting-title">
+                  How should your capital earn?
+                </h3>
+                <fieldset
+                  className="earn-segment"
+                  aria-label="Position type"
+                  data-kind={kind}
+                >
                   <button
                     type="button"
-                    aria-pressed={kind === "lend"}
-                    onClick={() => setKind("lend")}
+                    aria-pressed={kind === 'lend'}
+                    onClick={() => setKind('lend')}
                   >
                     Lending
                   </button>
-                  <button type="button" aria-pressed={kind === "lp"} onClick={() => setKind("lp")}>
+                  <button
+                    type="button"
+                    aria-pressed={kind === 'lp'}
+                    onClick={() => setKind('lp')}
+                  >
                     Leveraged LP model
                   </button>
                 </fieldset>
-                {kind === "lend" ? (
+                {kind === 'lend' ? (
                   <div className="selected-vault">
                     <div>
-                      <span className="earn-eyebrow">MORPHO · ROBINHOOD CHAIN</span>
+                      <span className="earn-eyebrow">
+                        MORPHO · ROBINHOOD CHAIN
+                      </span>
                       <strong>Steakhouse USDG</strong>
                     </div>
                     <div>
-                      <strong>{market ? percent(market.vault.apy) : "—"}</strong>
+                      <strong>
+                        {market ? percent(market.vault.apy) : '—'}
+                      </strong>
                       <small>7-day historical APY</small>
                     </div>
                   </div>
                 ) : (
                   <>
                     <p className="earn-small">
-                      Explore LP fees, borrowing costs and changing asset values. Assumed rates; no
-                      executable pool connected.
+                      Explore LP fees, borrowing costs and changing asset
+                      values. Assumed rates; no executable pool connected.
                     </p>
                     <div className="lp-inputs">
                       {[
-                        ["Leverage (×)", leverage, setLeverage, 1, 3],
-                        ["LP fee APR (%)", feeApr, setFeeApr, 0, 100],
-                        ["Borrow APR (%)", borrowApr, setBorrowApr, 0, 100],
-                        ["Cost APR on exposure (%)", costApr, setCostApr, 0, 100],
+                        ['Leverage (×)', leverage, setLeverage, 1, 3],
+                        ['LP fee APR (%)', feeApr, setFeeApr, 0, 100],
+                        ['Borrow APR (%)', borrowApr, setBorrowApr, 0, 100],
+                        [
+                          'Cost APR on exposure (%)',
+                          costApr,
+                          setCostApr,
+                          0,
+                          100,
+                        ],
                       ].map(([label, value, setter, min, max]) => (
                         <label key={String(label)}>
                           {String(label)}
@@ -771,24 +878,35 @@ export default function DemoWorkspace({
                             max={Number(max)}
                             value={Number(value)}
                             onChange={(e) =>
-                              (setter as (v: number) => void)(Number(e.target.value))
+                              (setter as (v: number) => void)(
+                                Number(e.target.value),
+                              )
                             }
                           />
                         </label>
                       ))}
                     </div>
                     <div className="earn-model-return">
-                      {modeledNetApr({ leverage, feeApr, borrowApr, costApr }).toFixed(2)}%{" "}
-                      <small>modeled net APR before price changes</small>
+                      {modeledNetApr({
+                        leverage,
+                        feeApr,
+                        borrowApr,
+                        costApr,
+                      }).toFixed(2)}
+                      % <small>modeled net APR before price changes</small>
                     </div>
                   </>
                 )}
-                {kind === "lend" && market && (
+                {kind === 'lend' && market && (
                   <p className="earn-small">
-                    {market.status === "live" ? "Live Morpho data" : "Saved Morpho snapshot"} ·
-                    observed{" "}
-                    {new Date(market.vault.asOf).toLocaleString("en-US", { timeZone: "UTC" })} UTC.
-                    This historical rate is held constant in your scenario.
+                    {market.status === 'live'
+                      ? 'Live Morpho data'
+                      : 'Saved Morpho snapshot'}{' '}
+                    · observed{' '}
+                    {new Date(market.vault.asOf).toLocaleString('en-US', {
+                      timeZone: 'UTC',
+                    })}{' '}
+                    UTC. This historical rate is held constant in your scenario.
                   </p>
                 )}
                 <label>
@@ -803,7 +921,10 @@ export default function DemoWorkspace({
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
                   />
-                  <small>Available: {state ? money(state.wallet) : "—"} simulated USDG</small>
+                  <small>
+                    Available: {state ? money(state.wallet) : '—'} simulated
+                    USDG
+                  </small>
                 </label>
                 <div className="earn-divider">
                   <ArrowDown size={16} />
@@ -811,29 +932,38 @@ export default function DemoWorkspace({
                 <PayoutPicker value={preferences} change={setPreferences} />
                 <button
                   className="earn-button earn-button-wide"
-                  disabled={locked || (kind === "lend" && (!market || market.vault.apy === null))}
+                  disabled={
+                    locked ||
+                    (kind === 'lend' && (!market || market.vault.apy === null))
+                  }
                 >
-                  {busy ? "Saving…" : "Try this position"}
+                  {busy ? 'Saving…' : 'Try this position'}
                   <ArrowUpRight size={18} />
                 </button>
                 <button
                   type="button"
                   className="earn-link"
                   disabled={busy || !!pendingRequest}
-                  onClick={() => onViewChange("results")}
+                  onClick={() => onViewChange('results')}
                 >
                   View saved results <ArrowRight size={16} />
                 </button>
               </form>
             </div>
-          ) : view === "results" ? (
+          ) : view === 'results' ? (
             <>
               <div className="demo-view-heading">
                 <div>
                   <h2>Your simulated portfolio</h2>
-                  <p>Advance time, convert earnings, and explore your positions.</p>
+                  <p>
+                    Advance time, convert earnings, and explore your positions.
+                  </p>
                 </div>
-                <button type="button" className="earn-link" onClick={() => onViewChange("setup")}>
+                <button
+                  type="button"
+                  className="earn-link"
+                  onClick={() => onViewChange('setup')}
+                >
                   New position <ArrowRight size={16} />
                 </button>
               </div>
@@ -847,7 +977,7 @@ export default function DemoWorkspace({
                     <button
                       type="button"
                       className="earn-link"
-                      onClick={() => onViewChange("activity")}
+                      onClick={() => onViewChange('activity')}
                     >
                       See activity <ArrowUpRight size={16} />
                     </button>
@@ -893,13 +1023,13 @@ export default function DemoWorkspace({
                       <Layers size={24} />
                       <h3>Start your first scenario.</h3>
                       <p>
-                        Choose a position and your stock picks, then advance time to explore the
-                        outcome.
+                        Choose a position and your stock picks, then advance
+                        time to explore the outcome.
                       </p>
                       <button
                         type="button"
                         className="earn-link"
-                        onClick={() => onViewChange("setup")}
+                        onClick={() => onViewChange('setup')}
                       >
                         Try your first position <ArrowRight size={16} />
                       </button>
@@ -917,20 +1047,29 @@ export default function DemoWorkspace({
                     </span>
                   </div>
                   <div className="holdings-grid">
-                    {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
-                      <article key={s.symbol}>
-                        <StockMark symbol={s.symbol} size={40} />
-                        <div>
-                          <h3>{s.symbol}</h3>
-                          <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} simulated tokens</p>
-                          <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
-                        </div>
-                      </article>
-                    ))}
+                    {STOCKS.filter((s) => state?.holdings[s.symbol]).map(
+                      (s) => (
+                        <article key={s.symbol}>
+                          <StockMark symbol={s.symbol} size={40} />
+                          <div>
+                            <h3>{s.symbol}</h3>
+                            <p>
+                              {state!.holdings[s.symbol]!.quantity.toFixed(6)}{' '}
+                              simulated tokens
+                            </p>
+                            <small>
+                              {money(state!.holdings[s.symbol]!.cost)} USDG
+                              modeled cost
+                            </small>
+                          </div>
+                        </article>
+                      ),
+                    )}
                   </div>
                   {stockCost === 0 && (
                     <p className="earn-muted">
-                      Your chosen tokens appear here after a simulated earnings conversion.
+                      Your chosen tokens appear here after a simulated earnings
+                      conversion.
                     </p>
                   )}
                 </section>
@@ -942,8 +1081,8 @@ export default function DemoWorkspace({
                 <div>
                   <h2>Your demo activity</h2>
                   <p>
-                    Every deposit, modeled return and stock allocation. These are simulation
-                    records.
+                    Every deposit, modeled return and stock allocation. These
+                    are simulation records.
                   </p>
                 </div>
               </div>
@@ -966,16 +1105,21 @@ export default function DemoWorkspace({
                 </div>
               </div>
               <div className="transparency-equation">
-                Wallet + position capital + available earnings + stock purchase cost = 10,000
-                starting USDG + net modeled earnings.
+                Wallet + position capital + available earnings + stock purchase
+                cost = 10,000 starting USDG + net modeled earnings.
               </div>
               <p className="earn-small">
-                Reconciliation uses historical purchase cost, not stock market value. Internal
-                transfers and compounding do not create earnings.
+                Reconciliation uses historical purchase cost, not stock market
+                value. Internal transfers and compounding do not create
+                earnings.
               </p>
               <div className="section-title">
                 <h2>Activity record</h2>
-                <button className="earn-button" disabled={!state} onClick={exportLedger}>
+                <button
+                  className="earn-button"
+                  disabled={!state}
+                  onClick={exportLedger}
+                >
                   Export demo ledger <ArrowUpRight size={16} />
                 </button>
               </div>
@@ -984,10 +1128,14 @@ export default function DemoWorkspace({
                   <article key={entry.id}>
                     <div className="earn-row">
                       <span className="earn-eyebrow">
-                        #{entry.id} · {entry.positionId.toUpperCase()} ·{" "}
+                        #{entry.id} · {entry.positionId.toUpperCase()} ·{' '}
                         {new Date(entry.at).toLocaleString()}
                       </span>
-                      <strong>{entry.amount === 0 ? "—" : `${money(entry.amount)} USDG`}</strong>
+                      <strong>
+                        {entry.amount === 0
+                          ? '—'
+                          : `${money(entry.amount)} USDG`}
+                      </strong>
                     </div>
                     <h3>{simulationLabel(entry.action)}</h3>
                     <p>{simulationLabel(entry.detail)}</p>
@@ -995,8 +1143,9 @@ export default function DemoWorkspace({
                       <ul>
                         {entry.purchases.map((buy) => (
                           <li key={buy.symbol}>
-                            {buy.symbol}: {buy.quantity.toFixed(8)} simulated tokens ·{" "}
-                            {money(buy.amount)} USDG · illustrative price ${buy.price}
+                            {buy.symbol}: {buy.quantity.toFixed(8)} simulated
+                            tokens · {money(buy.amount)} USDG · illustrative
+                            price ${buy.price}
                           </li>
                         ))}
                       </ul>
@@ -1008,7 +1157,11 @@ export default function DemoWorkspace({
                 <div className="earn-empty">
                   <RefreshCw size={24} />
                   <h3>No earnings activity yet.</h3>
-                  <button type="button" className="earn-link" onClick={() => onViewChange("setup")}>
+                  <button
+                    type="button"
+                    className="earn-link"
+                    onClick={() => onViewChange('setup')}
+                  >
                     Create a simulated position <ArrowRight size={16} />
                   </button>
                 </div>

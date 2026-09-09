@@ -1,0 +1,443 @@
+{
+  "startedAt": "2026-09-09T18:06:15.737Z",
+  "rpc": "http://127.0.0.1:18549",
+  "chainId": 4663,
+  "sourceForkBlock": 58746420,
+  "publicTransactions": false,
+  "localForkOnly": true,
+  "fakeFunds": true,
+  "generatedWalletsOnly": true,
+  "privateKeysPersisted": false,
+  "gateOrRoleOverrides": false,
+  "privilegedImpersonation": false,
+  "accountGasLimitPolicy": "eth_estimateGas plus 20 percent, matching application preparation",
+  "preliminaryAttempt": {
+    "evidence": "v2-v1-fork-regression-unbuffered-attempt.json",
+    "finding": "An unbuffered legacy deposit reverted with gas used457257 and gas limit0x70ecd. The identical call replayed successfully without an explicit gas cap; account calls below use the application gas buffer.",
+    "failedLocalHash": "0xfc7d2db0b5dd3257393bf883d06012d35ed76871413b3a8d52f89a2ac0bd9b3d"
+  },
+  "constructedSurplus": "Direct donation of fake USDG, not measured lending income.",
+  "checks": [
+    {
+      "name": "exact local RPC allowlist",
+      "passed": true
+    },
+    {
+      "name": "local chain advertises expected fork chain ID",
+      "passed": true
+    },
+    {
+      "name": "Anvil fork guard",
+      "passed": true
+    },
+    {
+      "name": "RPC is explicitly Anvil",
+      "passed": true
+    },
+    {
+      "name": "configured vault asset and USDG decimals",
+      "passed": true
+    },
+    {
+      "name": "v2: source hash matches saved artifact",
+      "passed": true
+    },
+    {
+      "name": "v1: source hash matches saved artifact",
+      "passed": true
+    },
+    {
+      "name": "v2: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "v2: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "v2: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "v1: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "v1: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "v1: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "outsider: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "outsider: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "outsider: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "v2: exact artifact deployed",
+      "passed": true
+    },
+    {
+      "name": "v2: owner and fixed dependencies match",
+      "passed": true
+    },
+    {
+      "name": "v2: exact immutable cap",
+      "passed": true,
+      "details": {
+        "cap": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      }
+    },
+    {
+      "name": "v2: all five configured stocks allowed",
+      "passed": true
+    },
+    {
+      "name": "v1: exact artifact deployed",
+      "passed": true
+    },
+    {
+      "name": "v1: owner and fixed dependencies match",
+      "passed": true
+    },
+    {
+      "name": "v1: exact immutable cap",
+      "passed": true,
+      "details": {
+        "cap": "100000000"
+      }
+    },
+    {
+      "name": "v1: all five configured stocks allowed",
+      "passed": true
+    },
+    {
+      "name": "V2 rejects non-owner deposit",
+      "passed": true,
+      "details": {
+        "expectedReason": "OWNER_ONLY",
+        "observedReason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "V2 rejects non-owner full exit",
+      "passed": true,
+      "details": {
+        "expectedReason": "OWNER_ONLY",
+        "observedReason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "V2 non-owner full exit also reverts when mined",
+      "passed": true
+    },
+    {
+      "name": "V2 exact 1000 USDG approval: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 approval equals reviewed deposit",
+      "passed": true
+    },
+    {
+      "name": "V2 1000 USDG deposit simulates",
+      "passed": true
+    },
+    {
+      "name": "V2 1000 USDG deposit: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 principal records deposit greater than old limit",
+      "passed": true
+    },
+    {
+      "name": "V2 owner approval consumed exactly",
+      "passed": true
+    },
+    {
+      "name": "V2 temporary vault approval reset",
+      "passed": true
+    },
+    {
+      "name": "V2 holds vault shares and preserves value within rounding",
+      "passed": true
+    },
+    {
+      "name": "V1 rejects deposit above 100 USDG",
+      "passed": true,
+      "details": {
+        "expectedReason": "DEPOSIT_CAP",
+        "observedReason": "DEPOSIT_CAP"
+      }
+    },
+    {
+      "name": "V1 above-cap deposit also reverts when mined",
+      "passed": true
+    },
+    {
+      "name": "V1 above-cap rejection leaves principal and funds unchanged",
+      "passed": true
+    },
+    {
+      "name": "V1 constructor rejects uncapped configuration",
+      "passed": true,
+      "details": {
+        "expectedReason": "PILOT_LIMIT",
+        "observedReason": "PILOT_LIMIT"
+      }
+    },
+    {
+      "name": "V1 exact 100 USDG approval: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V1 approval equals reviewed deposit",
+      "passed": true
+    },
+    {
+      "name": "V1 deposit at its preserved 100 USDG cap: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V1 cap, principal and allowance remain exact",
+      "passed": true
+    },
+    {
+      "name": "V1 rejects an additional micro-USDG at cap",
+      "passed": true,
+      "details": {
+        "expectedReason": "DEPOSIT_CAP",
+        "observedReason": "DEPOSIT_CAP"
+      }
+    },
+    {
+      "name": "V2 cannot spend principal as surplus",
+      "passed": true,
+      "details": {
+        "expectedReason": "YIELD_ONLY",
+        "observedReason": "YIELD_ONLY"
+      }
+    },
+    {
+      "name": "V2 donate 1 fake USDG to construct surplus: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 donation increases surplus without changing principal",
+      "passed": true
+    },
+    {
+      "name": "NVDA current local-fork pool exists",
+      "passed": true
+    },
+    {
+      "name": "NVDA current local-fork quote has positive minimum",
+      "passed": true
+    },
+    {
+      "name": "V2 convert 0.1 donated USDG into NVDA: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 stock reaches owner and meets minimum",
+      "passed": true
+    },
+    {
+      "name": "V2 actual spend and principal guard hold",
+      "passed": true
+    },
+    {
+      "name": "V2 router and vault allowances reset after harvest",
+      "passed": true
+    },
+    {
+      "name": "v2 full withdrawal: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "v2: full withdrawal clears shares, idle assets and principal",
+      "passed": true
+    },
+    {
+      "name": "v2: wallet USDG reconciles within two micro units",
+      "passed": true,
+      "details": {
+        "finalUsdG": "1999900004"
+      }
+    },
+    {
+      "name": "v1 full withdrawal: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "v1: full withdrawal clears shares, idle assets and principal",
+      "passed": true
+    },
+    {
+      "name": "v1: wallet USDG reconciles within two micro units",
+      "passed": true,
+      "details": {
+        "finalUsdG": "300000000"
+      }
+    }
+  ],
+  "transactions": [
+    {
+      "label": "v2 deploy",
+      "hash": "0x8cd0cc600fbac23c371376d4a74cecfd1522baa5c431adbc6d0c8086d86d39ad",
+      "block": 58746431,
+      "blockHash": "0xb10f3b9a74b3a77c7285899b92de9fff6765f035917df64b996e953cf4fc8120",
+      "status": 1,
+      "gasUsed": "1955105"
+    },
+    {
+      "label": "v1 deploy",
+      "hash": "0xdd7acebd3deb56d5ab79d5fca41183f239e21b9d664346109593ea5bc57c2d23",
+      "block": 58746432,
+      "blockHash": "0x950807819a20201a268e29a6fd4fe95b9a9b002de96d5a0de336e5455854da02",
+      "status": 1,
+      "gasUsed": "1955062"
+    },
+    {
+      "label": "V2 non-owner full exit also reverts when mined",
+      "hash": "0x7a91a1d5066bf585a9175492ccc89c3f597530dbe3ced49f7ebfa8912c7bcf1c",
+      "block": 58746433,
+      "blockHash": "0xcc6e92fb1b49bd0f1567ae611d2d279c8803ff171fd46ccea2b899024df883ca",
+      "status": 0,
+      "gasUsed": "21612"
+    },
+    {
+      "label": "V2 exact 1000 USDG approval",
+      "hash": "0x93c0b4e78ea818796b0dcb65105400ff0cc05dfa4d3601527906572eaaf2e51d",
+      "block": 58746434,
+      "blockHash": "0x06e5fc39cfd51f1124bc04e6dbae3828c03a53952725f6d3e7e69eab167964f9",
+      "status": 1,
+      "gasUsed": "57976"
+    },
+    {
+      "label": "V2 1000 USDG deposit",
+      "hash": "0x07c653c1134130f73e33aef4dce5e185573e7a727cb260ec6057929ad177bfe3",
+      "block": 58746435,
+      "blockHash": "0x2e11e79fcc35896b43cc1f463dfd417d17448a075ceae2012c757d0bc56a13b3",
+      "status": 1,
+      "gasUsed": "402807"
+    },
+    {
+      "label": "V1 above-cap deposit also reverts when mined",
+      "hash": "0xa4cabf81eaaf3f28f107ea666b04400ae869ccb31c55d8fe04bfef501cb0d517",
+      "block": 58746436,
+      "blockHash": "0xc5a2068f1f259f67f96ae05ab4e974a2ad5bbd50c1622b545c50f67c21b09ebb",
+      "status": 0,
+      "gasUsed": "29257"
+    },
+    {
+      "label": "V1 exact 100 USDG approval",
+      "hash": "0x72fa2e1b49a4936f0e3bd5172c0e42232cde37945f244f923d4609415eb61b88",
+      "block": 58746437,
+      "blockHash": "0x328aa01effd79047c3b700bac82766ee50362da22d44d9335d002bf6052971ea",
+      "status": 1,
+      "gasUsed": "57976"
+    },
+    {
+      "label": "V1 deposit at its preserved 100 USDG cap",
+      "hash": "0x2ddefa920f43fd4dc3b9f2b20e97bd5407b87d41927f04238531dfecedbc89c8",
+      "block": 58746438,
+      "blockHash": "0xd542aee6295b6e3413af02ba54962243ab6e6099f4bdf4df87a7faaa90bc641b",
+      "status": 1,
+      "gasUsed": "402807"
+    },
+    {
+      "label": "V2 donate 1 fake USDG to construct surplus",
+      "hash": "0xeefc70f00e1d0f89087e56b4c63266640762da991b0a2245f4a954baee074891",
+      "block": 58746439,
+      "blockHash": "0xfcb760748bc52f4c9d2d5e684446df63b76e124a0c1fe43dfb842f6a3edd571f",
+      "status": 1,
+      "gasUsed": "65366"
+    },
+    {
+      "label": "V2 convert 0.1 donated USDG into NVDA",
+      "hash": "0x768c626560f7b5724db208b402a2b93372c5da3ca72ec7f34babd48539ceb91b",
+      "block": 58746440,
+      "blockHash": "0x2a53fe58479304c9b870a73796f808bd68415b785e268950073ec43da164cb8b",
+      "status": 1,
+      "gasUsed": "665325"
+    },
+    {
+      "label": "v2 full withdrawal",
+      "hash": "0x0f06d2fae38229c1157a7730fe3fc56289ce0ef8b26af7bd904f144a013d38a5",
+      "block": 58746441,
+      "blockHash": "0xcb91c52623267f3ac23f129be514f7322376b62d0b07846ed62cdb1497322ab3",
+      "status": 1,
+      "gasUsed": "304129"
+    },
+    {
+      "label": "v1 full withdrawal",
+      "hash": "0x06ec8548a245b8d503d5cbb9ab7fb22b9692120aacf915cf9436ecdc13e6c6b8",
+      "block": 58746442,
+      "blockHash": "0xf8a09daffe5147feea134135ae2ced4cca377246591a2519d82b43f98f5e3128",
+      "status": 1,
+      "gasUsed": "304129"
+    }
+  ],
+  "accounts": {
+    "v2": {
+      "wallet": "0x1c5C3B22383AFA232533eD20FA67c18F0932932F",
+      "fakeUsdg": "2000000000",
+      "balanceMappingBaseSlot": 1,
+      "account": "0x25f7F8339fb0Ff32c591234Bc1fFb31838fDd2C5",
+      "finalWalletUsdg": "1999900004"
+    },
+    "v1": {
+      "wallet": "0xb19B65760856b3C34887a9f1D165F6E59cfE04F5",
+      "fakeUsdg": "300000000",
+      "balanceMappingBaseSlot": 1,
+      "account": "0x18815e487b4bD43880b4c59B2fC1d62b9B5dC2be",
+      "finalWalletUsdg": "300000000"
+    },
+    "outsider": {
+      "wallet": "0x3c250Bc932Be9F2A7aFF1f5B21c7b3b04372C5b0",
+      "fakeUsdg": "0",
+      "balanceMappingBaseSlot": 1
+    }
+  },
+  "artifacts": {
+    "v2": {
+      "file": "contracts/artifacts/FreestockYieldAccount.artifact.json",
+      "sourceHash": "0x0af9043d203a80084418631689c0b89bb40e9fc1af0c6f24071a6991ff17e214",
+      "creationBytecodeHash": "0x8417a94150166b257bfdc3100f189a412a566a5d31133f1d67d488975dfa0711",
+      "compiler": "0.8.30+commit.73712a01.Emscripten.clang"
+    },
+    "v1": {
+      "file": "contracts/legacy/v1/FreestockYieldAccount.artifact.json",
+      "sourceHash": "0xb43bec67f7266c27c1da0fc40b35775496f2ee5c0a8f31218500bd1ea7352656",
+      "creationBytecodeHash": "0x6df74e29147934ade5be3659f7dd1aa9953a1ac1a5fea8a258ec77d375f4e59c",
+      "compiler": "0.8.30+commit.73712a01.Emscripten.clang"
+    }
+  },
+  "completed": true,
+  "localStartBlock": 58746429,
+  "sourceForkHash": "0x0ae954b70a9db9fff1c4a6028d110fb59875716bde67e1f98e3369157f9829b7",
+  "harvest": {
+    "pool": "0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3",
+    "fee": 500,
+    "constructedDonation": "1000000",
+    "spentUsdg": "100000",
+    "quotedTokens": "445446546791484",
+    "minimumTokens": "440992081323569",
+    "receivedTokens": "445446546791484",
+    "surplusSource": "fake USDG donation, not observed borrower interest"
+  },
+  "finishedAt": "2026-09-09T18:06:22.812Z",
+  "checkCount": 59,
+  "transactionCount": 12
+}

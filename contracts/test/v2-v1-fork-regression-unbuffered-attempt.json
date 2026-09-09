@@ -1,0 +1,304 @@
+{
+  "startedAt": "2026-09-09T18:04:48.305Z",
+  "rpc": "http://127.0.0.1:18549",
+  "chainId": 4663,
+  "sourceForkBlock": 58746420,
+  "publicTransactions": false,
+  "localForkOnly": true,
+  "fakeFunds": true,
+  "generatedWalletsOnly": true,
+  "privateKeysPersisted": false,
+  "gateOrRoleOverrides": false,
+  "privilegedImpersonation": false,
+  "constructedSurplus": "Direct donation of fake USDG, not measured lending income.",
+  "checks": [
+    {
+      "name": "exact local RPC allowlist",
+      "passed": true
+    },
+    {
+      "name": "local chain advertises expected fork chain ID",
+      "passed": true
+    },
+    {
+      "name": "Anvil fork guard",
+      "passed": true
+    },
+    {
+      "name": "RPC is explicitly Anvil",
+      "passed": true
+    },
+    {
+      "name": "configured vault asset and USDG decimals",
+      "passed": true
+    },
+    {
+      "name": "v2: source hash matches saved artifact",
+      "passed": true
+    },
+    {
+      "name": "v1: source hash matches saved artifact",
+      "passed": true
+    },
+    {
+      "name": "v2: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "v2: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "v2: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "v1: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "v1: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "v1: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "outsider: fresh address has no prior code, ETH or USDG",
+      "passed": true
+    },
+    {
+      "name": "outsider: only the fresh USDG balance slot is empty",
+      "passed": true
+    },
+    {
+      "name": "outsider: fake USDG funding matches balanceOf",
+      "passed": true
+    },
+    {
+      "name": "v2: exact artifact deployed",
+      "passed": true
+    },
+    {
+      "name": "v2: owner and fixed dependencies match",
+      "passed": true
+    },
+    {
+      "name": "v2: exact immutable cap",
+      "passed": true,
+      "details": {
+        "cap": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      }
+    },
+    {
+      "name": "v2: all five configured stocks allowed",
+      "passed": true
+    },
+    {
+      "name": "v1: exact artifact deployed",
+      "passed": true
+    },
+    {
+      "name": "v1: owner and fixed dependencies match",
+      "passed": true
+    },
+    {
+      "name": "v1: exact immutable cap",
+      "passed": true,
+      "details": {
+        "cap": "100000000"
+      }
+    },
+    {
+      "name": "v1: all five configured stocks allowed",
+      "passed": true
+    },
+    {
+      "name": "V2 rejects non-owner deposit",
+      "passed": true,
+      "details": {
+        "expectedReason": "OWNER_ONLY",
+        "observedReason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "V2 rejects non-owner full exit",
+      "passed": true,
+      "details": {
+        "expectedReason": "OWNER_ONLY",
+        "observedReason": "OWNER_ONLY"
+      }
+    },
+    {
+      "name": "V2 non-owner full exit also reverts when mined",
+      "passed": true
+    },
+    {
+      "name": "V2 exact 1000 USDG approval: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 approval equals reviewed deposit",
+      "passed": true
+    },
+    {
+      "name": "V2 1000 USDG deposit simulates",
+      "passed": true
+    },
+    {
+      "name": "V2 1000 USDG deposit: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V2 principal records deposit greater than old limit",
+      "passed": true
+    },
+    {
+      "name": "V2 owner approval consumed exactly",
+      "passed": true
+    },
+    {
+      "name": "V2 temporary vault approval reset",
+      "passed": true
+    },
+    {
+      "name": "V2 holds vault shares and preserves value within rounding",
+      "passed": true
+    },
+    {
+      "name": "V1 rejects deposit above 100 USDG",
+      "passed": true,
+      "details": {
+        "expectedReason": "DEPOSIT_CAP",
+        "observedReason": "DEPOSIT_CAP"
+      }
+    },
+    {
+      "name": "V1 above-cap deposit also reverts when mined",
+      "passed": true
+    },
+    {
+      "name": "V1 above-cap rejection leaves principal and funds unchanged",
+      "passed": true
+    },
+    {
+      "name": "V1 constructor rejects uncapped configuration",
+      "passed": true,
+      "details": {
+        "expectedReason": "PILOT_LIMIT",
+        "observedReason": "PILOT_LIMIT"
+      }
+    },
+    {
+      "name": "V1 exact 100 USDG approval: mined successfully",
+      "passed": true
+    },
+    {
+      "name": "V1 approval equals reviewed deposit",
+      "passed": true
+    }
+  ],
+  "transactions": [
+    {
+      "label": "v2 deploy",
+      "hash": "0xbd226ae628ed82b1357c1703cb809f7fa9a22cab86a9331e0836a6eb8e7e01bf",
+      "block": 58746422,
+      "blockHash": "0x8e532e93adff1d0244ed7ccc15f96172d1733f17f5adbf3a37ebe6ec67dbe93e",
+      "status": 1,
+      "gasUsed": "1955105"
+    },
+    {
+      "label": "v1 deploy",
+      "hash": "0xcb91457807d9e458ac8347fcdd6243f210d933d8344fda8e3c390c9f671e5d24",
+      "block": 58746423,
+      "blockHash": "0x7ddffa4aa32a1fa3377d04e7c8fd0e8332cb0d008e2594fb9edf6459b15400b7",
+      "status": 1,
+      "gasUsed": "1955062"
+    },
+    {
+      "label": "V2 non-owner full exit also reverts when mined",
+      "hash": "0x9454316c42f7a87c2e67281c58b6cbc46e33da75720a5782d5fa4bd95a40ed11",
+      "block": 58746424,
+      "blockHash": "0xb171a0a704abbce7e519998a33c7e2d8f62522973ba47b9ab74dac7a08bc0e0c",
+      "status": 0,
+      "gasUsed": "21612"
+    },
+    {
+      "label": "V2 exact 1000 USDG approval",
+      "hash": "0xf176cf1254cb2d1a1f3e974c5bfbc219c6072e8eefff8b68a546b466d9152ec7",
+      "block": 58746425,
+      "blockHash": "0xc053060bf3c859a849a2b9fb09ede97801d35d1e14571aa0c53de387bbeaf421",
+      "status": 1,
+      "gasUsed": "57976"
+    },
+    {
+      "label": "V2 1000 USDG deposit",
+      "hash": "0x8c5fb85281e94f50031a17ecf149d422c29fc118c0b124894f3aed1cf2f9455c",
+      "block": 58746426,
+      "blockHash": "0xfc94f1c4f333900bdfb4aeedf1d76a02f3f62a57d3b1d33070231481d4033c58",
+      "status": 1,
+      "gasUsed": "402807"
+    },
+    {
+      "label": "V1 above-cap deposit also reverts when mined",
+      "hash": "0x80b7ec0fee0a6d2c4fbfe098055151bbd6b6447b77eafeaeb8c438e82d9c084c",
+      "block": 58746427,
+      "blockHash": "0xc5f70b2f979402cbd6e7d2fc39a665476524ab7e41985f8e215a2735075e51a0",
+      "status": 0,
+      "gasUsed": "29257"
+    },
+    {
+      "label": "V1 exact 100 USDG approval",
+      "hash": "0xb33cc905b3679789dc9a56d3a6e5cd33c1194192904b848638a1a199bac31ccd",
+      "block": 58746428,
+      "blockHash": "0x6d1a1329c14bfc3919cedd0e03ccfb3e4589ae88d4e374dd1c0464a93c532308",
+      "status": 1,
+      "gasUsed": "57964"
+    }
+  ],
+  "accounts": {
+    "v2": {
+      "wallet": "0x2f117D419356799Cdcd6829990C235A88aD802C2",
+      "fakeUsdg": "2000000000",
+      "balanceMappingBaseSlot": 1,
+      "account": "0x1768CeA496Ff89492D101B3427148361fCFfdE76"
+    },
+    "v1": {
+      "wallet": "0x0b366B0fA2EDA33a4989a27EAcf4dD3bF69C877D",
+      "fakeUsdg": "300000000",
+      "balanceMappingBaseSlot": 1,
+      "account": "0x0900d071abd9Fb10dDA09385AB1A80e575c971Fa"
+    },
+    "outsider": {
+      "wallet": "0x42Db0EdaA0AC1E0BBf88ec24C28932E70Ae4C9f0",
+      "fakeUsdg": "0",
+      "balanceMappingBaseSlot": 1
+    }
+  },
+  "artifacts": {
+    "v2": {
+      "file": "contracts/artifacts/FreestockYieldAccount.artifact.json",
+      "sourceHash": "0x0af9043d203a80084418631689c0b89bb40e9fc1af0c6f24071a6991ff17e214",
+      "creationBytecodeHash": "0x8417a94150166b257bfdc3100f189a412a566a5d31133f1d67d488975dfa0711",
+      "compiler": "0.8.30+commit.73712a01.Emscripten.clang"
+    },
+    "v1": {
+      "file": "contracts/legacy/v1/FreestockYieldAccount.artifact.json",
+      "sourceHash": "0xb43bec67f7266c27c1da0fc40b35775496f2ee5c0a8f31218500bd1ea7352656",
+      "creationBytecodeHash": "0x6df74e29147934ade5be3659f7dd1aa9953a1ac1a5fea8a258ec77d375f4e59c",
+      "compiler": "0.8.30+commit.73712a01.Emscripten.clang"
+    }
+  },
+  "completed": false,
+  "localStartBlock": 58746420,
+  "sourceForkHash": "0x0ae954b70a9db9fff1c4a6028d110fb59875716bde67e1f98e3369157f9829b7",
+  "failure": {
+    "name": "Error",
+    "message": "transaction execution reverted",
+    "rpcMessage": ""
+  },
+  "finishedAt": "2026-09-09T18:04:57.290Z",
+  "checkCount": 41,
+  "transactionCount": 7
+}

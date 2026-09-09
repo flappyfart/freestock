@@ -4,11 +4,11 @@
 
 ## What works now
 
-Connect Wallet uses EIP-6963 and leads to `/dashboard`; `/live` redirects there for compatibility. “Try it yourself” opens a separate simulation popup. Application sign-in is checked before new actions are offered. Read-only views show real chain balances and Uniswap V3 quotes. The live account supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
+Connect Wallet uses EIP-6963 and leads to `/dashboard`; `/live` redirects there for compatibility. “Try it yourself” opens a separate simulation popup. A free wallet ownership signature creates a profile session before live actions are offered. There is no separate application login. Read-only views show real chain balances and Uniswap V3 quotes. The live account supports account creation, exact USDG approval, deposits, reserving gains as principal, single-stock or weighted-basket purchases and full withdrawal. Every financial action requires explicit review and an EIP-1193 wallet confirmation; no server signer exists.
 
 Preparation verifies chain 4663, exact deployment calldata, canonical deployment receipt/block, CREATE address, runtime bytes, constructor ownership and fixed dependencies. Deposits apply a 0.1% share minimum; stock legs have a 1% minimum-output allowance and a 120-second onchain deadline. A fresh actual-sender simulation and gas estimate precede each wallet prompt. Plans expire after 45 seconds and bind the nonce. Client validation repeats route, amount, recipient, expiry, sender and network checks. Receipts and token purchase events are reconciled against the verified account.
 
-Signed-in users can prepare account creation, deposits and stock purchases. Sign-in does not verify issuer eligibility or wallet ownership. There is no country questionnaire or participant allowlist. Withdrawal preparation remains available for an existing verified account even when new deposit or purchase actions are unavailable. Account routes require Sites identity and return private, uncached responses. The owner’s wallet must approve every financial transaction.
+Wallet-authenticated users can prepare account creation, deposits and stock purchases. The signature verifies control of that wallet; it does not verify issuer eligibility. There is no country questionnaire or participant allowlist. Withdrawal preparation remains available for an existing verified account even when new deposit or purchase actions are unavailable. Account routes require a verified wallet session and enforce matching owner/address parameters and return private, uncached responses. The owner’s wallet must approve every financial transaction.
 
 Pending wallet requests use a device-only owner/chain journal with unique request IDs, nonces and transaction/account references. Web Locks serialize updates across tabs. Unknown submission outcomes stay locked against automatic retries; late replies cannot replace successor requests. Recovery checks original sender/nonce and canonical receipts, including wallet cancellation or another transaction consuming that nonce. Journal state is not a balance ledger. No background trading runs.
 
@@ -22,7 +22,7 @@ Chain 4663. Canonical 6-decimal USDG `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168
 
 The account constructor allows the five tested stocks. NVIDIA is: `0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC`. The selected USDG/NVDA fee-500 pool is `0xd4eb21209c4d6093f80b5b84f5c45cc093ea14a3`. AAPL, TSLA, GOOGL and SPY also passed swap/transfer tests. MSFT has no direct fee-500 pool and rejects. The quote service checks half-size versus full-size output to reject exhausted or strongly nonlinear routes; it includes a 1% minimum-output allowance and 60-second validity. These are not execution promises or oracle valuations.
 
-The account has one immutable owner, set to the actual constructor caller. New deposits must leave the principal baseline at or below 100 USDG. Compounded gains can raise that baseline above 100; this is a deposit limit, not a total-assets cap. Only the owner can deposit, withdraw, compound or harvest. There is no operator, arbitrary external call, upgrade or background permission.
+The account has one immutable owner, set to the actual constructor caller. New V2 accounts use `MaxUint256` for the deposit-cap field and have no Freestock deposit cap. Archived V1 accounts retain their immutable 100 USDG principal-based deposit limit. Compounded gains can raise a V1 baseline above 100; that legacy limit is not a total-assets cap. Only the owner can deposit, withdraw, compound or harvest. There is no operator, arbitrary external call, upgrade or background permission.
 
 Available gains equal account asset value above the recorded principal baseline. Losses must recover before harvest. Direct donations also count as gains; this is not a provenance claim about borrower interest. Holding vault shares already accumulates the vault return. `compound` moves gains into the principal baseline rather than creating another source of yield. Purchases approve exact amounts, enforce stock minimums/deadline, check actual token receipts and reset allowances. Basket legs revert together. Rounding and losses can reduce capital; no principal guarantee is implied.
 
@@ -32,7 +32,7 @@ Available gains equal account asset value above the recorded principal baseline.
 
 - Direct vault deposit, partial withdrawal and complete redemption passed.
 - Direct 10 fake USDG purchase produced 0.044245277168941167 NVIDIA tokens; onward token transfer passed and the router allowance was exhausted.
-- The new account passed **39 assertions**, including ownership, cap, slippage, gains-only budget, actual conversion, full exit, allowance cleanup and atomic rollback on an impossible stock minimum.
+- The archived V1 account passed **39 assertions**, including ownership, cap, slippage, gains-only budget, actual conversion, full exit, allowance cleanup and atomic rollback on an impossible stock minimum.
 - The account test advanced **local time by 30 days**. Genuine adapter accounting at that pinned state produced a surplus, but neither that amount nor time acceleration represents a real deposit, live earnings or a return forecast. A two-micro-USDG buffer was retained for rounding.
 - The vault explorer reports a partial source match. Its exact deployed Git commit has not been proven. Local success does not prove future liquidity or eligibility.
 
@@ -40,13 +40,13 @@ Solidity artifact: 0.8.30, optimizer 200, viaIR true, Cancun. `contracts/artifac
 
 ## Account access and provider boundaries
 
-The public website is intended for non-US users; live account actions require sign-in and wallet approval. Freestock has no separate eligibility questionnaire and makes no eligibility determination. Investor representations and applicable stock-provider restrictions still apply; non-US location alone does not establish unrestricted availability.
+The public website is intended for non-US users; live account actions require a wallet ownership signature and separate transaction approval. Freestock has no separate eligibility questionnaire and makes no eligibility determination. Investor representations and applicable stock-provider restrictions still apply; non-US location alone does not establish unrestricted availability.
 
 The prospectus distinguishes direct secondary blockchain purchases from purchases through an Authorised Participant, while also containing broader KYC/AML wording. This work does not assert that self-attestation alone is a completed verification. No issuer API key is required for the verified direct AMM route, and no mandatory AMM provider-preapproval workflow was established.
 
-The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. Provider restrictions and the account’s deposit cap continue to apply.
+The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. Provider restrictions continue to apply. Only legacy V1 accounts retain the old deposit cap.
 
-## Verification performed on this version
+## Historical verification records
 
 - 69 unit tests passed, including six account-reference storage/recovery tests, including amount/address validation, exact constructor dependencies, bytecode/source identity and rejection of malformed runtime responses.
 - Lint, TypeScript and the production build passed.

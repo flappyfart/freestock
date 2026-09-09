@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /live
+Disallow: /api/
+Disallow: /demo
+Sitemap: https://tryfreestock.com/sitemap.xml

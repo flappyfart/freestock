@@ -22,7 +22,7 @@ interface ISwapRouter {
     function exactInputSingle(ExactInputSingleParams calldata params) external payable returns (uint256 amountOut);
 }
 
-/// @notice A single-owner pilot account. No operator, keeper, admin or arbitrary calls.
+/// @notice A single-owner lending account. No operator, keeper, admin or arbitrary calls.
 /// @dev Holding vault shares compounds underlying returns. No principal protection guarantee.
 contract FreestockYieldAccount {
     address public immutable owner;
@@ -49,7 +49,7 @@ contract FreestockYieldAccount {
         require(vault_ != address(0) && asset_ != address(0) && router_ != address(0), "ZERO_ADDRESS");
         require(vault_.code.length > 0 && asset_.code.length > 0 && router_.code.length > 0, "NO_CODE");
         require(IVault(vault_).asset() == asset_, "VAULT_ASSET");
-        require(cap_ > 0 && cap_ <= 100e6 && stocks_.length > 0 && stocks_.length <= 6, "PILOT_LIMIT");
+        require(cap_ > 0 && stocks_.length > 0 && stocks_.length <= 6, "ACCOUNT_CONFIG");
         owner = msg.sender; vault = IVault(vault_); asset = IToken(asset_); router = ISwapRouter(router_); depositCap = cap_;
         for (uint256 i; i < stocks_.length; ++i) {
             require(stocks_[i] != asset_ && stocks_[i] != vault_ && stocks_[i].code.length > 0 && !stockAllowed[stocks_[i]], "STOCK_CONFIG");

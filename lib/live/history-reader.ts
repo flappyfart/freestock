@@ -1,5 +1,5 @@
 import { CHAIN_ID, USDG } from './config.ts';
-import { accountPlan } from './account-plan.ts';
+import { accountDeploymentVersion } from './account-plan.ts';
 import {
   historyAbi,
   approvalAbi,
@@ -59,8 +59,7 @@ export function createHistoryReader(reads: Readers, store: Store) {
       tx.to === null &&
       historyHash(tx.hash) === a.deployment &&
       typeof tx.input === 'string' &&
-      tx.input.toLowerCase() ===
-        accountPlan(a.wallet).transaction.data.toLowerCase() &&
+      !!accountDeploymentVersion(a.wallet, tx.input) &&
       quantity(tx.value) === 0n
     )
       return 'deploy';

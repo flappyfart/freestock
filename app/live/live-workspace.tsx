@@ -1,7 +1,13 @@
-"use client";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
-import { formatUnits } from "ethers";
+'use client';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '../../components/ui/dialog';
+import Link from 'next/link';
+import { formatUnits } from 'ethers';
 import {
   ArrowUpRight,
   Check,
@@ -14,24 +20,24 @@ import {
   ChevronRight,
   ScanLine,
   History,
-} from "lucide-react";
-import { requiresSessionReset } from "../../lib/live/pilot-access";
-import { readJournal, JOURNAL_EVENT } from "../../lib/live/wallet-journal";
-import PilotWorkspace, { type PilotAvailability } from "./pilot-workspace";
-import { WalletConnectButton } from "./wallet-connect-button";
-import { useWalletConnection } from "./wallet-provider";
-import { EarnShell } from "../earn-shell";
-import { StockLendingMarkets } from "../stock-lending-markets";
-import { MarketDirectory } from "../market-directory";
-import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from "../../lib/live/config";
-import { AgenticLending } from "./agentic-lending";
-import { PortfolioHistory } from "./portfolio-history";
+} from 'lucide-react';
+import { requiresSessionReset } from '../../lib/live/pilot-access';
+import { readJournal, JOURNAL_EVENT } from '../../lib/live/wallet-journal';
+import PilotWorkspace, { type PilotAvailability } from './pilot-workspace';
+import { WalletConnectButton } from './wallet-connect-button';
+import { useWalletConnection } from './wallet-provider';
+import { EarnShell } from '../earn-shell';
+import { StockLendingMarkets } from '../stock-lending-markets';
+import { MarketDirectory } from '../market-directory';
+import { CHAIN_ID, EXPLORER_URL, STOCK_TOKENS } from '../../lib/live/config';
+import { AgenticLending } from './agentic-lending';
+import { PortfolioHistory } from './portfolio-history';
 import {
   type AgentIntent,
   type PilotReadState,
   validateAgentIntent,
-} from "../../lib/live/agentic-lending";
-import "./live-workspace.css";
+} from '../../lib/live/agentic-lending';
+import './live-workspace.css';
 type Snapshot = {
   address: string;
   block: number;
@@ -62,61 +68,97 @@ type Preview = {
 };
 const format = (v: string, decimals = 6) => {
   const n = Number(formatUnits(v, decimals));
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat('en-US', {
     maximumFractionDigits: decimals === 18 ? 6 : 4,
   }).format(n);
 };
-type DashboardView = "overview" | "position" | "agentic" | "activity" | "markets" | "advanced";
+type DashboardView =
+  | 'overview'
+  | 'position'
+  | 'agentic'
+  | 'activity'
+  | 'markets'
+  | 'advanced';
 const dashboardSections = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "position", label: "Your position", icon: Wallet },
-  { id: "agentic", label: "Agentic Lending", icon: ScanLine },
-  { id: "activity", label: "Activity", icon: History },
-  { id: "markets", label: "Market explorer", icon: Layers3 },
-  { id: "advanced", label: "Advanced tools", icon: SlidersHorizontal },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'position', label: 'Your position', icon: Wallet },
+  { id: 'agentic', label: 'Agentic Lending', icon: ScanLine },
+  { id: 'activity', label: 'Activity', icon: History },
+  { id: 'markets', label: 'Market explorer', icon: Layers3 },
+  { id: 'advanced', label: 'Advanced tools', icon: SlidersHorizontal },
 ] as const;
-const dashboardCopy: Record<DashboardView, { title: string; description: string }> = {
-  overview: { title: "Overview", description: "Your wallet, lending position and next step." },
-  position: { title: "Your position", description: "Manage your USDG lending account." },
+const dashboardCopy: Record<
+  DashboardView,
+  { title: string; description: string }
+> = {
+  overview: {
+    title: 'Overview',
+    description: 'Your wallet, lending position and next step.',
+  },
+  position: {
+    title: 'Your position',
+    description: 'Manage your USDG lending account.',
+  },
   activity: {
-    title: "Portfolio activity",
-    description: "Your saved positions and verified transaction history.",
+    title: 'Portfolio activity',
+    description: 'Your saved positions and verified transaction history.',
   },
   agentic: {
-    title: "Agentic Lending",
-    description: "Your lending plan. A reason for every next move.",
+    title: 'Agentic Lending',
+    description: 'Your lending plan. A reason for every next move.',
   },
   markets: {
-    title: "Market explorer",
-    description: "Follow the lending markets. These feeds are read-only.",
+    title: 'Market explorer',
+    description: 'Follow the lending markets. These feeds are read-only.',
   },
   advanced: {
-    title: "Advanced tools",
-    description: "Inspect wallet balances and test a route without moving funds.",
+    title: 'Advanced tools',
+    description:
+      'Inspect wallet balances and test a route without moving funds.',
   },
 };
-export default function LiveWorkspace({ embedded = false }: { embedded?: boolean }) {
+export default function LiveWorkspace({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
   const wallet = useWalletConnection();
-  const { owner: connected, selected, network, requestConnect, switchNetwork } = wallet;
+  const {
+    owner: connected,
+    selected,
+    network,
+    requestConnect,
+    switchNetwork,
+  } = wallet;
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null),
     [reading, setReading] = useState(false),
     [working, setWorking] = useState(false),
-    [snapshotError, setSnapshotError] = useState(""),
-    [checkError, setCheckError] = useState(""),
-    [input, setInput] = useState("10"),
-    [symbol, setSymbol] = useState("NVDA"),
+    [snapshotError, setSnapshotError] = useState(''),
+    [checkError, setCheckError] = useState(''),
+    [input, setInput] = useState('10'),
+    [symbol, setSymbol] = useState('NVDA'),
     [quote, setQuote] = useState<Quote | null>(null),
     [preview, setPreview] = useState<Preview | null>(null),
-    [availability, setAvailability] = useState<PilotAvailability>("loading"),
-    [chainHealth, setChainHealth] = useState<{ available: boolean; message?: string } | null>(null),
+    [availability, setAvailability] = useState<PilotAvailability>('loading'),
+    [chainHealth, setChainHealth] = useState<{
+      available: boolean;
+      message?: string;
+    } | null>(null),
     [availabilityAttempt, setAvailabilityAttempt] = useState(0),
     [snapshotAttempt, setSnapshotAttempt] = useState(0);
+  const [authenticatedWallet, setAuthenticatedWallet] = useState<string | null>(
+    null,
+  );
+  const authenticated =
+    !!connected &&
+    authenticatedWallet?.toLowerCase() === connected.toLowerCase();
   const sessionScope = useRef<string | null | undefined>(undefined);
   const generation = useRef(0),
     requestInFlight = useRef(false);
   const busy = wallet.busy || reading || working;
   const currentSnapshot =
-    network === CHAIN_ID && snapshot?.address.toLowerCase() === connected?.toLowerCase()
+    network === CHAIN_ID &&
+    snapshot?.address.toLowerCase() === connected?.toLowerCase()
       ? snapshot
       : null;
   useEffect(() => {
@@ -132,25 +174,35 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
         return;
       }
       checking = true;
-      setAvailability("loading");
+      setAvailability('loading');
       try {
-        const response = await fetch("/api/live/status", {
-          cache: "no-store",
+        const response = await fetch('/api/live/status', {
+          cache: 'no-store',
           signal: controller.signal,
         });
-        if (!response.ok) throw Error("Availability check failed.");
+        if (!response.ok) throw Error('Availability check failed.');
         const value = (await response.json()) as {
           walletTransactionsEnabled?: unknown;
           sessionScope?: unknown;
+          authenticatedWallet?: unknown;
           chainHealth?: { available?: unknown; message?: unknown };
         };
         if (
-          typeof value.walletTransactionsEnabled !== "boolean" ||
-          typeof value.chainHealth?.available !== "boolean" ||
-          !(value.sessionScope === null ||
-            (typeof value.sessionScope === "string" && /^[a-f0-9]{64}$/.test(value.sessionScope))) ||
+          typeof value.walletTransactionsEnabled !== 'boolean' ||
+          !(
+            value.authenticatedWallet === null ||
+            (typeof value.authenticatedWallet === 'string' &&
+              /^0x[a-fA-F0-9]{40}$/.test(value.authenticatedWallet))
+          ) ||
+          typeof value.chainHealth?.available !== 'boolean' ||
+          !(
+            value.sessionScope === null ||
+            (typeof value.sessionScope === 'string' &&
+              /^[a-f0-9]{64}$/.test(value.sessionScope))
+          ) ||
           value.walletTransactionsEnabled !== (value.sessionScope !== null)
-        ) throw Error("Invalid availability.");
+        )
+          throw Error('Invalid availability.');
         if (controller.signal.aborted || version !== requestVersion) return;
         if (requiresSessionReset(sessionScope.current, value.sessionScope)) {
           // Clear profile data and reviews; the wallet journal survives for recovery.
@@ -158,14 +210,20 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           return;
         }
         sessionScope.current = value.sessionScope;
-        setAvailability(value.walletTransactionsEnabled ? "enabled" : "unavailable");
+        setAuthenticatedWallet(value.authenticatedWallet as string | null);
+        setAvailability(
+          value.walletTransactionsEnabled ? 'enabled' : 'unavailable',
+        );
         setChainHealth({
           available: value.chainHealth.available,
-          message: typeof value.chainHealth.message === "string" ? value.chainHealth.message : undefined,
+          message:
+            typeof value.chainHealth.message === 'string'
+              ? value.chainHealth.message
+              : undefined,
         });
       } catch {
         if (!controller.signal.aborted && version === requestVersion) {
-          setAvailability("error");
+          setAvailability('error');
           setChainHealth(null);
         }
       } finally {
@@ -177,15 +235,19 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
       }
     }
     void refreshAccess();
-    const refresh = () => { void refreshAccess(); };
-    window.addEventListener("focus", refresh);
-    window.addEventListener("pageshow", refresh);
-    document.addEventListener("visibilitychange", refresh);
+    const refresh = () => {
+      void refreshAccess();
+    };
+    window.addEventListener('freestock:wallet-auth', refresh);
+    window.addEventListener('focus', refresh);
+    window.addEventListener('pageshow', refresh);
+    document.addEventListener('visibilitychange', refresh);
     return () => {
       controller.abort();
-      window.removeEventListener("focus", refresh);
-      window.removeEventListener("pageshow", refresh);
-      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener('freestock:wallet-auth', refresh);
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('pageshow', refresh);
+      document.removeEventListener('visibilitychange', refresh);
     };
   }, [availabilityAttempt]);
   useEffect(() => {
@@ -195,46 +257,57 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     // oxlint-disable-next-line react/react-compiler
     setQuote(null);
     setPreview(null);
-    setSnapshotError("");
-    setCheckError("");
-    if (!connected || network !== CHAIN_ID) {
+    setSnapshotError('');
+    setCheckError('');
+    if (!authenticated || !connected || network !== CHAIN_ID) {
       setReading(false);
       return () => controller.abort();
     }
     setReading(true);
     void fetch(`/api/live/wallet?address=${encodeURIComponent(connected)}`, {
-      cache: "no-store",
+      cache: 'no-store',
       signal: controller.signal,
     })
       .then(async (response) => {
         const value = (await response.json()) as Snapshot & { error?: string };
-        if (!response.ok) throw Error(value.error ?? "Could not read this wallet.");
+        if (!response.ok)
+          throw Error(value.error ?? 'Could not read this wallet.');
         if (value.address?.toLowerCase() !== connected.toLowerCase())
-          throw Error("The wallet response did not match the connected account.");
-        if (!controller.signal.aborted && version === generation.current) setSnapshot(value);
+          throw Error(
+            'The wallet response did not match the connected account.',
+          );
+        if (!controller.signal.aborted && version === generation.current)
+          setSnapshot(value);
       })
       .catch((e: unknown) => {
         if (!controller.signal.aborted && version === generation.current)
-          setSnapshotError(e instanceof Error ? e.message : "Could not refresh wallet balances.");
+          setSnapshotError(
+            e instanceof Error
+              ? e.message
+              : 'Could not refresh wallet balances.',
+          );
       })
       .finally(() => {
-        if (!controller.signal.aborted && version === generation.current) setReading(false);
+        if (!controller.signal.aborted && version === generation.current)
+          setReading(false);
       });
     return () => {
       controller.abort();
     };
-  }, [connected, network, snapshotAttempt]);
+  }, [authenticated, connected, network, snapshotAttempt]);
   async function act(operation: () => Promise<void>) {
     if (requestInFlight.current || wallet.busy) return;
     requestInFlight.current = true;
     const version = generation.current;
     setWorking(true);
-    setCheckError("");
+    setCheckError('');
     try {
       await operation();
     } catch (e) {
       if (version === generation.current)
-        setCheckError(e instanceof Error ? e.message : "This check could not be completed.");
+        setCheckError(
+          e instanceof Error ? e.message : 'This check could not be completed.',
+        );
     } finally {
       requestInFlight.current = false;
       setWorking(false);
@@ -243,9 +316,11 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
   async function checkQuote() {
     const id = generation.current;
     setQuote(null);
-    const r = await fetch(`/api/live/quote?symbol=${symbol}&amount=${encodeURIComponent(input)}`);
+    const r = await fetch(
+      `/api/live/quote?symbol=${symbol}&amount=${encodeURIComponent(input)}`,
+    );
     const data = (await r.json()) as Quote & { error?: string };
-    if (!r.ok) throw Error(data.error ?? "No quote available.");
+    if (!r.ok) throw Error(data.error ?? 'No quote available.');
     if (id === generation.current) setQuote(data);
   }
   async function checkDeposit() {
@@ -256,27 +331,30 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
       `/api/live/deposit-preview?address=${connected}&amount=${encodeURIComponent(input)}`,
     );
     const data = (await r.json()) as Preview & { error?: string };
-    if (!r.ok) throw Error(data.error ?? "Deposit preview unavailable.");
+    if (!r.ok) throw Error(data.error ?? 'Deposit preview unavailable.');
     if (id === generation.current) setPreview(data);
   }
   const workspaceId = useId();
-  const [view, setView] = useState<DashboardView>("overview");
+  const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
+  const [view, setView] = useState<DashboardView>('overview');
   const [pilotState, setPilotState] = useState<PilotReadState | null>(null);
   const [agentIntent, setAgentIntent] = useState<AgentIntent | null>(null);
-  const pilotScope = `${selected?.info.uuid ?? "none"}:${connected?.toLowerCase() ?? "none"}:${network ?? "none"}`;
+  const pilotScope = `${selected?.info.uuid ?? 'none'}:${connected?.toLowerCase() ?? 'none'}:${network ?? 'none'}`;
   const activePilot = pilotState?.scope === pilotScope ? pilotState : null;
   const intentHandled = useCallback(
-    (id: string) => setAgentIntent((current) => (current?.id === id ? null : current)),
+    (id: string) =>
+      setAgentIntent((current) => (current?.id === id ? null : current)),
     [],
   );
   useEffect(() => {
     const followView = () => {
-      const target = new URLSearchParams(window.location.search).get("view");
-      if (dashboardSections.some((s) => s.id === target)) setView(target as DashboardView);
+      const target = new URLSearchParams(window.location.search).get('view');
+      if (dashboardSections.some((s) => s.id === target))
+        setView(target as DashboardView);
     };
     followView();
-    window.addEventListener("popstate", followView);
-    return () => window.removeEventListener("popstate", followView);
+    window.addEventListener('popstate', followView);
+    return () => window.removeEventListener('popstate', followView);
   }, []);
   const [recoveryOwner, setRecoveryOwner] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
@@ -285,8 +363,10 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     const inspect = () => {
       try {
         const saved = readJournal(connected);
-        const pendingReference = new URLSearchParams(window.location.search).get("transaction");
-        if (saved || pendingReference) setView("position");
+        const pendingReference = new URLSearchParams(
+          window.location.search,
+        ).get('transaction');
+        if (saved || pendingReference) setView('position');
         setRecoveryOwner(saved ? connected : null);
       } catch {
         // A damaged journal remains locked by the existing wallet submission path.
@@ -296,50 +376,45 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
     // Connecting opens the position; a URL receipt alone must not lock navigation after recovery.
     // oxlint-disable-next-line react/react-compiler -- Synchronize navigation with a newly connected wallet.
     setView(
-      ["agentic", "activity"].includes(
-        new URLSearchParams(window.location.search).get("view") ?? "",
+      ['agentic', 'activity'].includes(
+        new URLSearchParams(window.location.search).get('view') ?? '',
       )
-        ? (new URLSearchParams(window.location.search).get("view") as DashboardView)
-        : "position",
+        ? (new URLSearchParams(window.location.search).get(
+            'view',
+          ) as DashboardView)
+        : 'position',
     );
     inspect();
     window.addEventListener(JOURNAL_EVENT, inspect);
-    window.addEventListener("storage", inspect);
+    window.addEventListener('storage', inspect);
     return () => {
       window.removeEventListener(JOURNAL_EVENT, inspect);
-      window.removeEventListener("storage", inspect);
+      window.removeEventListener('storage', inspect);
     };
   }, [connected]);
   const hasRecovery = !!connected && recoveryOwner === connected;
-  const currentView: DashboardView = hasRecovery ? "position" : view;
-  const connectionVisible = currentView === "overview" || currentView === "position";
-  const positionVisible = currentView === "position";
-  const Heading = embedded ? "h2" : "h1";
+  const currentView: DashboardView = hasRecovery ? 'position' : view;
+  const connectionVisible =
+    currentView === 'overview' || currentView === 'position';
+  const positionVisible = currentView === 'position';
+  const Heading = embedded ? 'h2' : 'h1';
   const section = dashboardCopy[currentView];
-  const accessLabel =
-    availability === "enabled"
-      ? "Ready"
-      : availability === "loading"
-        ? "Checking"
-        : availability === "unavailable"
-          ? "Sign in required"
-          : "Check unavailable";
-  const networkLabel = !connected
-    ? "Not connected"
-    : network === CHAIN_ID
-      ? "Robinhood Chain"
-      : `Network ${network ?? "unknown"}`;
+  const walletReady =
+    authenticated && !!connected && !!selected && network === CHAIN_ID;
+  const needsSetup = !walletReady && currentView !== 'markets';
+
+  const retryAccess = () => setAvailabilityAttempt((value) => value + 1);
   function navigate(next: DashboardView) {
-    if (hasRecovery && next !== "position") return;
+    if (hasRecovery && next !== 'position') return;
     setView(next);
     const url = new URL(window.location.href);
-    url.searchParams.set("view", next);
-    window.history.replaceState(null, "", url);
+    url.searchParams.set('view', next);
+    window.history.replaceState(null, '', url);
     window.requestAnimationFrame(() => headingRef.current?.focus());
   }
   const content = (
     <div
-      className={`${embedded ? "" : "earn-wrap "}live-workspace dashboard-workspace dashboard-shell`}
+      className={`${embedded ? '' : 'earn-wrap '}live-workspace dashboard-workspace dashboard-shell`}
     >
       <aside className="dashboard-sidebar" aria-label="Dashboard navigation">
         <div className="dashboard-sidebar-heading">
@@ -353,14 +428,22 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               <button
                 type="button"
                 key={item.id}
-                aria-current={currentView === item.id ? "page" : undefined}
+                aria-current={currentView === item.id ? 'page' : undefined}
                 aria-controls={`${workspaceId}-content`}
-                disabled={hasRecovery && item.id !== "position"}
+                disabled={hasRecovery && item.id !== 'position'}
                 onClick={() => navigate(item.id)}
               >
                 <Icon size={18} aria-hidden="true" />
-                <span>{item.label}</span>
-                <ChevronRight size={14} className="dashboard-nav-chevron" aria-hidden="true" />
+                <span>
+                  {item.id === 'position' && !activePilot?.account
+                    ? 'Create position'
+                    : item.label}
+                </span>
+                <ChevronRight
+                  size={14}
+                  className="dashboard-nav-chevron"
+                  aria-hidden="true"
+                />
               </button>
             );
           })}
@@ -376,7 +459,44 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
         </div>
       </aside>
       <div className="dashboard-main" id={`${workspaceId}-content`}>
-        <header className="dashboard-page-heading">
+        <button
+          type="button"
+          className="dashboard-mobile-menu"
+          onClick={() => setSectionMenuOpen(true)}
+          aria-expanded={sectionMenuOpen}
+        >
+          <LayoutDashboard size={18} />
+          {section.title}
+          <ChevronRight size={17} />
+        </button>
+        <Dialog open={sectionMenuOpen} onOpenChange={setSectionMenuOpen}>
+          <DialogContent className="mobile-menu-dialog">
+            <DialogTitle>Your workspace</DialogTitle>
+            <DialogDescription>Choose where to go.</DialogDescription>
+            <nav aria-label="Mobile dashboard sections">
+              {dashboardSections.map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  aria-current={currentView === item.id ? 'page' : undefined}
+                  disabled={hasRecovery && item.id !== 'position'}
+                  onClick={() => {
+                    navigate(item.id);
+                    setSectionMenuOpen(false);
+                  }}
+                >
+                  {item.label}
+                  <ChevronRight size={16} />
+                </button>
+              ))}
+            </nav>
+          </DialogContent>
+        </Dialog>
+
+        <header
+          className="dashboard-page-heading"
+          hidden={positionVisible && walletReady}
+        >
           <div>
             <Heading ref={headingRef} tabIndex={-1}>
               {section.title}
@@ -399,26 +519,28 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
 
         {hasRecovery && (
           <output className="dashboard-notice dashboard-recovery-notice">
-            A wallet request needs attention. Resolve it in your position before switching dashboard
-            sections.
+            A wallet request needs attention. Resolve it in your position before
+            switching dashboard sections.
           </output>
         )}
         {chainHealth?.available === false && (
           <output className="dashboard-notice">
             <span>
-              {chainHealth.message || "The network connection is temporarily unavailable."} Wallet
-              balances and transaction checks may be delayed.
+              {chainHealth.message ||
+                'The network connection is temporarily unavailable.'}{' '}
+              Wallet balances and transaction checks may be delayed.
             </span>
             <button
               type="button"
               className="earn-link"
               onClick={() => {
-                setAvailability("loading");
+                setAvailability('loading');
                 setChainHealth(null);
                 setAvailabilityAttempt((value) => value + 1);
               }}
             >
-              Retry network connection <RefreshCw size={14} aria-hidden="true" />
+              Retry network connection{' '}
+              <RefreshCw size={14} aria-hidden="true" />
             </button>
           </output>
         )}
@@ -428,160 +550,161 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           </p>
         )}
 
-        <section
-          className="dashboard-connection dashboard-view"
-          id="wallet-connection"
-          data-compact={currentView === "position" && !!connected && network === CHAIN_ID}
-          hidden={!connectionVisible}
-          aria-label="Wallet connection and live access"
-        >
-          <div className="dashboard-connection-top">
-            <div className="dashboard-connection-copy">
-              <span className="dashboard-label">Your wallet</span>
-              {connected ? (
-                <>
-                  <strong>{selected?.info.name ?? "Browser wallet"}</strong>
-                  <code>{connected}</code>
-                </>
-              ) : (
-                <>
-                  <h2>Connect to get started</h2>
-                  <p>
-                    Create or restore your USDG lending position. Connecting does not request a
-                    transaction.
-                  </p>
-                </>
+        {needsSetup && (
+          <section
+            className="dashboard-onboarding"
+            aria-label="Get started"
+            aria-live="polite"
+          >
+            <ol className="onboarding-progress" aria-label="Setup progress">
+              <li data-complete={authenticated} aria-current="step">
+                <span>{authenticated ? <Check size={16} /> : '1'}</span>Connect
+                wallet
+              </li>
+              <li>
+                <span>2</span>Create position
+              </li>
+              <li>
+                <span>3</span>Add USDG
+              </li>
+              <li>
+                <span>4</span>Choose stock picks
+              </li>
+            </ol>
+            <div className="onboarding-body">
+              <div className="onboarding-symbol">
+                <Wallet size={28} />
+              </div>
+              <h2>
+                {!connected
+                  ? hasRecovery
+                    ? 'Reconnect to resume your position'
+                    : 'Your wallet is your Freestock account'
+                  : network !== CHAIN_ID
+                    ? 'Switch to Robinhood Chain'
+                    : wallet.busy
+                      ? 'Confirm the free message in your wallet'
+                      : 'One confirmation, then you’re in'}
+              </h2>
+              <p>
+                {!connected
+                  ? 'Connect your wallet and confirm a free ownership message. We’ll find your existing positions or walk you through creating your first one.'
+                  : network !== CHAIN_ID
+                    ? 'Your position runs on Robinhood Chain. Confirm the network switch to continue.'
+                    : 'This signature creates or unlocks your Freestock profile. It costs no gas, moves no money, and gives no permission to spend your tokens.'}
+              </p>
+              {connected && (
+                <p className="onboarding-connected">
+                  <Check size={16} /> {connected.slice(0, 6)}…
+                  {connected.slice(-4)}
+                </p>
               )}
-            </div>
-            {!connected ? (
-              <WalletConnectButton
-                walletName="Choose an installed wallet"
-                disabled={wallet.busy}
-                onClick={requestConnect}
-              />
-            ) : (
-              <div className="dashboard-connection-actions">
-                <button
-                  type="button"
-                  className="earn-link"
+              {!connected ? (
+                <WalletConnectButton
+                  walletName="Choose a wallet"
                   disabled={wallet.busy}
                   onClick={requestConnect}
-                >
-                  Change wallet
-                </button>
-                {network !== CHAIN_ID ? (
-                  <button
-                    type="button"
-                    className="dashboard-button"
-                    disabled={wallet.busy}
-                    onClick={() => void switchNetwork()}
-                  >
-                    Switch to Robinhood Chain
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="dashboard-refresh"
-                    disabled={busy}
-                    onClick={() => setSnapshotAttempt((value) => value + 1)}
-                    aria-label="Refresh wallet balances"
-                  >
-                    <RefreshCw size={16} aria-hidden="true" />{" "}
-                    {reading ? "Reading balances" : "Refresh balances"}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <dl className="dashboard-status-list" aria-live="polite">
-            <div>
-              <dt>Network</dt>
-              <dd>{networkLabel}</dd>
-            </div>
-            <div>
-              <dt>Live access</dt>
-              <dd data-confirmed={availability === "enabled"}>{accessLabel}</dd>
-            </div>
-            <div>
-              <dt>Wallet approvals</dt>
-              <dd>Required for every action</dd>
-            </div>
-          </dl>
-          {(availability === "error" || availability === "unavailable") && (
-            <div className="dashboard-access-help">
-              <p>Existing accounts can still be restored for withdrawal.</p>
-              <div>
+                />
+              ) : network !== CHAIN_ID ? (
                 <button
                   type="button"
-                  className="earn-link"
-                  onClick={() => {
-                    setAvailability("loading");
-                    setChainHealth(null);
-                    setAvailabilityAttempt((value) => value + 1);
-                  }}
+                  className="dashboard-button"
+                  disabled={wallet.busy}
+                  onClick={() => void switchNetwork()}
                 >
-                  Check access again
+                  Switch network <ArrowUpRight size={17} />
                 </button>
+              ) : (
                 <button
                   type="button"
-                  className="earn-link"
-                  onClick={() =>
-                    window.location.assign(
-                      `/signin-with-chatgpt?return_to=${encodeURIComponent(window.location.pathname + window.location.search + window.location.hash)}`,
-                    )
-                  }
+                  className="dashboard-button"
+                  disabled={wallet.busy}
+                  onClick={() => void wallet.confirmOwnership()}
                 >
-                  Sign in to use your live account <ArrowUpRight size={14} aria-hidden="true" />
+                  {wallet.busy
+                    ? 'Waiting for your wallet…'
+                    : 'Confirm wallet ownership'}
+                  <ArrowUpRight size={17} />
                 </button>
-              </div>
-            </div>
-          )}
-          {snapshotError && connected && network === CHAIN_ID && (
-            <div className="dashboard-balance-warning" role="alert">
-              <p>
-                {snapshotError}
-                {currentSnapshot ? " Showing the last successful balance check." : ""}
+              )}
+              <p className="onboarding-note">
+                Next, we’ll check for saved positions. You’ll need USDG to lend
+                and a little ETH for network fees.
               </p>
-              <button
-                type="button"
-                className="earn-link"
-                disabled={busy}
-                onClick={() => setSnapshotAttempt((value) => value + 1)}
-              >
-                Retry wallet balances
-              </button>
             </div>
-          )}
-          {currentSnapshot && (
-            <p className="dashboard-last-checked">
-              Wallet balances checked {new Date(currentSnapshot.observedAt).toLocaleString()}.
-              Account balances refresh separately in your position.
-            </p>
-          )}
-        </section>
+          </section>
+        )}
+        {authenticated && availability === 'error' && (
+          <p className="dashboard-notice">
+            Your wallet session check was interrupted.{' '}
+            <button type="button" className="earn-link" onClick={retryAccess}>
+              Try again
+            </button>
+          </p>
+        )}
+        {walletReady && connectionVisible && (
+          <div className="dashboard-wallet-bar">
+            <span>
+              <Wallet size={17} /> {selected?.info.name}{' '}
+              <code>
+                {connected!.slice(0, 6)}…{connected!.slice(-4)}
+              </code>
+            </span>
+            <button
+              type="button"
+              className="earn-link"
+              disabled={wallet.busy || hasRecovery}
+              onClick={requestConnect}
+            >
+              Change wallet
+            </button>
+            <button
+              type="button"
+              className="earn-link"
+              disabled={busy || hasRecovery}
+              onClick={() => void wallet.disconnect()}
+            >
+              Disconnect
+            </button>
+          </div>
+        )}
+        {walletReady && snapshotError && currentView === 'advanced' && (
+          <p className="dashboard-notice">
+            {snapshotError}
+            <button
+              type="button"
+              onClick={() => setSnapshotAttempt((v) => v + 1)}
+            >
+              Retry balances
+            </button>
+          </p>
+        )}
 
-        {currentView === "overview" && (
-          <section className="dashboard-overview-next" aria-label="Continue in your workspace">
+        {currentView === 'overview' && walletReady && (
+          <section
+            className="dashboard-overview-next"
+            aria-label="Continue in your workspace"
+          >
             <p>Manage your USDG position or explore the live market data.</p>
             <div>
               <button
                 type="button"
                 className="dashboard-button"
-                onClick={() => navigate("position")}
+                onClick={() => navigate('position')}
               >
                 Open your position <ArrowUpRight size={16} aria-hidden="true" />
               </button>
               <button
                 type="button"
                 className="dashboard-refresh"
-                onClick={() => navigate("agentic")}
+                onClick={() => navigate('agentic')}
               >
                 Agentic Lending <ChevronRight size={16} aria-hidden="true" />
               </button>
               <button
                 type="button"
                 className="dashboard-refresh"
-                onClick={() => navigate("markets")}
+                onClick={() => navigate('markets')}
               >
                 Explore markets <ChevronRight size={16} aria-hidden="true" />
               </button>
@@ -590,8 +713,11 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
         )}
 
         {/* Keep this exact keyed financial component mounted when changing dashboard sections. */}
-        <div className="dashboard-position dashboard-view" hidden={!positionVisible}>
-          {connected && selected && network === CHAIN_ID && (
+        <div
+          className="dashboard-position dashboard-view"
+          hidden={!positionVisible}
+        >
+          {authenticated && connected && selected && network === CHAIN_ID && (
             <PilotWorkspace
               key={`${selected.info.uuid}-${connected}`}
               owner={connected}
@@ -601,25 +727,25 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               onReadState={setPilotState}
               agentIntent={agentIntent}
               onAgentIntentHandled={intentHandled}
-              onActivity={()=>navigate("activity")}
+              onActivity={() => navigate('activity')}
             />
           )}
         </div>
 
-        <div hidden={currentView !== "agentic"}>
+        <div hidden={currentView !== 'agentic' || !walletReady}>
           <AgenticLending
             key={pilotScope}
             scope={pilotScope}
-            active={currentView === "agentic"}
+            active={currentView === 'agentic'}
             owner={connected}
             correctNetwork={network === CHAIN_ID}
             readState={activePilot}
-            enabled={availability === "enabled"}
+            enabled={availability === 'enabled'}
             onConnect={requestConnect}
-            onPosition={() => navigate("position")}
+            onPosition={() => navigate('position')}
             onReview={(intent) => {
               if (!connected || activePilot?.blocked || readJournal(connected))
-                throw Error("Finish the current wallet action first.");
+                throw Error('Finish the current wallet action first.');
               validateAgentIntent(
                 intent,
                 pilotScope,
@@ -628,21 +754,21 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                 Date.now(),
               );
               setAgentIntent(intent);
-              navigate("position");
+              navigate('position');
             }}
           />
         </div>
 
-        {currentView === "activity" && (
+        {currentView === 'activity' && walletReady && (
           <PortfolioHistory
             key={pilotScope}
             owner={connected}
             position={activePilot?.account ?? null}
             onConnect={requestConnect}
-            onPosition={() => navigate("position")}
+            onPosition={() => navigate('position')}
           />
         )}
-        {currentView === "markets" && (
+        {currentView === 'markets' && (
           <section
             className="dashboard-markets dashboard-view"
             aria-label="Read-only market explorer"
@@ -653,7 +779,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
         )}
         <section
           className="dashboard-advanced dashboard-view"
-          hidden={currentView !== "advanced"}
+          hidden={currentView !== 'advanced' || !walletReady}
           aria-label="Read-only wallet balances and route checks"
         >
           <div className="dashboard-advanced-content">
@@ -662,7 +788,8 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                 <div className="section-title">
                   <h2>Onchain balances</h2>
                   <span className="earn-pill">
-                    <Check size={13} /> Block {currentSnapshot.block.toLocaleString()}
+                    <Check size={13} /> Block{' '}
+                    {currentSnapshot.block.toLocaleString()}
                   </span>
                 </div>
                 <div className="earn-stats">
@@ -686,9 +813,10 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                   </div>
                 </div>
                 <p className="earn-small">
-                  Redemption value is a contract preview, not a withdrawal guarantee. Existing vault
-                  value is not labeled as earned interest because its original deposit history has
-                  not been reconciled here.
+                  Redemption value is a contract preview, not a withdrawal
+                  guarantee. Existing vault value is not labeled as earned
+                  interest because its original deposit history has not been
+                  reconciled here.
                 </p>
                 <div className="holdings-grid">
                   {currentSnapshot.stocks.map((s) => (
@@ -709,8 +837,10 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                   ))}
                 </div>
                 <p className="earn-small">
-                  Last checked {new Date(currentSnapshot.observedAt).toLocaleString()}. Balances
-                  refresh on connection or when you request it; public RPC availability can vary.
+                  Last checked{' '}
+                  {new Date(currentSnapshot.observedAt).toLocaleString()}.
+                  Balances refresh on connection or when you request it; public
+                  RPC availability can vary.
                 </p>
               </section>
             )}
@@ -718,17 +848,16 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
             <section className="earn-builder">
               <h2>Check a real route</h2>
               <p className="earn-small">
-                The same amount can preview a vault deposit or a stock purchase. These checks do not
-                move money.
+                The same amount can preview a vault deposit or a stock purchase.
+                These checks do not move money.
               </p>
               <label>
-                USDG amount · up to 100
+                USDG amount
                 <input
                   type="number"
                   disabled={busy}
                   value={input}
                   min="0.000001"
-                  max="100"
                   step="0.000001"
                   onChange={(e) => {
                     generation.current++;
@@ -750,9 +879,9 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
                   }}
                 >
                   {STOCK_TOKENS.map((s) => (
-                    <option key={s.symbol} disabled={s.symbol === "MSFT"}>
+                    <option key={s.symbol} disabled={s.symbol === 'MSFT'}>
                       {s.symbol}
-                      {s.symbol === "MSFT" ? " · direct route unavailable" : ""}
+                      {s.symbol === 'MSFT' ? ' · direct route unavailable' : ''}
                     </option>
                   ))}
                 </select>
@@ -782,17 +911,21 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               )}
               {quote && (
                 <div className="live-result">
-                  <span className="earn-eyebrow">UNISWAP V3 · ONCHAIN QUOTE</span>
+                  <span className="earn-eyebrow">
+                    UNISWAP V3 · ONCHAIN QUOTE
+                  </span>
                   <strong>
-                    {format(quote.amountIn)} USDG → {format(quote.amountOut, 18)} {quote.symbol}
+                    {format(quote.amountIn)} USDG →{' '}
+                    {format(quote.amountOut, 18)} {quote.symbol}
                   </strong>
                   <p>
-                    Minimum at 1% slippage: {format(quote.minimumOut, 18)} tokens. Gas is
-                    additional.
+                    Minimum at 1% slippage: {format(quote.minimumOut, 18)}{' '}
+                    tokens. Gas is additional.
                   </p>
                   <small>
-                    Block {quote.block.toLocaleString()} · Quote expires{" "}
-                    {new Date(quote.expiresAt).toLocaleTimeString()}. Not an executed trade.
+                    Block {quote.block.toLocaleString()} · Quote expires{' '}
+                    {new Date(quote.expiresAt).toLocaleTimeString()}. Not an
+                    executed trade.
                   </small>
                   <a
                     href={`${EXPLORER_URL}/address/${quote.pool}`}
@@ -807,16 +940,17 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
               {preview && (
                 <div className="live-result">
                   <strong>
-                    {format(preview.assets)} USDG → {format(preview.previewShares, 18)} vault shares
+                    {format(preview.assets)} USDG →{' '}
+                    {format(preview.previewShares, 18)} vault shares
                   </strong>
                   <p>
-                    {preview.simulation === "passed"
-                      ? "The exact deposit call simulated successfully at this block."
-                      : preview.simulation === "needs-balance"
-                        ? "The connected wallet needs more USDG before a deposit can be simulated."
-                        : preview.simulation === "needs-approval"
-                          ? "A token allowance is needed before the exact deposit can be simulated. No approval has been requested."
-                          : "The exact deposit call could not be simulated."}
+                    {preview.simulation === 'passed'
+                      ? 'The exact deposit call simulated successfully at this block.'
+                      : preview.simulation === 'needs-balance'
+                        ? 'The connected wallet needs more USDG before a deposit can be simulated.'
+                        : preview.simulation === 'needs-approval'
+                          ? 'A token allowance is needed before the exact deposit can be simulated. No approval has been requested.'
+                          : 'The exact deposit call could not be simulated.'}
                   </p>
                   <small>{preview.reason}</small>
                 </div>
@@ -827,5 +961,9 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
       </div>
     </div>
   );
-  return embedded ? content : <EarnShell active="Dashboard">{content}</EarnShell>;
+  return embedded ? (
+    content
+  ) : (
+    <EarnShell active="Dashboard">{content}</EarnShell>
+  );
 }

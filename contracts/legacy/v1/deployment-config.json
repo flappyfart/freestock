@@ -1,0 +1,29 @@
+{
+  "chainId": 4663,
+  "asset": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+  "vault": "0xBeEff033F34C046626B8D0A041844C5d1A5409dd",
+  "router": "0xcaf681a66d020601342297493863e78c959e5cb2",
+  "stocks": [
+    {
+      "symbol": "NVDA",
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC"
+    },
+    {
+      "symbol": "AAPL",
+      "address": "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+    },
+    {
+      "symbol": "TSLA",
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+    },
+    {
+      "symbol": "GOOGL",
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+    },
+    {
+      "symbol": "SPY",
+      "address": "0x117cc2133c37B721F49dE2A7a74833232B3B4C0C"
+    }
+  ],
+  "depositCap": "100000000"
+}

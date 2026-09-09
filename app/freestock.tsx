@@ -1,8 +1,8 @@
-"use client";
+'use client';
 /* SVG brand marks are already local and optimized. Inline chart SVG needs its image role. */
 /* oxlint-disable next/no-img-element, jsx-a11y/prefer-tag-over-role, next/no-html-link-for-pages -- Local SVG images and semantic SVG roles are intentional; Sites sign-in requires native top-level navigation. */
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -23,16 +23,21 @@ import {
   Check,
   Info,
   ArrowUpFromLine,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { HomepageIntro, HomepageQuestions } from "./homepage-intro";
-import { MotionEffects } from "./motion-effects";
-import { LandingIntro } from "./landing-intro";
-import { ScrollMotion } from "./scroll-motion";
-import { prizeSummary } from "@/lib/prizes";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { HomepageIntro, HomepageQuestions } from './homepage-intro';
+import { MotionEffects } from './motion-effects';
+import { LandingIntro } from './landing-intro';
+import { ScrollMotion } from './scroll-motion';
+import { prizeSummary } from '@/lib/prizes';
 import {
   initialState,
   parseAmount,
@@ -45,40 +50,46 @@ import {
   type Command,
   type Draw,
   type Stock,
-} from "@/lib/engine";
+} from '@/lib/engine';
 
 const bigint = (value: string) => BigInt(value);
 const names: Record<Stock, string> = {
-  AAPL: "Apple",
-  NVDA: "NVIDIA",
-  MSFT: "Microsoft",
-  TSLA: "Tesla",
-  GOOGL: "Alphabet",
-  SPY: "S&P 500",
+  AAPL: 'Apple',
+  NVDA: 'NVIDIA',
+  MSFT: 'Microsoft',
+  TSLA: 'Tesla',
+  GOOGL: 'Alphabet',
+  SPY: 'S&P 500',
 };
 const money = (value: string | bigint) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
     maximumFractionDigits: 2,
   }).format(Number(value) / 1e6);
 const num = (n: number, digits = 0) =>
-  new Intl.NumberFormat("en-US", { maximumFractionDigits: digits }).format(n);
+  new Intl.NumberFormat('en-US', { maximumFractionDigits: digits }).format(n);
 const entries = (n: string) => Number(n) / Number(UNIT * DAY);
 const eventNames: Record<string, string> = {
-  deposit: "Savings added",
-  withdrawal_requested: "Withdrawal requested",
-  withdrawal_completed: "Withdrawal completed",
-  time_advanced: "Time advanced",
-  draw_closed: "Entries locked",
-  randomness_stored: "Draw result stored",
-  prize_settled: "Prize settled",
-  prize_claimed: "Allocation claimed",
-  stock_selected: "Example stock changed",
+  deposit: 'Savings added',
+  withdrawal_requested: 'Withdrawal requested',
+  withdrawal_completed: 'Withdrawal completed',
+  time_advanced: 'Time advanced',
+  draw_closed: 'Entries locked',
+  randomness_stored: 'Draw result stored',
+  prize_settled: 'Prize settled',
+  prize_claimed: 'Allocation claimed',
+  stock_selected: 'Example stock changed',
 };
 function SuccessIcon() {
   return (
-    <svg className="success-icon" viewBox="0 0 28 28" width="23" height="23" aria-hidden="true">
+    <svg
+      className="success-icon"
+      viewBox="0 0 28 28"
+      width="23"
+      height="23"
+      aria-hidden="true"
+    >
       <path d="M4 14l8 7L24 7" />
     </svg>
   );
@@ -86,9 +97,14 @@ function SuccessIcon() {
 function ActionButton({
   children,
   ...props
-}: Omit<React.ComponentProps<typeof Button>, "className"> & { className?: string }) {
+}: Omit<React.ComponentProps<typeof Button>, 'className'> & {
+  className?: string;
+}) {
   return (
-    <Button {...props} className={`primary arrow-button ${props.className || ""}`}>
+    <Button
+      {...props}
+      className={`primary arrow-button ${props.className || ''}`}
+    >
       {children}
       <span className="arrow-capsule" aria-hidden="true">
         <ArrowRight size={17} />
@@ -97,13 +113,21 @@ function ActionButton({
   );
 }
 function StockLogo({ symbol }: { symbol: Stock }) {
-  if (symbol === "SPY")
+  if (symbol === 'SPY')
     return (
       <span className="stock-logo spy-mark" aria-hidden="true">
         <ChartNoAxesCombined size={22} />
       </span>
     );
-  return <img className="stock-logo" src={`/stocks/${symbol}.svg`} alt="" width="36" height="36" />;
+  return (
+    <img
+      className="stock-logo"
+      src={`/stocks/${symbol}.svg`}
+      alt=""
+      width="36"
+      height="36"
+    />
+  );
 }
 function StockTicket({ stock }: { stock: Stock }) {
   return (
@@ -131,8 +155,11 @@ function SavingsChart({ state }: { state: State }) {
     max = Math.max(1, ...points.map((p) => Number(p.balance))),
     last = Math.max(1, points.length - 1);
   const path = points
-    .map((p, i) => `${i ? "L" : "M"}${(i / last) * 600} ${102 - (Number(p.balance) / max) * 77}`)
-    .join(" ");
+    .map(
+      (p, i) =>
+        `${i ? 'L' : 'M'}${(i / last) * 600} ${102 - (Number(p.balance) / max) * 77}`,
+    )
+    .join(' ');
   return (
     <div className="savings-graph">
       <div className="graph-grid" />
@@ -143,14 +170,16 @@ function SavingsChart({ state }: { state: State }) {
         aria-label={`Savings history. Current simulated balance ${money(state.balance)}.`}
       >
         <path
-          d={points.length === 1 ? "M0 102 L600 102" : path}
+          d={points.length === 1 ? 'M0 102 L600 102' : path}
           stroke="var(--accent, #cbfffc)"
           strokeWidth="2.4"
           fill="none"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      {state.events.length === 0 && <span>Your next chapter starts with your first deposit.</span>}
+      {state.events.length === 0 && (
+        <span>Your next chapter starts with your first deposit.</span>
+      )}
     </div>
   );
 }
@@ -165,7 +194,10 @@ function PrizeOverview({
 }) {
   const prizes = prizeSummary(state);
   return (
-    <section className="prize-overview panel" aria-labelledby="prize-overview-title">
+    <section
+      className="prize-overview panel"
+      aria-labelledby="prize-overview-title"
+    >
       <div className="prize-overview-heading">
         <div>
           <p className="small-label">YOUR SAVED DEMO ACCOUNT</p>
@@ -204,14 +236,17 @@ function PrizeOverview({
                 onClick={() => onClaim(draw.id)}
                 aria-label={`Claim ${money(draw.amount)} ${names[draw.stock]} prize from draw ${draw.id}`}
               >
-                {locked ? "Please wait…" : "Claim prize"}
+                {locked ? 'Please wait…' : 'Claim prize'}
               </ActionButton>
             </div>
           ))}
         </div>
       )}
       {prizes.claimed > 0n && (
-        <div className="claimed-stock-list" aria-label="Claimed simulated stock prizes">
+        <div
+          className="claimed-stock-list"
+          aria-label="Claimed simulated stock prizes"
+        >
           {Object.entries(state.holdings).map(([symbol, amount]) => (
             <div key={symbol}>
               <StockLogo symbol={symbol as Stock} />
@@ -225,25 +260,27 @@ function PrizeOverview({
         </div>
       )}
       <p className="prize-account-note">
-        Stock prizes appear separately from savings, so claiming does not increase your savings
-        balance or its chart. All amounts are simulated.
+        Stock prizes appear separately from savings, so claiming does not
+        increase your savings balance or its chart. All amounts are simulated.
       </p>
     </section>
   );
 }
 export default function Freestock() {
-  const [state, setState] = useState<State>(() => initialState("2026-09-08")),
+  const [state, setState] = useState<State>(() => initialState('2026-09-08')),
     [ready, setReady] = useState(false),
     [signedOut, setSignedOut] = useState(false),
     [busy, setBusy] = useState(false),
-    [pane, setPane] = useState("overview"),
-    [amount, setAmount] = useState("250"),
-    [mode, setMode] = useState("deposit"),
-    [modal, setModal] = useState<"funds" | "about" | null>(null),
-    [error, setError] = useState(""),
-    [notice, setNotice] = useState(""),
-    [retry, setRetry] = useState<{ command: Command; key: string } | null>(null),
-    [activityFilter, setActivityFilter] = useState("all");
+    [pane, setPane] = useState('overview'),
+    [amount, setAmount] = useState('250'),
+    [mode, setMode] = useState('deposit'),
+    [modal, setModal] = useState<'funds' | 'about' | null>(null),
+    [error, setError] = useState(''),
+    [notice, setNotice] = useState(''),
+    [retry, setRetry] = useState<{ command: Command; key: string } | null>(
+      null,
+    ),
+    [activityFilter, setActivityFilter] = useState('all');
   const version = useRef(-1),
     running = useRef(false),
     stateRef = useRef(state);
@@ -260,19 +297,27 @@ export default function Freestock() {
   const load = useCallback(
     async (background = false) => {
       try {
-        const r = await fetch("/api/account", { cache: "no-store" });
-        const data = (await r.json()) as { state: State; version: number; error?: string };
+        const r = await fetch('/api/account', { cache: 'no-store' });
+        const data = (await r.json()) as {
+          state: State;
+          version: number;
+          error?: string;
+        };
         if (r.status === 401) {
           setSignedOut(true);
           return;
         }
         if (!r.ok) throw Error(data.error);
         accept(data);
-        if (!background) setError("");
+        if (!background) setError('');
         setSignedOut(false);
       } catch (e) {
         if (!background)
-          setError(e instanceof Error ? e.message : "Your preview could not be loaded.");
+          setError(
+            e instanceof Error
+              ? e.message
+              : 'Your preview could not be loaded.',
+          );
       }
     },
     [accept],
@@ -283,17 +328,18 @@ export default function Freestock() {
   }, [load]);
   useEffect(() => {
     const refresh = () => {
-      if (document.visibilityState === "visible" && !running.current) void load(true);
+      if (document.visibilityState === 'visible' && !running.current)
+        void load(true);
     };
-    window.addEventListener("focus", refresh);
-    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
     return () => {
-      window.removeEventListener("focus", refresh);
-      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
     };
   }, [load]);
   useEffect(() => {
-    if (pane === "overview" && version.current >= 0 && !running.current) {
+    if (pane === 'overview' && version.current >= 0 && !running.current) {
       // oxlint-disable-next-line react/react-compiler -- Refresh follows navigation and awaits the API response.
       void load(true);
     }
@@ -303,52 +349,61 @@ export default function Freestock() {
       if (running.current) return false;
       running.current = true;
       setBusy(true);
-      setError("");
-      setNotice("");
+      setError('');
+      setNotice('');
       const requestKey = key || crypto.randomUUID();
       let definiteFailure = false;
       try {
-        const response = await fetch("/api/commands", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Idempotency-Key": requestKey },
+        const response = await fetch('/api/commands', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Idempotency-Key': requestKey,
+          },
           body: JSON.stringify(command),
           signal: AbortSignal.timeout(20000),
         });
-        const data = (await response.json()) as { state: State; version: number; error?: string };
+        const data = (await response.json()) as {
+          state: State;
+          version: number;
+          error?: string;
+        };
         if (!response.ok) {
           definiteFailure = response.status < 500;
           if (response.status >= 500) setRetry({ command, key: requestKey });
           else setRetry(null);
-          throw Error(data.error || "The action could not be completed.");
+          throw Error(data.error || 'The action could not be completed.');
         }
         accept(data);
         setRetry(null);
         setModal(null);
         const resultDraw =
-          "drawId" in command
+          'drawId' in command
             ? data.state.draws.find((draw) => draw.id === command.drawId)
             : undefined;
         setNotice(
-          command.type === "deposit"
-            ? "Simulated money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner."
-            : command.type === "withdraw"
-              ? "Withdrawal reserved. Complete it below to return funds to your demo wallet."
-              : command.type === "advance"
-                ? `${command.days} simulated day${command.days === 1 ? "" : "s"} completed.`
-                : command.type === "claim"
-                  ? `${resultDraw ? `${money(resultDraw.amount)} ${names[resultDraw.stock]}` : "Your prize"} claimed. See Stock prizes claimed on Home. Your savings balance stays separate.`
-                  : command.type === "settle_prize" && resultDraw
+          command.type === 'deposit'
+            ? 'Simulated money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner.'
+            : command.type === 'withdraw'
+              ? 'Withdrawal reserved. Complete it below to return funds to your demo wallet.'
+              : command.type === 'advance'
+                ? `${command.days} simulated day${command.days === 1 ? '' : 's'} completed.`
+                : command.type === 'claim'
+                  ? `${resultDraw ? `${money(resultDraw.amount)} ${names[resultDraw.stock]}` : 'Your prize'} claimed. See Stock prizes claimed on Home. Your savings balance stays separate.`
+                  : command.type === 'settle_prize' && resultDraw
                     ? resultDraw.winner === 0
                       ? `You won ${money(resultDraw.amount)} of ${names[resultDraw.stock]}! One step left: use Claim prize to add it to your account.`
                       : `Example saver ${resultDraw.winner} won draw #${resultDraw.id}. This prize belongs to that saver.`
-                    : "Saved to your preview.",
+                    : 'Saved to your preview.',
         );
         return true;
       } catch (e) {
         if (!definiteFailure) setRetry({ command, key: requestKey });
         setModal(null);
         setError(
-          e instanceof Error ? e.message : "Connection interrupted. Retry to confirm the result.",
+          e instanceof Error
+            ? e.message
+            : 'Connection interrupted. Retry to confirm the result.',
         );
         return false;
       } finally {
@@ -366,7 +421,10 @@ export default function Freestock() {
     const context = (
       document as Document & {
         modelContext?: {
-          registerTool: (tool: unknown, options: { signal: AbortSignal }) => void | Promise<void>;
+          registerTool: (
+            tool: unknown,
+            options: { signal: AbortSignal },
+          ) => void | Promise<void>;
         };
       }
     ).modelContext;
@@ -376,33 +434,43 @@ export default function Freestock() {
       try {
         await context.registerTool(
           {
-            name: "get_freestock_preview",
-            description: "Read simulated savings and draw state. No real funds.",
-            inputSchema: { type: "object", properties: {}, additionalProperties: false },
+            name: 'get_freestock_preview',
+            description:
+              'Read simulated savings and draw state. No real funds.',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+              additionalProperties: false,
+            },
             annotations: { readOnlyHint: true },
-            execute: () => ({ mode: "simulation", state: stateRef.current }),
+            execute: () => ({ mode: 'simulation', state: stateRef.current }),
           },
           { signal: lifecycle.signal },
         );
         await context.registerTool(
           {
-            name: "add_simulated_freestock_funds",
+            name: 'add_simulated_freestock_funds',
             description:
-              "Complete a deposit of simulated USDG into the saved private preview. Never moves real funds.",
+              'Complete a deposit of simulated USDG into the saved private preview. Never moves real funds.',
             inputSchema: {
-              type: "object",
-              properties: { amount: { type: "string" } },
-              required: ["amount"],
+              type: 'object',
+              properties: { amount: { type: 'string' } },
+              required: ['amount'],
               additionalProperties: false,
             },
             annotations: { readOnlyHint: false },
             execute: async (input: unknown) => {
-              const c = parseCommand({ ...(input as object), type: "deposit" });
-              if (!toolsRef.current.ready || toolsRef.current.retry || running.current)
-                throw Error("Preview is not ready for another action.");
+              const c = parseCommand({ ...(input as object), type: 'deposit' });
+              if (
+                !toolsRef.current.ready ||
+                toolsRef.current.retry ||
+                running.current
+              )
+                throw Error('Preview is not ready for another action.');
               const ok = await toolsRef.current.run(c);
-              if (!ok) throw Error("Deposit not confirmed. Check the visible error.");
-              return { mode: "simulation", confirmed: true };
+              if (!ok)
+                throw Error('Deposit not confirmed. Check the visible error.');
+              return { mode: 'simulation', confirmed: true };
             },
           },
           { signal: lifecycle.signal },
@@ -424,31 +492,40 @@ export default function Freestock() {
     daysLeft = 7 - (state.day % 7);
   const won = prizeSummary(state).claimed;
   const drawWork = state.draws.filter((d) =>
-    ["closed", "randomness_ready", "claimable"].includes(d.status),
+    ['closed', 'randomness_ready', 'claimable'].includes(d.status),
   ).length;
-  let amountError = "";
+  let amountError = '';
   try {
     const n = parseAmount(amount);
-    if (n > bigint(mode === "deposit" ? state.wallet : state.balance))
+    if (n > bigint(mode === 'deposit' ? state.wallet : state.balance))
       amountError =
-        mode === "deposit" ? "Amount exceeds your demo wallet." : "Amount exceeds your savings.";
+        mode === 'deposit'
+          ? 'Amount exceeds your demo wallet.'
+          : 'Amount exceeds your savings.';
   } catch {
-    amountError = "Enter a valid USDG amount.";
+    amountError = 'Enter a valid USDG amount.';
   }
   const chooseMode = (value: string) => {
     setMode(value);
-    setAmount(value === "withdraw" ? "100" : "250");
+    setAmount(value === 'withdraw' ? '100' : '250');
   };
   const exportActivity = () => {
     const content = JSON.stringify(
-      { product: "freestock", mode: "simulation", exportedAt: new Date().toISOString(), state },
+      {
+        product: 'freestock',
+        mode: 'simulation',
+        exportedAt: new Date().toISOString(),
+        state,
+      },
       null,
       2,
     );
-    const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
-    const a = document.createElement("a");
+    const url = URL.createObjectURL(
+      new Blob([content], { type: 'application/json' }),
+    );
+    const a = document.createElement('a');
     a.href = url;
-    a.download = "freestock-simulated-account.json";
+    a.download = 'freestock-simulated-account.json';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -456,23 +533,31 @@ export default function Freestock() {
     .reverse()
     .filter(
       (e) =>
-        activityFilter === "all" ||
-        (activityFilter === "savings"
-          ? ["deposit", "withdrawal_requested", "withdrawal_completed"].includes(e.type)
-          : e.type.startsWith("prize") ||
-            e.type === "draw_closed" ||
-            e.type === "randomness_stored"),
+        activityFilter === 'all' ||
+        (activityFilter === 'savings'
+          ? [
+              'deposit',
+              'withdrawal_requested',
+              'withdrawal_completed',
+            ].includes(e.type)
+          : e.type.startsWith('prize') ||
+            e.type === 'draw_closed' ||
+            e.type === 'randomness_stored'),
     );
   function DrawAction({ draw }: { draw: Draw }) {
     const actions: Partial<
-      Record<Draw["status"], { label: string; type: "resolve" | "settle_prize" | "claim" }>
+      Record<
+        Draw['status'],
+        { label: string; type: 'resolve' | 'settle_prize' | 'claim' }
+      >
     > = {
-      closed: { label: "Reveal example result", type: "resolve" },
+      closed: { label: 'Reveal example result', type: 'resolve' },
       randomness_ready: {
-        label: draw.winner === 0 ? "Prepare my prize" : "Complete draw for winner",
-        type: "settle_prize",
+        label:
+          draw.winner === 0 ? 'Prepare my prize' : 'Complete draw for winner',
+        type: 'settle_prize',
       },
-      claimable: { label: "Claim simulated prize", type: "claim" },
+      claimable: { label: 'Claim simulated prize', type: 'claim' },
     };
     const action = actions[draw.status];
     return action ? (
@@ -486,17 +571,21 @@ export default function Freestock() {
       </Button>
     ) : (
       <span className="pill">
-        {draw.status === "unfunded"
-          ? "Not funded"
-          : draw.status === "claimed"
-            ? "Claimed"
-            : "Awarded to another saver"}
+        {draw.status === 'unfunded'
+          ? 'Not funded'
+          : draw.status === 'claimed'
+            ? 'Claimed'
+            : 'Awarded to another saver'}
         <Check size={13} />
       </span>
     );
   }
   return (
-    <Tabs value={pane} onValueChange={(v) => setPane(String(v))} className="app-shell">
+    <Tabs
+      value={pane}
+      onValueChange={(v) => setPane(String(v))}
+      className="app-shell"
+    >
       <MotionEffects />
       <LandingIntro />
       <ScrollMotion />
@@ -512,21 +601,23 @@ export default function Freestock() {
           <span
             className="nav-glider"
             style={{
-              transform: `translateX(${["overview", "draws", "activity"].indexOf(pane) * 100}%)`,
+              transform: `translateX(${['overview', 'draws', 'activity'].indexOf(pane) * 100}%)`,
             }}
           />
           {[
-            ["overview", "Home"],
-            ["draws", "Prize draws"],
-            ["activity", "Activity"],
+            ['overview', 'Home'],
+            ['draws', 'Prize draws'],
+            ['activity', 'Activity'],
           ].map(([value, label]) => (
             <TabsTrigger className="nav-item" key={value} value={value}>
               {label}
-              {value === "draws" && drawWork > 0 && <span className="nav-count">{drawWork}</span>}
+              {value === 'draws' && drawWork > 0 && (
+                <span className="nav-count">{drawWork}</span>
+              )}
             </TabsTrigger>
           ))}
         </TabsList>
-        <button className="account-pill" onClick={() => setModal("about")}>
+        <button className="account-pill" onClick={() => setModal('about')}>
           <span className="avatar">f</span>Your preview
           <ChevronRight size={13} />
         </button>
@@ -542,18 +633,22 @@ export default function Freestock() {
         </span>
       </div>
       <main className="workspace" id="main-content">
-        {pane !== "overview" && (
+        {pane !== 'overview' && (
           <div className="page-heading">
             <div>
               <p className="small-label">YOUR DEMO ACCOUNT</p>
-              <h1>{pane === "draws" ? "Your stock prize draws." : "Every step, accounted for."}</h1>
+              <h1>
+                {pane === 'draws'
+                  ? 'Your stock prize draws.'
+                  : 'Every step, accounted for.'}
+              </h1>
               <p>
-                {pane === "draws"
-                  ? "Reveal the winner. If it’s you, prepare and claim your prize. All prizes are pretend."
-                  : "Your deposits, withdrawals, entries, and prizes in one place."}
+                {pane === 'draws'
+                  ? 'Reveal the winner. If it’s you, prepare and claim your prize. All prizes are pretend.'
+                  : 'Your deposits, withdrawals, entries, and prizes in one place.'}
               </p>
             </div>
-            <button className="pill" onClick={() => setModal("about")}>
+            <button className="pill" onClick={() => setModal('about')}>
               <Layers size={15} />
               How it works
               <CircleHelp size={13} />
@@ -563,11 +658,11 @@ export default function Freestock() {
         {signedOut && (
           <div className="message-banner">
             <Info size={18} />
-            <span>Sign in to start your own saved preview.</span>
+            <span>Open the Freestock demo to explore a saved preview.</span>
             <a
               className="secondary"
               data-auth-navigation="dispatch-owned"
-              href="/signin-with-chatgpt?return_to=%2F"
+              href="/?demo=setup"
               target="_top"
             >
               Sign in with ChatGPT
@@ -582,9 +677,11 @@ export default function Freestock() {
             <Button
               className="secondary"
               disabled={busy}
-              onClick={() => (retry ? void run(retry.command, retry.key) : void load())}
+              onClick={() =>
+                retry ? void run(retry.command, retry.key) : void load()
+              }
             >
-              {busy ? "Retrying…" : "Retry"}
+              {busy ? 'Retrying…' : 'Retry'}
             </Button>
           </div>
         )}
@@ -595,7 +692,7 @@ export default function Freestock() {
             <button
               className="dismiss"
               aria-label="Dismiss confirmation"
-              onClick={() => setNotice("")}
+              onClick={() => setNotice('')}
             >
               ×
             </button>
@@ -607,21 +704,28 @@ export default function Freestock() {
             Loading your saved preview…
           </div>
         )}
-        {ready && !signedOut && state.draws.length > 0 && pane !== "activity" && (
-          <PrizeOverview
-            state={state}
-            locked={locked}
-            onClaim={(id) => void run({ type: "claim", drawId: id })}
-          />
-        )}
+        {ready &&
+          !signedOut &&
+          state.draws.length > 0 &&
+          pane !== 'activity' && (
+            <PrizeOverview
+              state={state}
+              locked={locked}
+              onClaim={(id) => void run({ type: 'claim', drawId: id })}
+            />
+          )}
         <TabsContent value="overview" className="pane-content">
           <HomepageIntro />
           <div className="demo-heading">
             <div>
               <h2>Try a $10 simulated draw.</h2>
-              <p>Add simulated money. Skip ahead 7 days. Then reveal the draw.</p>
+              <p>
+                Add simulated money. Skip ahead 7 days. Then reveal the draw.
+              </p>
             </div>
-            <span className="pill">You start with $10,000 of simulated money</span>
+            <span className="pill">
+              You start with $10,000 of simulated money
+            </span>
           </div>
           <div className="dashboard-grid">
             <section className="savings-panel panel">
@@ -630,10 +734,12 @@ export default function Freestock() {
                 <Wallet size={18} />
               </div>
               <div className="balance">
-                {money(state.balance).split(".")[0]}
-                <span>.{money(state.balance).split(".")[1]}</span>
+                {money(state.balance).split('.')[0]}
+                <span>.{money(state.balance).split('.')[1]}</span>
               </div>
-              <p className="caption">Simulated balance · USDG is the demo’s dollar unit</p>
+              <p className="caption">
+                Simulated balance · USDG is the demo’s dollar unit
+              </p>
               <SavingsChart state={state} />
               <div className="savings-bottom">
                 <div>
@@ -649,16 +755,34 @@ export default function Freestock() {
                 </div>
               </div>
             </section>
-            <section className="deposit-panel panel" id="try-demo" tabIndex={-1}>
+            <section
+              className="deposit-panel panel"
+              id="try-demo"
+              tabIndex={-1}
+            >
               <div className="section-top">
-                <h2>{mode === "deposit" ? "Add to your savings" : "Withdraw savings"}</h2>
-                {mode === "deposit" ? <ArrowDownLeft size={19} /> : <ArrowUpFromLine size={19} />}
+                <h2>
+                  {mode === 'deposit'
+                    ? 'Add to your savings'
+                    : 'Withdraw savings'}
+                </h2>
+                {mode === 'deposit' ? (
+                  <ArrowDownLeft size={19} />
+                ) : (
+                  <ArrowUpFromLine size={19} />
+                )}
               </div>
               <fieldset className="money-mode" aria-label="Savings action">
-                <Button aria-pressed={mode === "deposit"} onClick={() => chooseMode("deposit")}>
+                <Button
+                  aria-pressed={mode === 'deposit'}
+                  onClick={() => chooseMode('deposit')}
+                >
                   Deposit
                 </Button>
-                <Button aria-pressed={mode === "withdraw"} onClick={() => chooseMode("withdraw")}>
+                <Button
+                  aria-pressed={mode === 'withdraw'}
+                  onClick={() => chooseMode('withdraw')}
+                >
                   Withdraw
                 </Button>
               </fieldset>
@@ -666,7 +790,7 @@ export default function Freestock() {
                 <span>$</span>
                 <Input
                   id="savings-amount"
-                  aria-label={`${mode === "deposit" ? "Deposit" : "Withdrawal"} amount in USDG`}
+                  aria-label={`${mode === 'deposit' ? 'Deposit' : 'Withdrawal'} amount in USDG`}
                   inputMode="decimal"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
@@ -675,48 +799,66 @@ export default function Freestock() {
                 <span>USDG</span>
               </label>
               <div className="quick-amounts">
-                {["100", "250", "500", "Max"].map((v) => (
+                {['100', '250', '500', 'Max'].map((v) => (
                   <Button
                     key={v}
                     onClick={() =>
                       setAmount(
-                        v === "Max"
-                          ? String(Number(mode === "deposit" ? state.wallet : state.balance) / 1e6)
+                        v === 'Max'
+                          ? String(
+                              Number(
+                                mode === 'deposit'
+                                  ? state.wallet
+                                  : state.balance,
+                              ) / 1e6,
+                            )
                           : v,
                       )
                     }
                   >
-                    {v === "Max" ? "Max" : `$${v}`}
+                    {v === 'Max' ? 'Max' : `$${v}`}
                   </Button>
                 ))}
               </div>
               <div className="deposit-explainer">
                 <div>
                   <Wallet size={16} />
-                  <span>{mode === "deposit" ? "Demo wallet" : "Available savings"}</span>
-                  <strong>{money(mode === "deposit" ? state.wallet : state.balance)}</strong>
+                  <span>
+                    {mode === 'deposit' ? 'Demo wallet' : 'Available savings'}
+                  </span>
+                  <strong>
+                    {money(mode === 'deposit' ? state.wallet : state.balance)}
+                  </strong>
                 </div>
                 <div>
                   <Gift size={16} />
-                  <span>{mode === "deposit" ? "Entries start building" : "Withdrawal method"}</span>
-                  <strong>{mode === "deposit" ? "After deposit" : "Request, then complete"}</strong>
+                  <span>
+                    {mode === 'deposit'
+                      ? 'Entries start building'
+                      : 'Withdrawal method'}
+                  </span>
+                  <strong>
+                    {mode === 'deposit'
+                      ? 'After deposit'
+                      : 'Request, then complete'}
+                  </strong>
                 </div>
               </div>
               <ActionButton
                 className="wide"
                 disabled={locked || !!amountError}
-                onClick={() => setModal("funds")}
+                onClick={() => setModal('funds')}
               >
                 {busy
-                  ? "Saving…"
-                  : mode === "deposit"
-                    ? "Add simulated funds"
-                    : "Request withdrawal"}
+                  ? 'Saving…'
+                  : mode === 'deposit'
+                    ? 'Add simulated funds'
+                    : 'Request withdrawal'}
               </ActionButton>
               <p className="footnote">
-                {amountError && amount !== ""
+                {amountError && amount !== ''
                   ? amountError
-                  : "Preview funds have no monetary value."}
+                  : 'Preview funds have no monetary value.'}
               </p>
             </section>
             <section className="prize-panel panel">
@@ -735,7 +877,10 @@ export default function Freestock() {
                   <br />
                   A pretend prize in this demo.
                 </p>
-                <button className="text-button" onClick={() => setPane("draws")}>
+                <button
+                  className="text-button"
+                  onClick={() => setPane('draws')}
+                >
                   Explore the draw
                   <ArrowUpRight size={17} />
                 </button>
@@ -775,13 +920,16 @@ export default function Freestock() {
                 <Clock3 size={20} />
                 <p>
                   <strong>{money(state.pending)} withdrawal pending</strong>
-                  <span>This amount no longer builds future entries. Existing entries remain.</span>
+                  <span>
+                    This amount no longer builds future entries. Existing
+                    entries remain.
+                  </span>
                 </p>
               </div>
               <Button
                 className="secondary"
                 disabled={locked}
-                onClick={() => void run({ type: "complete_withdrawal" })}
+                onClick={() => void run({ type: 'complete_withdrawal' })}
               >
                 Complete simulated withdrawal
                 <ArrowRight size={15} />
@@ -799,7 +947,7 @@ export default function Freestock() {
                 <strong>Skip ahead to see a draw.</strong>
                 <span>
                   Day {state.day} of your preview. {daysLeft} simulated day
-                  {daysLeft === 1 ? "" : "s"} until draw #{nextDraw}.
+                  {daysLeft === 1 ? '' : 's'} until draw #{nextDraw}.
                 </span>
               </p>
             </div>
@@ -807,14 +955,14 @@ export default function Freestock() {
               <Button
                 className="secondary"
                 disabled={locked || state.day >= 365}
-                onClick={() => void run({ type: "advance", days: 1 })}
+                onClick={() => void run({ type: 'advance', days: 1 })}
               >
                 +1 day
               </Button>
               <Button
                 className="secondary"
                 disabled={locked || state.day > 358}
-                onClick={() => void run({ type: "advance", days: 7 })}
+                onClick={() => void run({ type: 'advance', days: 7 })}
               >
                 +7 days
                 <ArrowRight size={15} />
@@ -822,8 +970,8 @@ export default function Freestock() {
             </div>
           </section>
           <p className="simulation-guide">
-            After skipping ahead, open Prize draws to reveal who won. A draw can complete only when
-            the pool has enough simulated earnings.
+            After skipping ahead, open Prize draws to reveal who won. A draw can
+            complete only when the pool has enough simulated earnings.
           </p>
           <HomepageQuestions />
         </TabsContent>
@@ -834,8 +982,8 @@ export default function Freestock() {
                 <span className="pill">Example draw #{nextDraw}</span>
                 <h2>Your next stock prize draw.</h2>
                 <p>
-                  A $10 simulated prize, paid for only when the pool has enough earnings after
-                  costs.
+                  A $10 simulated prize, paid for only when the pool has enough
+                  earnings after costs.
                 </p>
                 <div className="draw-stats">
                   <div>
@@ -849,7 +997,10 @@ export default function Freestock() {
                     <small>Changes until entries lock</small>
                   </div>
                 </div>
-                <Button className="secondary" onClick={() => setPane("overview")}>
+                <Button
+                  className="secondary"
+                  onClick={() => setPane('overview')}
+                >
                   Go to your savings
                   <ArrowRight size={15} />
                 </Button>
@@ -865,14 +1016,18 @@ export default function Freestock() {
                     key={stock}
                     aria-pressed={stock === state.stock}
                     disabled={locked}
-                    onClick={() => void run({ type: "select_stock", stock })}
+                    onClick={() => void run({ type: 'select_stock', stock })}
                   >
                     <StockLogo symbol={stock} />
                     <span>
                       <strong>{names[stock]}</strong>
                       <small>{stock}</small>
                     </span>
-                    {stock === state.stock ? <Check size={16} /> : <Plus size={14} />}
+                    {stock === state.stock ? (
+                      <Check size={16} />
+                    ) : (
+                      <Plus size={14} />
+                    )}
                   </button>
                 ))}
               </div>
@@ -890,10 +1045,13 @@ export default function Freestock() {
                 <Gift size={27} />
                 <h3>Your first draw starts with savings.</h3>
                 <p>
-                  Add simulated money, then use +7 days on Home. Come back here to reveal the
-                  winner.
+                  Add simulated money, then use +7 days on Home. Come back here
+                  to reveal the winner.
                 </p>
-                <Button className="secondary" onClick={() => setPane("overview")}>
+                <Button
+                  className="secondary"
+                  onClick={() => setPane('overview')}
+                >
                   Start with your savings
                   <ArrowRight size={14} />
                 </Button>
@@ -910,52 +1068,54 @@ export default function Freestock() {
                           <span>{draw.stock}</span>
                         </h3>
                         <p>
-                          Day {draw.day} · {money(draw.amount)} simulated allocation
+                          Day {draw.day} · {money(draw.amount)} simulated
+                          allocation
                         </p>
                       </div>
                     </div>
                     <div className="draw-result">
                       <strong>
                         {draw.winner === undefined
-                          ? "Entries locked"
+                          ? 'Entries locked'
                           : draw.winner === 0
-                            ? "Your entry was selected"
+                            ? 'Your entry was selected'
                             : `Example saver ${draw.winner} selected`}
                       </strong>
                       <span>
-                        {draw.status === "closed"
-                          ? "Reveal the result to find out who won"
-                          : draw.status === "randomness_ready"
-                            ? "Winner picked. Use the next action to prepare the winner’s prize."
-                            : draw.status === "claimable"
-                              ? "Ready for you to claim"
-                              : draw.status === "unfunded"
-                                ? "No prize reserved"
-                                : "Allocation recorded"}
+                        {draw.status === 'closed'
+                          ? 'Reveal the result to find out who won'
+                          : draw.status === 'randomness_ready'
+                            ? 'Winner picked. Use the next action to prepare the winner’s prize.'
+                            : draw.status === 'claimable'
+                              ? 'Ready for you to claim'
+                              : draw.status === 'unfunded'
+                                ? 'No prize reserved'
+                                : 'Allocation recorded'}
                       </span>
                     </div>
                     <DrawAction draw={draw} />
                     <details className="draw-proof">
                       <summary>View draw record</summary>
                       <p>
-                        <strong>Frozen entries (USDG-days):</strong> You{" "}
-                        {num(entries(draw.weights[0]), 2)}; example savers{" "}
+                        <strong>Frozen entries (USDG-days):</strong> You{' '}
+                        {num(entries(draw.weights[0]), 2)}; example savers{' '}
                         {draw.weights
                           .slice(1)
                           .map((w) => num(entries(w), 2))
-                          .join(", ")}
+                          .join(', ')}
                         .
                       </p>
                       <p>
-                        <strong>Snapshot SHA-256:</strong> <code>{draw.snapshot}</code>
+                        <strong>Snapshot SHA-256:</strong>{' '}
+                        <code>{draw.snapshot}</code>
                       </p>
                       <p>
-                        <strong>Simulated random index:</strong>{" "}
-                        <code>{draw.randomIndex ?? "Not requested"}</code>
+                        <strong>Simulated random index:</strong>{' '}
+                        <code>{draw.randomIndex ?? 'Not requested'}</code>
                       </p>
                       <p>
-                        This record is stored by the preview server. It is not an onchain proof or a
-                        Chainlink VRF fulfillment.
+                        This record is stored by the preview server. It is not
+                        an onchain proof or a Chainlink VRF fulfillment.
                       </p>
                     </details>
                   </article>
@@ -971,7 +1131,9 @@ export default function Freestock() {
               </span>
             </div>
             {Object.keys(state.holdings).length === 0 ? (
-              <p className="portfolio-empty">Claimed prizes will appear here.</p>
+              <p className="portfolio-empty">
+                Claimed prizes will appear here.
+              </p>
             ) : (
               <div className="holding-list">
                 {Object.entries(state.holdings).map(([symbol, value]) => (
@@ -992,17 +1154,25 @@ export default function Freestock() {
           <section className="activity-section panel">
             <div className="activity-toolbar">
               <fieldset className="filter-buttons" aria-label="Filter activity">
-                {["all", "savings", "prizes"].map((f) => (
+                {['all', 'savings', 'prizes'].map((f) => (
                   <Button
                     key={f}
                     aria-pressed={activityFilter === f}
                     onClick={() => setActivityFilter(f)}
                   >
-                    {f === "all" ? "All activity" : f === "savings" ? "Savings" : "Prizes"}
+                    {f === 'all'
+                      ? 'All activity'
+                      : f === 'savings'
+                        ? 'Savings'
+                        : 'Prizes'}
                   </Button>
                 ))}
               </fieldset>
-              <Button className="secondary" disabled={!ready} onClick={exportActivity}>
+              <Button
+                className="secondary"
+                disabled={!ready}
+                onClick={exportActivity}
+              >
                 <Download size={14} />
                 Export account
               </Button>
@@ -1010,11 +1180,15 @@ export default function Freestock() {
             {eventList.length === 0 ? (
               <div className="empty-state">
                 <History size={27} />
-                <h3>{state.events.length ? "No matching activity." : "A fresh start."}</h3>
+                <h3>
+                  {state.events.length
+                    ? 'No matching activity.'
+                    : 'A fresh start.'}
+                </h3>
                 <p>
                   {state.events.length
-                    ? "Try another filter."
-                    : "Your first simulated deposit will appear here."}
+                    ? 'Try another filter.'
+                    : 'Your first simulated deposit will appear here.'}
                 </p>
               </div>
             ) : (
@@ -1022,11 +1196,11 @@ export default function Freestock() {
                 {eventList.map((e) => (
                   <li key={e.id}>
                     <span className="activity-icon">
-                      {e.type === "deposit" ? (
+                      {e.type === 'deposit' ? (
                         <ArrowDownLeft size={17} />
-                      ) : e.type.startsWith("withdrawal") ? (
+                      ) : e.type.startsWith('withdrawal') ? (
                         <ArrowUpRight size={17} />
-                      ) : e.type.startsWith("prize") ? (
+                      ) : e.type.startsWith('prize') ? (
                         <Gift size={17} />
                       ) : (
                         <Clock3 size={17} />
@@ -1037,7 +1211,7 @@ export default function Freestock() {
                       <p>{e.detail}</p>
                     </div>
                     <span className="activity-amount">
-                      {bigint(e.amount) > 0n ? money(e.amount) : "Saved"}
+                      {bigint(e.amount) > 0n ? money(e.amount) : 'Saved'}
                       <small>
                         Day {e.day} · #{e.id}
                       </small>
@@ -1050,10 +1224,10 @@ export default function Freestock() {
         </TabsContent>
         <footer>
           <span>
-            Planned for eligible non-US users. Demo only. Live lending can lose principal and
-            withdrawals depend on liquidity.
+            Planned for eligible non-US users. Demo only. Live lending can lose
+            principal and withdrawals depend on liquidity.
           </span>
-          <button className="text-button" onClick={() => setModal("about")}>
+          <button className="text-button" onClick={() => setModal('about')}>
             <CircleHelp size={15} />
             How it works
           </button>
@@ -1067,33 +1241,33 @@ export default function Freestock() {
       >
         <DialogContent className="freestock-dialog">
           <DialogTitle className="modal-title">
-            {modal === "funds"
-              ? mode === "deposit"
-                ? "Add simulated money to savings."
-                : "Request your withdrawal."
-              : "How freestock works."}
+            {modal === 'funds'
+              ? mode === 'deposit'
+                ? 'Add simulated money to savings.'
+                : 'Request your withdrawal.'
+              : 'How freestock works.'}
           </DialogTitle>
           <DialogDescription className="modal-description">
-            {modal === "funds"
-              ? "Review your simulated transaction before confirming."
-              : "Save together. The pool’s earnings pay for prizes. A random draw picks a winner."}
+            {modal === 'funds'
+              ? 'Review your simulated transaction before confirming.'
+              : 'Save together. The pool’s earnings pay for prizes. A random draw picks a winner.'}
           </DialogDescription>
-          {modal === "funds" ? (
+          {modal === 'funds' ? (
             <>
               <div className="confirmation-amount">
                 {(() => {
                   try {
                     return money(parseAmount(amount));
                   } catch {
-                    return "$0.00";
+                    return '$0.00';
                   }
                 })()}
                 <span>simulated USDG</span>
               </div>
               <p className="modal-copy">
-                {mode === "deposit"
-                  ? "Funds move from your demo wallet into savings. Entries grow with the amount you save and the time it stays in the pool."
-                  : "The requested amount stops building future entries and enters a withdrawal queue. Complete it in the overview to return it to your demo wallet."}
+                {mode === 'deposit'
+                  ? 'Funds move from your demo wallet into savings. Entries grow with the amount you save and the time it stays in the pool.'
+                  : 'The requested amount stops building future entries and enters a withdrawal queue. Complete it in the overview to return it to your demo wallet.'}
               </p>
               <div className="modal-note">
                 <ShieldCheck size={18} />
@@ -1103,14 +1277,17 @@ export default function Freestock() {
                 className="wide"
                 disabled={locked || !!amountError}
                 onClick={() =>
-                  void run({ type: mode === "deposit" ? "deposit" : "withdraw", amount })
+                  void run({
+                    type: mode === 'deposit' ? 'deposit' : 'withdraw',
+                    amount,
+                  })
                 }
               >
                 {busy
-                  ? "Saving…"
-                  : mode === "deposit"
-                    ? "Confirm simulated deposit"
-                    : "Confirm withdrawal request"}
+                  ? 'Saving…'
+                  : mode === 'deposit'
+                    ? 'Confirm simulated deposit'
+                    : 'Confirm withdrawal request'}
               </ActionButton>
             </>
           ) : (
@@ -1118,46 +1295,55 @@ export default function Freestock() {
               <section>
                 <h3>Built for an eligible non-US audience.</h3>
                 <p>
-                  The planned product uses USDG on Robinhood Chain and awards Robinhood Stock
-                  Tokens. These tokens provide stock exposure without ownership of the underlying
-                  shares. US persons and people in the US are excluded. Other country restrictions
+                  The planned product uses USDG on Robinhood Chain and awards
+                  Robinhood Stock Tokens. These tokens provide stock exposure
+                  without ownership of the underlying shares. US persons and
+                  people in the US are excluded. Other country restrictions
                   apply, and live availability is still unconfirmed.
                 </p>
               </section>
               <section>
                 <h3>Saving earns you chances to win.</h3>
                 <p>
-                  Each simulated dollar saved for one day earns one entry. Save $100 for seven days
-                  to earn 700 entries. Your share of all entries is your chance of winning. Entries
-                  start fresh after each weekly demo draw.
+                  Each simulated dollar saved for one day earns one entry. Save
+                  $100 for seven days to earn 700 entries. Your share of all
+                  entries is your chance of winning. Entries start fresh after
+                  each weekly demo draw.
                 </p>
               </section>
               <section>
                 <h3>Everything here is simulated.</h3>
                 <p>
-                  You start with $10,000 of simulated money, labeled USDG. Four example savers
-                  contribute $32,500. These figures are invented scenario inputs. No real people,
-                  funds, lending, shares, or stock tokens are represented.
+                  You start with $10,000 of simulated money, labeled USDG. Four
+                  example savers contribute $32,500. These figures are invented
+                  scenario inputs. No real people, funds, lending, shares, or
+                  stock tokens are represented.
                 </p>
               </section>
               <section>
                 <h3>What funds a prize?</h3>
                 <p>
-                  Pool earnings fund prizes instead of interest paid to every saver. Deposits are
-                  not spent on draws. In this demo, a draw leaves your savings balance unchanged.
+                  Pool earnings fund prizes instead of interest paid to every
+                  saver. Deposits are not spent on draws. In this demo, a draw
+                  leaves your savings balance unchanged.
                 </p>
                 <p>
-                  The scenario assumes 4% annual gross yield and deducts 10% of that yield as
-                  example costs. These are editable code assumptions, not quoted returns or proposed
-                  fees. A $10 prize is reserved only from available simulated net yield.
+                  The scenario assumes 4% annual gross yield and deducts 10% of
+                  that yield as example costs. These are editable code
+                  assumptions, not quoted returns or proposed fees. A $10 prize
+                  is reserved only from available simulated net yield.
                 </p>
               </section>
               <div className="design-credits">
-                Interface elements adapted from{" "}
-                <a href="https://uiverse.io/adamgiebl/new-bird-34" target="_blank" rel="noreferrer">
+                Interface elements adapted from{' '}
+                <a
+                  href="https://uiverse.io/adamgiebl/new-bird-34"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   adamgiebl
                 </a>
-                ,{" "}
+                ,{' '}
                 <a
                   href="https://uiverse.io/Pradeepsaranbishnoi/heavy-dragonfly-92"
                   target="_blank"
@@ -1165,14 +1351,14 @@ export default function Freestock() {
                 >
                   Pradeepsaranbishnoi
                 </a>
-                , and{" "}
+                , and{' '}
                 <a
                   href="https://uiverse.io/Shoh2008/perfect-mouse-3"
                   target="_blank"
                   rel="noreferrer"
                 >
                   Shoh2008
-                </a>{" "}
+                </a>{' '}
                 on Uiverse.
               </div>
             </div>
