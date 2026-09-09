@@ -50,7 +50,7 @@ export default function Page() {
               <h2>Start with your wallet.</h2>
               <p>
                 Connect your wallet, switch to Robinhood Chain and confirm a
-                free ownership message. Your Freestock profile is created
+                free ownership message. Your wallet profile is created
                 automatically. You’ll need USDG to lend and a little ETH to pay
                 network fees on that chain.
               </p>
@@ -171,7 +171,7 @@ export default function Page() {
               </p>
               <p>
                 Activity saves verified position references and transaction
-                records to your sign-in. Receipts show what actually happened.
+                records to your wallet profile. Receipts show what happened.
                 Activity totals cover the records shown, not lifetime profit or
                 your complete wallet holdings.
               </p>

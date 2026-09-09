@@ -157,7 +157,7 @@ export default function PilotWorkspace({
       } catch {
         if (alive.current)
           setHistoryWarning(
-            'Your position is verified, but it could not be saved to your profile. Keep its creation transaction and retry in Activity.',
+            'Your position is verified, but it could not be saved to your wallet profile. Keep its creation transaction and retry in Activity.',
           );
       }
     },
@@ -715,8 +715,8 @@ export default function PilotWorkspace({
             ))}
           </select>
           <span>
-            Saved to your sign-in. Connecting the same wallet on another device
-            restores these references.
+            Saved to your wallet profile. Connect the same wallet on another
+            device to restore your positions.
           </span>
         </label>
       )}
@@ -740,14 +740,14 @@ export default function PilotWorkspace({
 
       {availability === 'loading' && (
         <p className="pd-notice" aria-live="polite">
-          Checking your sign-in. Your current review and wallet request are
-          saved.
+          Checking your wallet connection. Your current review and wallet
+          request are saved.
         </p>
       )}
       {(availability === 'unavailable' || availability === 'error') && (
         <p className="pd-notice">
-          The sign-in check could not finish. Recheck your connection before
-          starting another action.
+          We couldn’t verify your wallet connection. Reconnect before starting
+          another action.
         </p>
       )}
       {refreshWarning && (
@@ -1369,8 +1369,8 @@ export default function PilotWorkspace({
             Save receipt
           </a>
           <p className="pd-meta">
-            Activity saves verified records to your signed-in profile. If saving
-            is unavailable, keep this receipt and sync it later. The explorer
+            Activity saves verified records to your wallet profile. If saving is
+            unavailable, keep this receipt and sync it later. The explorer
             retains the onchain transaction.
           </p>
         </div>

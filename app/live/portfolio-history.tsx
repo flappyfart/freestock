@@ -191,7 +191,7 @@ export function PortfolioHistory({
         <h2>Your positions, remembered.</h2>
         <p>
           Connect your wallet to see the positions and verified activity saved
-          to this sign-in.
+          to your wallet profile.
         </p>
         <button className="dashboard-button" onClick={onConnect}>
           Connect wallet <ArrowUpRight size={16} />
@@ -325,7 +325,7 @@ export function PortfolioHistory({
           <div>
             <h2>Activity</h2>
             <p>
-              Saved to this sign-in and wallet. Balances always come from fresh
+              Saved to your wallet profile. Balances always come from fresh
               chain reads.
             </p>
           </div>

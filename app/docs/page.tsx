@@ -125,8 +125,8 @@ export default function Page() {
                 <li>
                   <strong>Connect your wallet.</strong> Switch to Robinhood
                   Chain, chain ID 4663, then confirm a free ownership message.
-                  This creates or accesses your Freestock profile, without
-                  moving funds or approving token spending.
+                  This creates or opens your wallet profile, without moving
+                  funds or approving token spending.
                 </li>
                 <li>
                   <strong>Restore or create.</strong> Freestock checks saved
@@ -287,9 +287,9 @@ export default function Page() {
               <h2>Activity, restoration and recovery</h2>
               <p>
                 Activity saves verified account references and transaction
-                records to your signed-in profile. Restoring a reference
-                rechecks the deployment, contract code, owner and configured
-                dependencies against the chain.
+                records to your wallet profile. Restoring a reference rechecks
+                the deployment, contract code, owner and configured dependencies
+                against the chain.
               </p>
               <p>
                 History imports scan a bounded range and can resume after
@@ -406,9 +406,9 @@ export default function Page() {
               <p>
                 The backend reads chain state, prepares unsigned transactions,
                 verifies receipts and stores user-scoped history. It has no
-                wallet private key and does not broadcast transactions. Sign-in
-                and wallet ownership are separate: only the owner wallet can
-                authorize account actions.
+                wallet private key and does not broadcast transactions.
+                Connecting your wallet opens your profile. Only the account
+                owner’s wallet can authorize account actions.
               </p>
               <p>
                 <a
