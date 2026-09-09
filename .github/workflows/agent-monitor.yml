@@ -1,0 +1,23 @@
+name: Agentic Lending monitoring
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: agent-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check due lending plans
+        env:
+          MONITOR_TOKEN: ${{ secrets.AGENT_MONITOR_TOKEN }}
+        run: |
+          test -n "$MONITOR_TOKEN" || { echo 'Monitoring secret is not configured.'; exit 1; }
+          curl --silent --show-error --fail-with-body --max-time 210 \
+            --request POST --header "Authorization: Bearer $MONITOR_TOKEN" \
+            https://tryfreestock.com/api/internal/agent-monitor

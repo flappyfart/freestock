@@ -58,7 +58,7 @@
   margin: 0;
 }
 .agentic-section-heading > span {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--al-muted);
 }
 .agentic-plan {
@@ -74,7 +74,7 @@
 }
 .agentic-source small,
 .agentic-source > span {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--al-muted);
 }
 .agentic-source strong {
@@ -117,12 +117,12 @@
   font-size: 14px;
 }
 .agentic-weights > p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--al-muted);
   margin: 2px 0 0;
 }
 .agentic-workspace .agentic-note {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
   color: var(--al-muted);
   margin: 0;
@@ -238,7 +238,7 @@
 }
 .agentic-quote small {
   color: var(--al-muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .agentic-history ol {
   list-style: none;
@@ -247,13 +247,13 @@
 }
 .agentic-history li {
   display: grid;
-  grid-template-columns: 95px 1fr;
+  grid-template-columns: 155px 1fr;
   gap: 20px;
   padding-block: 17px;
   border-top: 1px solid var(--al-line);
 }
 .agentic-history time {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--al-muted);
 }
 .agentic-history strong {

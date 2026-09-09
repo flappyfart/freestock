@@ -51,7 +51,7 @@ Preparation uses the actual sender and current state. Current plans expire after
 
 [`agentic-lending.ts`](../lib/live/agentic-lending.ts) is a deterministic rule engine. It evaluates a verified account snapshot, retention preference, stock allocations, conversion minimum and ETH network-fee budget. It explains a wait, retain or purchase-review recommendation.
 
-The plan is saved locally for the wallet; the recommendation activity view is session-local. There is no LLM call, background scheduler, delegated spender or cross-pool reallocation. A recommendation hands off to a fresh manual transaction review. The ETH gas limit is not an all-in cost percentage measured in USDG; that comparison is future work.
+Plans and the latest 100 decisions per position are stored in D1 under the authenticated wallet identity. Optional scheduled monitoring performs read-only checks while the browser is closed. There is no LLM call, delegated spender or cross-pool reallocation. Recommendations enforce a purchase maximum, ETH gas ceiling and gas-plus-pool fee percentage in USDG. Fresh manual review rechecks the saved rules. See [operations](AGENTIC-LENDING-OPERATIONS.md) for fee feeds, scheduling and failure handling.
 
 ## Storage and accounting
 
@@ -64,7 +64,7 @@ The plan is saved locally for the wallet; the recommendation activity view is se
 | D1 `live_transactions`              | Reconciled transaction records                                         | Saved history, not a custody ledger                                                |
 | D1 `accounts`, `commands`           | Legacy prize-model records                                             | Retained compatibility data; old command endpoint retired                          |
 | Browser local storage               | Account references, lending plans and transaction journal              | Device-local; not authoritative chain state                                        |
-| Browser memory                      | Current quotes, reviews and recommendation activity                    | Temporary session state                                                            |
+| Browser memory                      | Current quotes and reviews                    | Temporary session state                                                            |
 | Owner wallet                        | Keys and transaction authorization                                     | Never stored by the backend                                                        |
 
 The [D1 migrations](../drizzle) define the persisted schema. [`earn-engine.ts`](../lib/earn-engine.ts) uses integer/BigInt accounting for the simulation. [`earn-store.ts`](../lib/earn-store.ts) combines command idempotency and version checks to avoid duplicated or conflicting simulation updates. Simulation command bodies are limited to 4 KB. The model's rates, stock prices and leveraged-LP outcomes are illustrative; they do not execute transactions or model all real costs.
@@ -116,3 +116,14 @@ Read the [route handlers](../app/api) for exact query parameters and validation.
 Market views show a tracked subset, not every pool on Robinhood Chain. Vault and underlying-market values can overlap, so their TVLs should not be added into a headline total. Stock-loan rates and balances are read-only; an empty market does not establish an earning opportunity.
 
 [`markets.ts`](../lib/markets.ts), [`stock-lending-markets.ts`](../lib/stock-lending-markets.ts) and [`rpc-reader.ts`](../lib/live/rpc-reader.ts) separate data retrieval from execution. A dated catalogue snapshot may keep a browsing view useful when its provider is unavailable. Missing data must not be presented as a measured zero. Financial preparation requires fresh successful verification and simulation; a cached marketing snapshot cannot authorize a transaction.
+
+## Agentic Lending storage and API
+
+Migration `0004` adds `agent_plans`, `agent_decisions` and `service_checks`. Plans use optimistic revisions. Atomic leases prevent duplicate checks; saving, pausing or deleting invalidates old workers. Decisions and next-check timestamps update in one database batch. No prepared transactions or private keys are persisted.
+
+- `GET /api/live/agent?owner=…&account=…`: session-scoped plan and latest 50 decisions.
+- `POST /api/live/agent`: same-origin, wallet-authenticated `save`, `check` or `remove`; revision required. New plans verify deployed account identity. Existing plans can be paused during an RPC outage.
+- `GET /api/live/agent/health`: public aggregate service status and last completion, without wallet data.
+- `POST /api/internal/agent-monitor`: secret-authenticated read-only scheduler. Cannot prepare arbitrary caller-supplied actions or sign/send transactions.
+
+The application displays only completed saved decisions. An expired quote, changed allocation, stale source, excessive fees or changed plan stops the recommendation. Wallet approval remains separate from plan configuration.

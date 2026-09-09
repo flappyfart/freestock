@@ -50,6 +50,7 @@ export type AgentIntent = {
   amount: string;
   allocations: Allocation[];
   expiresAt: string;
+  planRevision?: number;
 };
 export type AgentDecision = {
   code:

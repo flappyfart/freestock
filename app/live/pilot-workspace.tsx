@@ -124,6 +124,7 @@ export default function PilotWorkspace({
     'deposit' | 'harvest' | 'compound' | 'withdraw' | null
   >(null);
   const [agentNote, setAgentNote] = useState('');
+  const [agentRevision, setAgentRevision] = useState<number | null>(null);
   const [savedPositions, setSavedPositions] = useState<SavedLiveAccount[]>([]);
   const [historyWarning, setHistoryWarning] = useState('');
   const [historyState, setHistoryState] = useState<
@@ -446,6 +447,8 @@ export default function PilotWorkspace({
           : [{ symbol: selection, weightBps: 10000 }],
       ),
     });
+    if (action === 'harvest' && agentRevision !== null)
+      params.set('agentRevision', String(agentRevision));
     const value = await api<Prepared>(`/api/live/pilot/prepare?${params}`);
     if (alive.current) {
       setPlan(value);
@@ -557,6 +560,7 @@ export default function PilotWorkspace({
     setActionView(view);
     setPlan(null);
     setAgentNote('');
+    setAgentRevision(null);
   };
   useEffect(() => {
     onReadState({
@@ -608,10 +612,11 @@ export default function PilotWorkspace({
           ]),
         ),
       );
+      setAgentRevision(agentIntent.planRevision ?? null);
       setActionView('harvest');
       setError('');
       setAgentNote(
-        'Your Agentic Lending plan filled in this purchase. Review a fresh quote below; its costs may differ from the recommendation. No transaction has been submitted.',
+        'Your Agentic Lending plan filled in this purchase. The fresh quote below rechecks your saved allocation and fee limits. No transaction has been submitted.',
       );
     } catch (e) {
       setError(

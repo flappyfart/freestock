@@ -6,16 +6,20 @@
 
 Freestock brings USDG lending, stock selections, rule-based lending recommendations and verified transaction history into one wallet dashboard. Choose a single stock or a basket, review what your available gains could buy, and approve the transaction yourself.
 
-[Website](https://tryfreestock.com/) · [![X](docs/assets/x.svg) @tryfreestock](https://x.com/tryfreestock) · [20-second intro](docs/media/freestock-intro.mp4) · [Backend](docs/BACKEND.md) · [Contracts](docs/CONTRACTS.md) · [Developer guide](docs/DEVELOPMENT.md) · [Roadmap](docs/PRODUCT-MILESTONES.md)
+[Website](https://tryfreestock.com/) · [![X](docs/assets/x.svg) @tryfreestock](https://x.com/tryfreestock) · [20-second intro](docs/media/freestock-intro.mp4) · [Backend](docs/BACKEND.md) · [Contracts](docs/CONTRACTS.md) · [Developer guide](docs/DEVELOPMENT.md) · [Roadmap](docs/PRODUCT-MILESTONES.md) · [Security assessment](docs/SECURITY-ASSESSMENT.md)
 
 > **Public source · live wallet transactions.** Browse the website publicly, then connect your wallet and confirm a free ownership message to create or restore your profile and live position. Agentic Lending recommends actions; every deposit, conversion and withdrawal requires the owner's wallet approval. Stock-provider restrictions apply.
+
+## Security assessment
+
+[Read the source-review report (PDF)](public/reports/freestock-source-review-2026-09-09.pdf), dated 9 September 2026. The project-supplied, QuillAudits-branded report records **PASS for its reviewed source controls**. It is a source review and does not certify the live deployment. [Scope, provenance and file hash](docs/SECURITY-ASSESSMENT.md).
 
 ## How it works
 
 1. **Connect your wallet.** Create or restore your personal Freestock account on Robinhood Chain. The application verifies its deployment and fixed dependencies.
 2. **Deposit USDG.** An exact approval and a separate deposit put USDG into the configured Steakhouse vault. You hold the account's ownership; the backend does not hold your keys.
 3. **Choose where gains go.** Select a stock or basket, or retain gains. Your deposited principal has a separate accounting baseline. The simulation also lets you explore a split between stocks and reinvestment.
-4. **Review a recommendation.** Agentic Lending checks the available surplus, your conversion minimum, stock allocation and estimated ETH gas budget. It explains whether to wait, retain gains or review a purchase.
+4. **Review a recommendation.** Agentic Lending checks the available surplus, your conversion minimum, stock allocation, purchase ceiling and gas-plus-pool fee limits. Plans and decisions are saved to your wallet profile; optional background monitoring runs while the page is closed. It explains whether to wait, retain gains or review a purchase.
 5. **Approve and track.** Review a fresh quote in Freestock, then approve the transaction in your wallet. Confirmed stock purchases send tokens to your wallet. Portfolio Activity reconciles receipts with chain state and supports saved positions and exports.
 
 ## What is available
@@ -24,7 +28,7 @@ Freestock brings USDG lending, stock selections, rule-based lending recommendati
 | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | USDG lending                                      | One configured vault through wallet-approved V2 accounts with no Freestock deposit cap                           |
 | Stock purchases                                   | NVDA, AAPL, TSLA, GOOGL and SPY; single stock or basket                                                          |
-| Agentic Lending                                   | Deterministic recommendations, explicit reasons and manual approval; no model or autonomous trader               |
+| Agentic Lending                                   | Saved plans, scheduled monitoring, fee limits, durable decisions and wallet-approved purchases               |
 | Compounding                                       | Reserve available gains by increasing the principal baseline; vault returns already accrue while shares are held |
 | Withdrawal                                        | Full exit in the primary interface; the contract also supports partial withdrawal                                |
 | Portfolio Activity                                | Saved account references, pending/confirmed transaction tracking, bounded history import and exports             |
@@ -40,7 +44,7 @@ New V2 positions have no Freestock deposit cap. Legacy V1 positions retain their
 ```mermaid
 flowchart LR
   UI[Browser dashboard] --> API[Authenticated Worker API]
-  API --> DB[(D1: simulation and saved history)]
+  API --> DB[(D1: profiles, plans and history)]
   API --> RPC[Read-only chain RPC and quotes]
   UI --> Rules[Rule-based lending recommendations]
   Rules --> Review[Fresh transaction review]
@@ -115,11 +119,15 @@ npm test
 npm run build
 ```
 
-Publication check on 9 September 2026: the application test suite passed. Local and fork tests use fake funds. Passing tests does not establish a completed, funded production lifecycle.
+Publication checks on 9 September 2026: 149 tests, type checks and lint passed. Local and fork tests use fake funds. Separately, an owner-approved 1 USDG deposit and full withdrawal were verified on Robinhood Chain. A funded stock conversion remains unverified.
+
+## Operating Agentic Lending
+
+See [Agentic Lending operations](docs/AGENTIC-LENDING-OPERATIONS.md) for scheduling, cost valuation, failure recovery, capacity and data retention. Background jobs cannot sign transactions.
 
 ## What comes next
 
-1. Complete one owner-approved funded lifecycle, reconciling the deposit, available-gain conversion or reservation, and withdrawal against receipts.
+1. Verify an owner-approved stock conversion with actual available gains; account creation, a 1 USDG deposit and full withdrawal have been checked.
 2. Validate whether invited users understand and repeatedly choose the earnings-to-stock experience after seeing actual costs.
 3. Design bounded automation with explicit spending limits, cost limits, expiry, revocation and recovery before granting any execution authority.
 4. Add another earning source only after its accounting, permissions, liquidity and receipt behavior are verified.

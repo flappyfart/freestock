@@ -124,3 +124,58 @@ export const walletSessions = sqliteTable(
   },
   (t) => [index('wallet_sessions_expiry').on(t.expiresAt)],
 );
+
+// Saved recommendations are never permission to sign or spend from a wallet.
+export const agentPlans = sqliteTable(
+  'agent_plans',
+  {
+    userId: text('user_id').notNull(),
+    wallet: text('wallet').notNull(),
+    account: text('account').notNull(),
+    deployment: text('deployment').notNull(),
+    settings: text('settings').notNull(),
+    revision: integer('revision').notNull().default(1),
+    monitoring: integer('monitoring').notNull().default(0),
+    nextCheckAt: integer('next_check_at').notNull(),
+    lastCheckedAt: integer('last_checked_at'),
+    lastDecision: text('last_decision'),
+    leaseToken: text('lease_token'),
+    leaseUntil: integer('lease_until').notNull().default(0),
+    failureCount: integer('failure_count').notNull().default(0),
+    updatedAt: integer('updated_at').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.wallet, t.account] }),
+    index('idx_agent_plans_due').on(t.monitoring, t.nextCheckAt, t.leaseUntil),
+  ],
+);
+
+export const agentDecisions = sqliteTable(
+  'agent_decisions',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    wallet: text('wallet').notNull(),
+    account: text('account').notNull(),
+    revision: integer('revision').notNull(),
+    source: text('source').notNull(),
+    decision: text('decision').notNull(),
+    createdAt: integer('created_at').notNull(),
+  },
+  (t) => [
+    index('idx_agent_decisions_owner_time').on(
+      t.userId,
+      t.wallet,
+      t.account,
+      t.createdAt,
+    ),
+  ],
+);
+
+export const serviceChecks = sqliteTable('service_checks', {
+  name: text('name').primaryKey(),
+  startedAt: integer('started_at').notNull(),
+  completedAt: integer('completed_at'),
+  status: text('status').notNull(),
+  details: text('details').notNull(),
+});

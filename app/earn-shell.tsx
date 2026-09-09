@@ -222,6 +222,9 @@ export function EarnShell({
             </svg>
             @tryfreestock <ArrowUpRight size={14} aria-hidden="true" />
           </a>
+          <Link href="/docs#security-assessment">
+            Security assessment <ArrowRight size={16} />
+          </Link>
           <DemoLink view="results" className="earn-link">
             Your demo results <ArrowRight size={16} />
           </DemoLink>

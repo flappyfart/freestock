@@ -12,20 +12,33 @@ import {
 } from 'lucide-react';
 import { ENABLED_STOCKS } from '../../lib/live/basket';
 import { readJournal } from '../../lib/live/wallet-journal';
-import type { Prepared } from '../../lib/live/wallet-transaction';
 import {
-  defaultAgentPlan,
-  agentPurchaseAmount,
+  defaultAgentSettings,
+  validateAgentSettings,
+  type AgentSettings,
+} from '../../lib/live/agent-settings';
+import {
   evaluateLending,
-  planFingerprint,
   validateAgentPlan,
-  type AgentPlan,
   type AgentQuote,
   type AgentIntent,
   type PilotReadState,
 } from '../../lib/live/agentic-lending';
+import type { SavedAgentPlan, SavedDecision } from '../../lib/live/agent-store';
 import './agentic-lending.css';
-
+type History = {
+  id: string;
+  source: string;
+  createdAt: number;
+  decision: SavedDecision;
+}[];
+type Payload = {
+  saved: SavedAgentPlan | null;
+  history: History;
+  quote?: AgentQuote | null;
+  error?: string;
+  busy?: boolean;
+};
 type Props = {
   scope: string;
   active: boolean;
@@ -37,6 +50,12 @@ type Props = {
   onPosition: () => void;
   onReview: (intent: AgentIntent) => void;
 };
+const time = (value: number | string | null) =>
+  value
+    ? new Date(
+        typeof value === 'number' ? value * 1000 : value,
+      ).toLocaleString()
+    : 'Not checked yet';
 export function AgenticLending({
   scope,
   active,
@@ -48,210 +67,186 @@ export function AgenticLending({
   onPosition,
   onReview,
 }: Props) {
-  const [plan, setPlan] = useState<AgentPlan>(() =>
-    structuredClone(defaultAgentPlan),
+  const account = correctNetwork ? (readState?.account ?? null) : null;
+  const key = `${owner}:${account?.account ?? ''}`;
+  const [settings, setSettings] = useState<AgentSettings>(() =>
+    structuredClone(defaultAgentSettings),
   );
   const [minimum, setMinimum] = useState('1'),
-    [gas, setGas] = useState('0.00005');
-  const [quote, setQuote] = useState<AgentQuote | null>(null);
-  const [now, setNow] = useState(0),
-    [working, setWorking] = useState(false);
-  const [message, setMessage] = useState(''),
-    [error, setError] = useState('');
-  const [history, setHistory] = useState<
-    { at: string; title: string; reason: string }[]
-  >([]);
-  const request = useRef<AbortController | null>(null);
-  const lastDecision = useRef('');
-  const storageKey = `freestock:agentic-plan:4663:${owner?.toLowerCase() ?? 'preview'}`;
-  const account = correctNetwork ? (readState?.account ?? null) : null;
-  let currentPlan = plan,
+    [maximum, setMaximum] = useState('25'),
+    [gas, setGas] = useState('0.00005'),
+    [cost, setCost] = useState('5');
+  const [saved, setSaved] = useState<SavedAgentPlan | null>(null),
+    [history, setHistory] = useState<History>([]),
+    [quote, setQuote] = useState<AgentQuote | null>(null);
+  const [loaded, setLoaded] = useState(false),
+    [working, setWorking] = useState(false),
+    [error, setError] = useState(''),
+    [message, setMessage] = useState('');
+  const [health, setHealth] = useState('loading'),
+    [now, setNow] = useState(0);
+  const currentKey = useRef(key),
+    request = useRef<AbortController | null>(null);
+  useLayoutEffect(() => {
+    currentKey.current = key;
+  }, [key]);
+  let valid = settings,
     formError = '';
   try {
-    currentPlan = validateAgentPlan({
-      ...plan,
-      minimumGains:
-        plan.destination === 'retain'
-          ? plan.minimumGains
-          : parseUnits(minimum, 6).toString(),
-      maximumGasWei:
-        plan.destination === 'retain'
-          ? plan.maximumGasWei
-          : parseUnits(gas, 18).toString(),
+    valid = validateAgentSettings({
+      ...settings,
+      maximumPurchase: parseUnits(maximum, 6).toString(),
+      maximumCostBps: Number(cost) * 100,
+      plan: {
+        ...settings.plan,
+        minimumGains: parseUnits(minimum, 6).toString(),
+        maximumGasWei: parseUnits(gas, 18).toString(),
+      },
     });
-  } catch {
+  } catch (e) {
     formError =
-      'Choose stock weights totaling 100%, a positive USDG minimum, and a positive ETH gas limit up to 1.';
+      e instanceof Error ? e.message : 'Check your amounts and stock weights.';
   }
-  const fingerprint = formError
-    ? JSON.stringify([plan, minimum, gas])
-    : planFingerprint(currentPlan);
-  const latest = useRef({
-    active,
-    fingerprint,
-    blocked: readState?.blocked,
-    account,
-    paused: plan.paused,
-  });
-  useLayoutEffect(() => {
-    latest.current = {
-      active,
-      fingerprint,
-      blocked: readState?.blocked,
-      account,
-      paused: plan.paused,
-    };
-  }, [active, fingerprint, readState?.blocked, account, plan.paused]);
+  const fingerprint = JSON.stringify(valid),
+    dirty =
+      !!formError || !saved || fingerprint !== JSON.stringify(saved.settings);
+  function fill(value: AgentSettings) {
+    setSettings(value);
+    setMinimum(formatUnits(value.plan.minimumGains, 6));
+    setMaximum(formatUnits(value.maximumPurchase, 6));
+    setGas(formatUnits(value.plan.maximumGasWei, 18));
+    setCost(String(value.maximumCostBps / 100));
+  }
+  async function loadPlan(signal?: AbortSignal) {
+    if (!owner || !account) return;
+    const captured = key;
+    const response = await fetch(
+      `/api/live/agent?${new URLSearchParams({ owner, account: account.account })}`,
+      { cache: 'no-store', signal },
+    );
+    const data = (await response.json()) as Payload;
+    if (!response.ok)
+      throw Error(data.error ?? 'Your saved plan could not load.');
+    if (currentKey.current !== captured || signal?.aborted) return;
+    setSaved(data.saved);
+    setHistory(data.history);
+    fill(data.saved?.settings ?? structuredClone(defaultAgentSettings));
+    setLoaded(true);
+    setQuote(null);
+    setError('');
+  }
   useEffect(() => {
-    const restore = () => {
-      try {
-        const saved = window.localStorage.getItem(storageKey);
-        const value = saved
-          ? validateAgentPlan(JSON.parse(saved))
-          : structuredClone(defaultAgentPlan);
-        setPlan(value);
-        setMinimum(formatUnits(value.minimumGains, 6));
-        setGas(formatUnits(value.maximumGasWei, 18));
-      } catch {
-        setMessage(
-          'Saved settings could not be loaded. Review this new plan before using it.',
-        );
-      }
-    };
-    // oxlint-disable-next-line react/react-compiler -- Restore externally persisted preferences when the wallet storage scope changes.
-    restore();
-    const sync = (event: StorageEvent) => {
-      if (event.key === storageKey || event.key === null) restore();
-    };
-    window.addEventListener('storage', sync);
+    const controller = new AbortController();
+    // oxlint-disable-next-line react/react-compiler -- Restore an authenticated external profile when its wallet/account identity changes.
+    setLoaded(false);
+    setWorking(false);
+    setSaved(null);
+    setHistory([]);
+    setQuote(null);
+    setMessage('');
+    setError('');
+    fill(structuredClone(defaultAgentSettings));
+    if (owner && account && enabled)
+      void loadPlan(controller.signal).catch((e) => {
+        if (!controller.signal.aborted) setError(e.message);
+      });
     return () => {
+      controller.abort();
       request.current?.abort();
-      window.removeEventListener('storage', sync);
+      request.current = null;
     };
-  }, [storageKey]);
+    // The position snapshot refreshes frequently; profile restoration follows identity only.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, enabled]);
   useEffect(() => {
     if (!active) return;
-    // oxlint-disable-next-line react/react-compiler -- Synchronize advice expiry with the external clock when this view becomes active.
+    // oxlint-disable-next-line react/react-compiler -- Quote expiry follows the wall clock while this view is visible.
     setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
+    const refresh = () =>
+      void fetch('/api/live/agent/health', { cache: 'no-store' })
+        .then((r) => r.json())
+        .then((d) => setHealth((d as { status: string }).status))
+        .catch(() => setHealth('unavailable'));
+    refresh();
+    const clock = window.setInterval(() => setNow(Date.now()), 1000),
+      status = window.setInterval(refresh, 60000);
+    return () => {
+      window.clearInterval(clock);
+      window.clearInterval(status);
+    };
   }, [active]);
   useEffect(() => {
-    request.current?.abort();
-    request.current = null;
-    // oxlint-disable-next-line react/react-compiler -- Invalidate external quotes immediately when the plan or active view changes.
+    // oxlint-disable-next-line react/react-compiler -- Any edited setting invalidates an external transaction quote.
     setQuote(null);
-    setWorking(false);
-    setError('');
   }, [fingerprint, active]);
-  const decision = evaluateLending({
+  const localDecision = evaluateLending({
     owner: owner ?? '',
     account,
-    plan: currentPlan,
+    plan: valid.plan,
     blocked: readState?.blocked,
     readError: readState?.error,
     quote,
     now,
   });
-  useEffect(() => {
-    if (
-      !active ||
-      !account ||
-      formError ||
-      decision.code === 'busy' ||
-      decision.code === lastDecision.current
-    )
+  const recorded = !dirty ? saved?.lastDecision : null;
+  const usableQuote =
+    !dirty &&
+    quote &&
+    recorded?.cost &&
+    Date.parse(recorded.cost.expiresAt) > now &&
+    localDecision.canReview;
+  const decision = recorded ?? localDecision;
+  async function action(kind: 'save' | 'check', input = valid) {
+    if (!owner || !account || !enabled || request.current) return;
+    if (kind === 'check' && (dirty || !saved)) {
+      setError('Save your changes before checking the plan.');
       return;
-    lastDecision.current = decision.code;
-    setHistory((rows) =>
-      [
-        {
-          at: new Date().toISOString(),
-          title: decision.title,
-          reason: decision.reason,
-        },
-        ...rows,
-      ].slice(0, 12),
-    );
-  }, [
-    active,
-    account,
-    formError,
-    decision.code,
-    decision.title,
-    decision.reason,
-  ]);
-  function savePlan(value = currentPlan) {
-    try {
-      const valid = validateAgentPlan(value);
-      window.localStorage.setItem(storageKey, JSON.stringify(valid));
-      setMessage(
-        'Plan saved on this browser. This grants no permission to move funds.',
-      );
-      setError('');
-    } catch {
-      setError(
-        'The plan could not be saved. Check the settings and browser storage access.',
-      );
     }
-  }
-  async function checkCost() {
-    if (
-      !account ||
-      !owner ||
-      formError ||
-      !decision.canQuote ||
-      !enabled ||
-      request.current
-    )
-      return;
     const controller = new AbortController(),
-      captured = fingerprint,
-      observedAccount = account.account;
+      captured = key;
+    request.current = controller;
+    setWorking(true);
+    setError('');
+    setMessage('');
+    setQuote(null);
     try {
-      if (readJournal(owner))
-        throw Error('Resolve the pending wallet action first.');
-      request.current = controller;
-      setWorking(true);
-      setError('');
-      setQuote(null);
-      const query = new URLSearchParams({
-        owner,
-        deployment: account.deployment,
-        action: 'harvest',
-        amount: formatUnits(agentPurchaseAmount(account), 6),
-        allocations: JSON.stringify(currentPlan.allocations),
-      });
-      const response = await fetch(`/api/live/pilot/prepare?${query}`, {
-        cache: 'no-store',
+      if (kind === 'check' && readJournal(owner))
+        throw Error('Finish the pending wallet action first.');
+      const response = await fetch('/api/live/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
+        body: JSON.stringify({
+          action: kind,
+          owner,
+          account: account.account,
+          deployment: account.deployment,
+          revision: saved?.revision ?? 0,
+          ...(kind === 'save' ? { settings: input } : {}),
+        }),
       });
-      const prepared = (await response.json()) as Prepared & { error?: string };
+      const data = (await response.json()) as Payload;
       if (!response.ok)
         throw Error(
-          prepared.error ??
-            'The purchase could not be estimated. No action has been taken.',
+          data.error ??
+            (data.busy
+              ? 'A check is already running or just finished. Wait 30 seconds and reload the plan.'
+              : 'The plan changed during this check. Reload it and try again.'),
         );
-      if (
-        controller.signal.aborted ||
-        latest.current.fingerprint !== captured ||
-        !latest.current.active ||
-        latest.current.paused ||
-        latest.current.blocked ||
-        latest.current.account?.account !== observedAccount
-      )
-        return;
-      if (readJournal(owner))
-        throw Error(
-          'A wallet action started elsewhere. Resolve it before checking this plan again.',
-        );
-      setQuote({ prepared, fingerprint: captured });
+      if (currentKey.current !== captured || controller.signal.aborted) return;
+      setSaved(data.saved);
+      setHistory(data.history);
+      setQuote(data.quote ?? null);
       setNow(Date.now());
+      if (kind === 'save') {
+        fill(input);
+        setMessage(
+          'Saved to your wallet profile. No spending permission granted.',
+        );
+      }
     } catch (e) {
       if (!controller.signal.aborted)
-        setError(
-          e instanceof Error ? e.message : 'The cost check is unavailable.',
-        );
+        setError(e instanceof Error ? e.message : 'Try again.');
     } finally {
       if (request.current === controller) {
         request.current = null;
@@ -260,20 +255,23 @@ export function AgenticLending({
     }
   }
   function review() {
-    if (!account || !owner || !quote || formError) return;
+    if (!owner || !account || !quote || !usableQuote || readState?.blocked)
+      return;
     try {
       if (readJournal(owner))
-        throw Error('Resolve the pending wallet action first.');
-      const freshDecision = evaluateLending({
+        throw Error('Finish the pending wallet action first.');
+      if (!recorded?.cost || Date.parse(recorded.cost.expiresAt) <= Date.now())
+        throw Error('Refresh the cost estimate first.');
+      const fresh = evaluateLending({
         owner,
         account,
-        plan: currentPlan,
-        blocked: readState?.blocked,
-        readError: readState?.error,
+        plan: valid.plan,
         quote,
         now: Date.now(),
+        blocked: readState?.blocked,
+        readError: readState?.error,
       });
-      if (!freshDecision.canReview) throw Error(freshDecision.reason);
+      if (!fresh.canReview) throw Error(fresh.reason);
       onReview({
         id: crypto.randomUUID(),
         scope,
@@ -281,55 +279,88 @@ export function AgenticLending({
         account: account.account,
         deployment: account.deployment,
         amount: quote.prepared.assets,
-        allocations: currentPlan.allocations,
+        allocations: valid.plan.allocations,
         expiresAt: quote.prepared.expiresAt,
+        planRevision: saved!.revision,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Refresh this recommendation.');
+      setError(e instanceof Error ? e.message : 'Check your plan again.');
     }
   }
+  function importBrowserPlan() {
+    try {
+      const old = window.localStorage.getItem(
+        `freestock:agentic-plan:4663:${owner?.toLowerCase()}`,
+      );
+      if (!old) throw Error('No earlier plan was found on this browser.');
+      const plan = validateAgentPlan(JSON.parse(old));
+      const maximumPurchase =
+        BigInt(plan.minimumGains) > BigInt(defaultAgentSettings.maximumPurchase)
+          ? plan.minimumGains
+          : defaultAgentSettings.maximumPurchase;
+      fill(
+        validateAgentSettings({
+          ...structuredClone(defaultAgentSettings),
+          plan,
+          maximumPurchase,
+        }),
+      );
+      setMessage(
+        'Your earlier browser settings are loaded. Save them to your wallet profile to keep them across devices.',
+      );
+      setError('');
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : 'The earlier plan could not be loaded.',
+      );
+    }
+  }
+  const canManage = !!owner && !!account && enabled && loaded;
   return (
-    <section
-      className="agentic-workspace"
-      aria-label="Agentic Lending recommendations"
-    >
+    <section className="agentic-workspace" aria-label="Agentic Lending">
       <div className="agentic-mode">
         <span>
-          <ScanLine size={17} /> Recommendation mode
+          <ScanLine size={17} /> Agentic Lending
         </span>
-        <p>Rule-based checks. Every transaction needs your wallet approval.</p>
+        <p>Set the rules. Track the decisions. Approve each transaction.</p>
       </div>
       <div className="agentic-grid">
         <form
           className="agentic-plan"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!formError) savePlan();
+            if (!formError) void action('save');
           }}
         >
           <div className="agentic-section-heading">
             <h2>Your lending plan</h2>
-            <span>This browser</span>
+            <span>
+              {saved
+                ? dirty
+                  ? 'Unsaved changes'
+                  : 'Saved to wallet profile'
+                : 'Create a plan'}
+            </span>
           </div>
           <div className="agentic-source">
             <small>Earning source</small>
             <strong>Steakhouse USDG</strong>
-            <span>Robinhood Chain · Single-vault plan</span>
+            <span>Robinhood Chain · One verified lending vault</span>
           </div>
           <label>
             Where should gains go?
             <select
-              value={plan.destination}
+              disabled={working}
+              value={settings.plan.destination}
               onChange={(e) =>
-                setPlan({
-                  ...plan,
-                  destination: e.target.value as AgentPlan['destination'],
-                  allocations:
-                    e.target.value === 'retain' &&
-                    plan.allocations.reduce((n, a) => n + a.weightBps, 0) !==
-                      10000
-                      ? defaultAgentPlan.allocations
-                      : plan.allocations,
+                setSettings({
+                  ...settings,
+                  plan: {
+                    ...settings.plan,
+                    destination: e.target.value as 'stocks' | 'retain',
+                  },
                 })
               }
             >
@@ -337,10 +368,10 @@ export function AgenticLending({
               <option value="retain">Keep gains invested</option>
             </select>
           </label>
-          {plan.destination === 'stocks' && (
+          {settings.plan.destination === 'stocks' && (
             <>
-              <fieldset className="agentic-weights">
-                <legend>Stock purchase allocation</legend>
+              <fieldset className="agentic-weights" disabled={working}>
+                <legend>Stock allocation</legend>
                 {ENABLED_STOCKS.map((stock) => (
                   <label key={stock.symbol}>
                     <span>{stock.symbol}</span>
@@ -351,73 +382,142 @@ export function AgenticLending({
                       step="1"
                       aria-label={`${stock.symbol} allocation percent`}
                       value={
-                        (plan.allocations.find((a) => a.symbol === stock.symbol)
-                          ?.weightBps ?? 0) / 100
+                        (settings.plan.allocations.find(
+                          (a) => a.symbol === stock.symbol,
+                        )?.weightBps ?? 0) / 100
                       }
-                      onChange={(e) => {
-                        const bps = Number(e.target.value) * 100;
-                        setPlan({
-                          ...plan,
-                          allocations: ENABLED_STOCKS.flatMap((s) => {
-                            const weight =
-                              s.symbol === stock.symbol
-                                ? bps
-                                : (plan.allocations.find(
-                                    (a) => a.symbol === s.symbol,
-                                  )?.weightBps ?? 0);
-                            return weight > 0
-                              ? [{ symbol: s.symbol, weightBps: weight }]
-                              : [];
-                          }),
-                        });
-                      }}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          plan: {
+                            ...settings.plan,
+                            allocations: ENABLED_STOCKS.flatMap((s) => {
+                              const weight =
+                                s.symbol === stock.symbol
+                                  ? Number(e.target.value) * 100
+                                  : (settings.plan.allocations.find(
+                                      (a) => a.symbol === s.symbol,
+                                    )?.weightBps ?? 0);
+                              return weight > 0
+                                ? [{ symbol: s.symbol, weightBps: weight }]
+                                : [];
+                            }),
+                          },
+                        })
+                      }
                     />
                     <span>%</span>
                   </label>
                 ))}
                 <p>
                   Total{' '}
-                  {plan.allocations.reduce((n, a) => n + a.weightBps, 0) / 100}%
-                  · must equal 100%
+                  {settings.plan.allocations.reduce(
+                    (n, a) => n + a.weightBps,
+                    0,
+                  ) / 100}
+                  % · must equal 100%
                 </p>
               </fieldset>
               <label>
-                Minimum available gains (USDG)
+                Wait until gains reach (USDG)
                 <input
+                  disabled={working}
                   type="number"
                   min="0.000001"
-                  step="0.000001"
-                  required
+                  step="any"
                   value={minimum}
                   onChange={(e) => setMinimum(e.target.value)}
                 />
               </label>
               <label>
+                Maximum purchase per recommendation (USDG)
+                <input
+                  disabled={working}
+                  type="number"
+                  min="0.000001"
+                  step="any"
+                  value={maximum}
+                  onChange={(e) => setMaximum(e.target.value)}
+                />
+              </label>
+              <label>
+                Maximum estimated fees (% of purchase)
+                <input
+                  disabled={working}
+                  type="number"
+                  min="0.05"
+                  max="100"
+                  step="0.01"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                />
+              </label>
+              <label>
                 Maximum estimated network fee (ETH)
                 <input
+                  disabled={working}
                   type="number"
                   min="0.000000000000000001"
                   max="1"
                   step="any"
-                  required
                   value={gas}
                   onChange={(e) => setGas(e.target.value)}
                 />
               </label>
               <p className="agentic-note">
-                This limits the ETH gas estimate used for advice. Pool fees are
-                included in stock quotes. An all-in cost percentage in USDG is
-                not calculated.
+                The fee check combines estimated ETH gas, valued in USDG, with
+                stock pool fees. It excludes price movement and slippage; final
+                costs can change.
               </p>
             </>
           )}
-          {plan.destination === 'retain' && (
+          {settings.plan.destination === 'retain' && (
             <p className="agentic-note">
-              Vault shares already accumulate returns. This plan recommends
-              holding them; it does not raise your principal baseline or create
-              another source of yield.
+              Your vault shares already reflect lending returns. Holding them
+              needs no extra transaction and creates no additional source of
+              yield.
             </p>
           )}
+          <label>
+            Check while you’re away
+            <select
+              disabled={working}
+              value={settings.monitoring ? 'on' : 'off'}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  monitoring: e.target.value === 'on',
+                })
+              }
+            >
+              <option value="off">Off — check when I ask</option>
+              <option value="on">On — monitor my saved plan</option>
+            </select>
+          </label>
+          {settings.monitoring && (
+            <label>
+              Preferred check interval
+              <select
+                disabled={working}
+                value={settings.intervalMinutes}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    intervalMinutes: Number(e.target.value) as 15 | 60 | 360,
+                  })
+                }
+              >
+                <option value="15">Every 15 minutes</option>
+                <option value="60">Every hour</option>
+                <option value="360">Every 6 hours</option>
+              </select>
+            </label>
+          )}
+          <p className="agentic-note">
+            Checks are queued and may run later than your preferred interval.
+            They never move funds. Open this page for decisions and fresh
+            purchase quotes.
+          </p>
           {formError && (
             <p className="agentic-error" role="alert">
               {formError}
@@ -425,122 +525,182 @@ export function AgenticLending({
           )}
           <button
             className="dashboard-button"
-            disabled={!!formError}
+            disabled={!canManage || working || !!formError}
             type="submit"
           >
-            <Check size={16} /> Save plan
+            <Check size={16} />
+            {working ? 'Saving or checking…' : 'Save plan'}
           </button>
-          <button
-            className="agentic-pause"
-            type="button"
-            disabled={!!formError}
-            onClick={() => {
-              const changed = { ...currentPlan, paused: !plan.paused };
-              setPlan(changed);
-              savePlan(changed);
-            }}
-          >
-            {plan.paused ? <Play size={15} /> : <Pause size={15} />}
-            {plan.paused ? 'Resume recommendations' : 'Pause recommendations'}
-          </button>
+          {saved && (
+            <button
+              className="agentic-pause"
+              type="button"
+              disabled={working}
+              onClick={() =>
+                void action('save', {
+                  ...saved.settings,
+                  plan: {
+                    ...saved.settings.plan,
+                    paused: !saved.settings.plan.paused,
+                  },
+                })
+              }
+            >
+              {saved.settings.plan.paused ? (
+                <Play size={15} />
+              ) : (
+                <Pause size={15} />
+              )}{' '}
+              {saved.settings.plan.paused
+                ? 'Resume saved plan'
+                : 'Pause saved plan'}
+            </button>
+          )}
+          {loaded && !saved && (
+            <button
+              className="agentic-text-button"
+              type="button"
+              disabled={working}
+              onClick={importBrowserPlan}
+            >
+              Import earlier browser settings
+            </button>
+          )}
           {message && <output className="agentic-note">{message}</output>}
         </form>
         <div className="agentic-observation">
           <div
             className="agentic-decision"
             aria-live="polite"
-            data-ready={!formError && decision.canReview}
+            data-ready={!!usableQuote}
           >
             <span className="agentic-decision-label">
-              <ScanLine size={18} /> Next move
+              <ScanLine size={18} />
+              {recorded ? 'Latest decision' : 'Next step'}
             </span>
             <h2>
               {!owner
                 ? 'Connect your lending wallet'
-                : !correctNetwork
-                  ? 'Use Robinhood Chain'
-                  : formError
-                    ? 'Complete your lending plan'
-                    : decision.title}
+                : !account
+                  ? 'Create or open your position'
+                  : !loaded
+                    ? 'Load your saved plan'
+                    : dirty
+                      ? 'Save your lending rules'
+                      : decision.title}
             </h2>
             <p>
               {!owner
-                ? 'Set your plan here, then connect to check it against your actual position.'
-                : !correctNetwork
-                  ? 'Open Your position to switch to Robinhood Chain and load your account.'
-                  : formError
-                    ? 'Set valid amounts and a stock allocation totaling 100%.'
-                    : decision.reason}
+                ? 'Your wallet opens a private profile for your plan and decisions.'
+                : !account
+                  ? 'Agentic Lending uses your verified position. Create a lending account and add USDG to begin.'
+                  : !loaded
+                    ? 'Connect your wallet profile to restore your plan.'
+                    : dirty
+                      ? 'Choose where gains should go and when a purchase is worth the fees.'
+                      : decision.reason}
             </p>
+            {recorded && (
+              <p>
+                Checked {time(recorded.checkedAt)}. A saved decision is a
+                historical snapshot.
+              </p>
+            )}
             <div className="agentic-decision-actions">
               {!owner ? (
                 <button className="dashboard-button" onClick={onConnect}>
                   Connect wallet <ArrowUpRight size={16} />
                 </button>
-              ) : !correctNetwork ||
-                !account ||
-                ['setup', 'stale', 'busy'].includes(decision.code) ? (
+              ) : !account || !enabled ? (
                 <button className="dashboard-button" onClick={onPosition}>
                   Open your position <ArrowUpRight size={16} />
                 </button>
-              ) : decision.canQuote && !formError ? (
-                <button
-                  className="dashboard-button"
-                  onClick={() => void checkCost()}
-                  disabled={working || !enabled}
-                >
-                  {working ? 'Checking quote and gas…' : 'Check quote & gas'}
-                  <RefreshCw size={16} />
-                </button>
-              ) : decision.canReview && !formError ? (
-                <button
-                  className="dashboard-button"
-                  onClick={review}
-                  disabled={!enabled}
-                >
-                  Review purchase <ArrowUpRight size={16} />
-                </button>
-              ) : null}
-              {quote && !decision.canReview && !decision.canQuote && (
-                <button
-                  className="agentic-text-button"
-                  onClick={() => {
-                    setQuote(null);
-                    setError('');
-                  }}
-                >
-                  Check again
-                </button>
+              ) : (
+                <>
+                  {canManage && saved && (
+                    <button
+                      className="dashboard-button"
+                      disabled={working || dirty || !!readState?.blocked}
+                      onClick={() => void action('check')}
+                    >
+                      <RefreshCw size={16} />
+                      {working ? 'Checking your plan…' : 'Check now'}
+                    </button>
+                  )}
+                  {!!usableQuote && (
+                    <button
+                      className="dashboard-button"
+                      disabled={working || !!readState?.blocked}
+                      onClick={review}
+                    >
+                      Review purchase <ArrowUpRight size={16} />
+                    </button>
+                  )}
+                  <button
+                    className="agentic-text-button"
+                    disabled={working}
+                    onClick={() =>
+                      void loadPlan().catch((e) => setError(e.message))
+                    }
+                  >
+                    Reload saved plan
+                  </button>
+                </>
               )}
             </div>
-            {!!owner && !enabled && (
-              <p className="agentic-note">
-                Connect your wallet to review live transaction estimates and
-                stock purchases. Each purchase must fit your available gains and
-                pass a fresh liquidity check.
-              </p>
-            )}
             {error && (
               <p className="agentic-error" role="alert">
                 {error}
               </p>
             )}
+            <p className="agentic-note">
+              Every transaction requires your wallet approval. A purchase review
+              rechecks your saved limits.
+            </p>
           </div>
           <div className="agentic-evidence">
-            <h3>What the recommendation uses</h3>
+            <h3>Monitoring & evidence</h3>
             <dl>
+              <div>
+                <dt>Saved plan</dt>
+                <dd>
+                  {saved?.settings.plan.paused
+                    ? 'Paused'
+                    : saved?.settings.monitoring
+                      ? 'Background checks on'
+                      : 'Manual checks'}
+                </dd>
+              </div>
+              <div>
+                <dt>Monitoring service</dt>
+                <dd>
+                  {health === 'healthy' || health === 'running'
+                    ? 'Running'
+                    : health === 'not_started'
+                      ? 'Waiting for first run'
+                      : health === 'loading'
+                        ? 'Checking…'
+                        : 'Delayed — manual checks available'}
+                </dd>
+              </div>
+              <div>
+                <dt>Last plan check</dt>
+                <dd>{time(saved?.lastCheckedAt ?? null)}</dd>
+              </div>
+              <div>
+                <dt>Next eligible check</dt>
+                <dd>
+                  {saved?.settings.monitoring && !saved.settings.plan.paused
+                    ? time(saved.nextCheckAt)
+                    : 'When you ask'}
+                </dd>
+              </div>
               <div>
                 <dt>Position value</dt>
                 <dd>
                   {account
                     ? `${formatUnits(account.assetValue, 6)} USDG`
                     : 'Awaiting position'}
-                </dd>
-              </div>
-              <div>
-                <dt>Principal baseline</dt>
-                <dd>
-                  {account ? `${formatUnits(account.principal, 6)} USDG` : '—'}
                 </dd>
               </div>
               <div>
@@ -551,14 +711,25 @@ export function AgenticLending({
                     : '—'}
                 </dd>
               </div>
-              <div>
-                <dt>Network-fee estimate</dt>
-                <dd>
-                  {quote
-                    ? `${formatUnits(quote.prepared.estimatedGasCostWei, 18)} ETH`
-                    : 'Needs a fresh quote'}
-                </dd>
-              </div>
+              {recorded?.cost && (
+                <>
+                  <div>
+                    <dt>Estimated gas + pool fees</dt>
+                    <dd>
+                      {formatUnits(recorded.cost.totalFeesUsdg, 6)} USDG (
+                      {recorded.cost.feeBps / 100}%)
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>ETH price updated</dt>
+                    <dd>{time(recorded.cost.ethUpdatedAt)}</dd>
+                  </div>
+                  <div>
+                    <dt>USDG price updated</dt>
+                    <dd>{time(recorded.cost.usdgUpdatedAt)}</dd>
+                  </div>
+                </>
+              )}
             </dl>
             {quote?.prepared.purchases?.map((p) => (
               <div className="agentic-quote" key={p.symbol}>
@@ -574,50 +745,46 @@ export function AgenticLending({
               </div>
             ))}
             <p className="agentic-note">
-              Surplus can include direct transfers. It is not a total of
-              interest earned or a guarantee of capital.{' '}
-              {account && (
-                <>
-                  Block {account.block.toLocaleString()} · checked{' '}
-                  <time dateTime={account.observedAt}>
-                    {new Date(account.observedAt).toLocaleTimeString()}
-                  </time>
-                  .
-                </>
-              )}
+              Fee valuations use Chainlink ETH/USD and USDG/USD within their
+              published 24-hour heartbeat. Estimates expire after 45 seconds.
+              Surplus can include direct transfers; it is not a guarantee of
+              interest earned or principal value.
             </p>
           </div>
         </div>
       </div>
       <section className="agentic-history">
         <div className="agentic-section-heading">
-          <h2>Decision activity</h2>
-          <span>This session · no trades submitted here</span>
+          <h2>Decision history</h2>
+          <span>Saved with your wallet profile</span>
         </div>
         {history.length ? (
           <ol>
-            {history.map((item, i) => (
-              <li key={`${item.at}-${i}`}>
-                <time dateTime={item.at}>
-                  {new Date(item.at).toLocaleTimeString()}
+            {history.map((item) => (
+              <li key={item.id}>
+                <time dateTime={new Date(item.createdAt * 1000).toISOString()}>
+                  {time(item.createdAt)}
+                  <br />
+                  {item.source === 'background'
+                    ? 'Background check'
+                    : 'Your check'}
                 </time>
                 <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.reason}</p>
+                  <strong>{item.decision.title}</strong>
+                  <p>{item.decision.reason}</p>
                 </div>
               </li>
             ))}
           </ol>
         ) : (
           <p>
-            Changes in your position’s recommendation will appear here after it
-            is connected.
+            Save a plan, then select Check now. Decisions and reasons appear
+            here, including when the agent chooses to wait.
           </p>
         )}
         <p className="agentic-note">
-          Position balances refresh while the dashboard is open and idle. Quotes
-          are checked when you request them. Recommendations run while this view
-          is open; closing it runs no background jobs.{' '}
+          Your latest 50 decisions are shown; up to 100 are retained per
+          position. Background checks prepare recommendations only.{' '}
           <Link href="/docs#agentic-lending">How Agentic Lending works ↗</Link>
         </p>
       </section>

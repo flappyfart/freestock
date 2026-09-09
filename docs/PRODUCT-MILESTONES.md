@@ -14,7 +14,7 @@ Updated 9 September 2026 UTC. This is a delivery and validation plan, not a clai
 
 ## Next: validate the narrow customer need
 
-Agentic Lending now ships in recommendation mode: one verified account, an explicit stock/retention plan, a conversion minimum, an ETH gas budget, decision reasons and a manual-review handoff. It is rule-based and has no model connection, background execution or cross-pool allocator. Use this surface to test comprehension and the usefulness of waiting/holding/conversion advice. An all-in USDG cost comparison and neutral cash alternative still need the study worksheet described below.
+Agentic Lending now ships in recommendation mode: one verified account, an explicit stock/retention plan, a conversion minimum, an ETH gas budget, decision reasons and a manual-review handoff. It is rule-based and has no model connection, background execution or cross-pool allocator. Use this surface to test comprehension and the usefulness of waiting/holding/conversion advice. Gas-plus-pool fees are now compared in USDG; a neutral cash alternative still needs the study worksheet described below.
 
 Use eight people who already manage a stablecoin lending position. Record their actual position size, available earnings, last earnings decision and real costs. Compare receiving USDG, reinvesting and buying stocks without predicting future stock returns. The current modal supports the stocks/reinvest/split demonstration; the cash alternative and proposed fee-limit controls in the study need a neutral comparison worksheet before sessions.
 
@@ -42,4 +42,8 @@ Success is a repeatable customer outcome with understandable costs and reliable 
 
 ## Public access update — 9 September 2026
 
-The single-participant application allowlist has been removed. Wallet-authenticated users can prepare owner-approved account creation, deposits, stock purchases, compounding and withdrawals. Public browsing and real wallet execution remain separate from the simulator. New V2 positions remove the Freestock deposit cap; older V1 positions retain their immutable limit. Free wallet-message confirmation creates a profile without a separate application login. Owner checks, receipt checks and manual transaction signing remain in place. Website: https://tryfreestock.com/. X: https://x.com/tryfreestock. No funded user lifecycle was performed by the builder during this release.
+The single-participant application allowlist has been removed. Wallet-authenticated users can prepare owner-approved account creation, deposits, stock purchases, compounding and withdrawals. Public browsing and real wallet execution remain separate from the simulator. New V2 positions remove the Freestock deposit cap; older V1 positions retain their immutable limit. Free wallet-message confirmation creates a profile without a separate application login. Owner checks, receipt checks and manual transaction signing remain in place. Website: https://tryfreestock.com/. X: https://x.com/tryfreestock. Subsequently, the owner approved account creation, a 1 USDG deposit and full withdrawal, verified against receipts. A funded stock conversion remains to be checked.
+
+## Monitoring release — 9 September 2026
+
+Implemented: wallet-profile plans, persistent decision history, scheduled read-only checks, optimistic revisions, leases, pause invalidation, bounded retries, per-recommendation purchase ceilings and gas-plus-pool fee limits. Recommendation mode is now usable across devices. Unattended financial execution remains a separate development step: V2 contracts have no executor permission, and no funded transaction signer has been configured.

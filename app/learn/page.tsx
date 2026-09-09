@@ -132,8 +132,8 @@ export default function Page() {
               <h2>Recommendations. Your approval.</h2>
               <p>
                 Agentic Lending checks your available gains, stock choices,
-                conversion minimum and ETH fee budget. It explains whether to
-                wait, keep gains invested or review a purchase.
+                conversion minimum, purchase limit and fee budgets. It explains
+                whether to wait, keep gains invested or review a purchase.
               </p>
               <p>
                 It uses rules, not an AI model. It does not send transactions
@@ -143,7 +143,10 @@ export default function Page() {
               <p>
                 Set your stock picks and minimum conversion amount in the
                 dashboard’s Agentic Lending section. You can change or pause
-                this plan whenever you want.
+                this plan whenever you want. Save it to your wallet profile and
+                turn on background monitoring to receive decisions while you are
+                away. Checks can run later than your preferred interval; the
+                dashboard shows their status and history.
               </p>
             </section>
             <section id="timing">

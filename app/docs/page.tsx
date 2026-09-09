@@ -41,10 +41,12 @@ export default function Page() {
               ['earnings-plan', 'Stocks and baskets'],
               ['pricing', 'Quotes and fees'],
               ['agentic-lending', 'Agentic Lending'],
+              ['agent-monitoring', 'Monitoring and limits'],
               ['storage', 'Activity and recovery'],
               ['market-data', 'Lending market data'],
               ['stock-lending', 'Stock lending'],
               ['contracts', 'Contracts and backend'],
+              ['security-assessment', 'Security assessment'],
               ['automation', 'Automation status'],
               ['demo', 'Simulator'],
             ].map(([id, label]) => (
@@ -268,7 +270,7 @@ export default function Page() {
               <p>
                 The current engine uses deterministic rules. It checks your
                 verified position, available surplus, stock allocation,
-                conversion minimum, pause state and maximum ETH fee budget.
+                conversion minimum, purchase limit, pause state and fee budgets.
               </p>
               <p>
                 It can recommend waiting, retaining gains or reviewing a
@@ -277,10 +279,44 @@ export default function Page() {
                 always requests fresh transaction details.
               </p>
               <p>
-                Plans are stored locally for the selected wallet/account. They
-                do not grant spending permissions. There is no AI model,
-                operator signer or unattended trader. A recommendation becomes a
-                transaction only after your explicit wallet approval.
+                Plans and decision history are saved to your wallet profile for
+                each position. They do not grant spending permissions. There is
+                no AI model, operator signer or unattended trader. A
+                recommendation becomes a transaction only after your explicit
+                wallet approval.
+              </p>
+            </section>
+            <section id="agent-monitoring">
+              <h2>Background monitoring and cost limits</h2>
+              <p>
+                Save a plan and turn on “Check while you’re away” to queue
+                background recommendations every 15 minutes, hour or six hours.
+                Scheduled runs may be delayed. The dashboard shows the service
+                status, last check, next eligible check and saved reasons for
+                waiting.
+              </p>
+              <p>
+                The agent caps each proposed purchase and compares estimated ETH
+                gas plus pool fees with your chosen percentage of the purchase.
+                ETH is valued in USDG using Chainlink ETH/USD and USDG/USD,
+                checked against their published 24-hour heartbeat. The source
+                timestamps are shown; the estimate excludes price movement and
+                slippage. It is not a guaranteed execution cost.
+              </p>
+              <p>
+                Pause stops future background checks and invalidates work in
+                progress. Saved decisions are historical records, not reusable
+                quotes. Select Check now for a new estimate, then Review
+                purchase. The final preparation rechecks the saved plan and fee
+                limits before opening your wallet review. Changing the saved
+                plan requires checking it again.
+              </p>
+              <p>
+                Plans restore when the same wallet reconnects on another device.
+                The latest 50 decisions are displayed and up to 100 retained per
+                position. Manual checks are limited to one completed check per
+                30 seconds. Failed checks retry with a delay. Monitoring neither
+                signs transactions nor switches lending pools.
               </p>
             </section>
             <section id="storage">
@@ -433,9 +469,44 @@ export default function Page() {
               </p>
               <p>
                 Tests include local chain forks with fake funds. They do not
-                prove future liquidity or a completed funded production
-                lifecycle. Real funds can lose value; provider restrictions
-                apply.
+                prove future liquidity. A wallet-approved 1 USDG deposit and
+                full withdrawal were verified on 9 September 2026; a funded
+                stock conversion remains unverified. Real funds can lose value;
+                provider restrictions apply.
+              </p>
+            </section>
+            <section id="security-assessment">
+              <span className="earn-eyebrow">
+                9 SEPTEMBER 2026 · SOURCE REVIEW
+              </span>
+              <h2>Security assessment</h2>
+              <p>
+                The project-supplied, QuillAudits-branded report records{' '}
+                <strong>PASS for the source controls it reviewed</strong>:
+                application architecture, wallet authentication, API boundaries,
+                the account contract, dependencies and operational controls.
+              </p>
+              <p>
+                Its scope is the public repository and documentation. The full
+                scope qualification is on page 7. This source review does not
+                certify the live deployment or subsequent product changes.
+              </p>
+              <a
+                className="earn-button"
+                href="/reports/freestock-source-review-2026-09-09.pdf"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Read the full report <ArrowUpRight size={17} />
+              </a>
+              <p>
+                <a
+                  href={`${repo}/blob/main/docs/SECURITY-ASSESSMENT.md`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Scope, document provenance and file hash on GitHub ↗
+                </a>
               </p>
             </section>
             <section id="automation">

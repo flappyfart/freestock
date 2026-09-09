@@ -29,6 +29,13 @@
       "when": 1788976614053,
       "tag": "0003_wallet_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788981314299,
+      "tag": "0004_moaning_triathlon",
+      "breakpoints": true
     }
   ]
 }

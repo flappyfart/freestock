@@ -44,7 +44,7 @@ The public website is intended for non-US users; live account actions require a 
 
 The prospectus distinguishes direct secondary blockchain purchases from purchases through an Authorised Participant, while also containing broader KYC/AML wording. This work does not assert that self-attestation alone is a completed verification. No issuer API key is required for the verified direct AMM route, and no mandatory AMM provider-preapproval workflow was established.
 
-The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. No real deposit or public stock purchase has been executed in this build session. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. Provider restrictions continue to apply. Only legacy V1 accounts retain the old deposit cap.
+The user must connect a funded EOA wallet, review issuer terms, create their account and approve each financial action. An owner-approved 1 USDG deposit and full withdrawal have been verified; a funded stock purchase remains unverified. Check current fees and immediately withdrawable liquidity; quoted asset value alone is not spendable cash. Automatic conversion, keeper permissions, staking adapters and leveraged LP execution remain unimplemented. Provider restrictions continue to apply. Only legacy V1 accounts retain the old deposit cap.
 
 ## Historical verification records
 
@@ -74,7 +74,7 @@ Additional selected-token Final Terms: [AAPL](https://cdn.robinhood.com/assets/r
 
 `contracts/test/current-mainnet-readiness.json` records the fresh check. On 2026-09-09 at 00:40:27 UTC, 65 read-only RPC checks completed without error at block 58,125,772. Vault runtime matched the pinned dependency, the 100 USDG deposit preview remained positive, and all five selected fee-500 stock pools returned positive 1 and 100 USDG quotes. The issuer registry still listed all five tokens as active. This check submitted no public transactions and is not proof of future liquidity. The Apple multiplier was 1.000566080061092436, so quantities are labeled tokens rather than underlying shares.
 
-The deployed environment still uses the official public RPC fallback; dedicated production capacity is not configured. Unattended conversion, staking and leveraged LP execution are not available. Browsing is public; live account actions require application sign-in and owner wallet approval.
+The deployed environment uses a dedicated Alchemy RPC held as a server-only secret. Unattended conversion, staking and leveraged LP execution are not available. Browsing is public; live account actions use a wallet-signature profile and owner wallet approval.
 
 ## Portfolio history update — 2026-09-09
 
@@ -82,4 +82,10 @@ Dashboard Activity now saves verified position references and transaction record
 
 Bounded imports reconcile account events with canonical receipts and checkpoints. Imports can resume after partial scans or chain reorganizations. Nonce-linked replacements retain their actual outcomes without counting earlier requests twice. Approvals, failed requests and replacements may need a transaction hash imported separately; direct transfers are outside the account-event scan. Totals and exports cover the displayed page, not lifetime interest or current holdings. Storage failures do not turn a confirmed financial transaction into a failed one and should be retried through Activity.
 
-The first-live-run guide prepares an owner-approved deposit, a decision about actual available gains, and a withdrawal. This update does not prove a real-money lifecycle or enable background execution. The history tests use controlled RPC fixtures and an in-memory SQLite database.
+The first-live-run guide covers an owner-approved deposit, a decision about actual available gains, and a withdrawal. A 1 USDG deposit and full exit were subsequently verified onchain; stock conversion remains to be tested with real available gains. The history regression tests use controlled RPC fixtures and an in-memory SQLite database.
+
+## Agentic Lending update — 9 September 2026
+
+Plans and decision history now persist to wallet profiles. Optional read-only background checks evaluate the verified account, stock allocation, gain minimum, purchase ceiling and ETH/network-plus-pool cost limits. Every financial transaction still requires the owner's wallet approval. [Operations and limits](AGENTIC-LENDING-OPERATIONS.md).
+
+Production uses a dedicated Alchemy RPC through a server-only secret. An owner-approved account creation, exact 1 USDG approval, deposit and full withdrawal were verified onchain. The final account value, principal, vault shares and account allowances were zero. This does not verify a funded stock conversion.
