@@ -1,72 +1,131 @@
-# freestock
+![Freestock — agentic lending, your stock picks](docs/assets/freestock-banner.png)
 
-Private USDG lending and Stock Token wallet pilot with a simulation modal for exploring DeFi scenarios. The modal uses a separate demo account to create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
+# Freestock
 
-**The live flow is Home → Connect Wallet → Dashboard.** `/dashboard` is the place to create and manage a live position in the private, participant-restricted pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. “Try it yourself” opens an accessible simulation modal containing setup, saved results and activity. The demo uses no real funds. There is no separate Wallet page. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
+**Put available DeFi gains toward the stock tokens you choose.**
 
-## Working routes
+Freestock brings USDG lending, stock selections, rule-based lending recommendations and verified transaction history into one wallet dashboard. Choose a single stock or a basket, review what your available gains could buy, and approve the transaction yourself.
 
-**Agentic Lending** is a prominent Home feature and a Dashboard section at `/dashboard?view=agentic`. Its first release is a deterministic, read-only recommendation engine, not a connected language model or autonomous executor. It uses the existing verified account snapshot, including chain time, to recommend waiting, retaining vault shares or reviewing a stock purchase. The plan specifies supported stock weights, a minimum surplus and a maximum ETH network-fee estimate. It does not compute an all-in USDG fee percentage or optimize across executable pools.
+[Product](https://tryfreestock.com/) · [20-second intro](docs/media/freestock-intro.mp4) · [Backend](docs/BACKEND.md) · [Contracts](docs/CONTRACTS.md) · [Developer guide](docs/DEVELOPMENT.md) · [Roadmap](docs/PRODUCT-MILESTONES.md)
 
-Plans are explicitly device-local and wallet-scoped; decision activity is session-only. Existing 30-second account reads remain the single position data source. Quote/simulation preparation occurs only when requested. Recommendations cannot send transactions: identity-bound, short-lived intents only prefill the existing purchase form, which obtains a new reviewed quote. Pending journals and reviews take priority. Owner-only contracts and wallet-signing checks are unchanged. `/docs#agentic-lending` describes freshness, storage, cost and execution boundaries.
+> **Public source · private pilot.** The hosted application is access controlled. Agentic Lending currently recommends actions; it does not move funds autonomously. Every financial transaction requires the owner's wallet approval. Publishing this repository does not enable unrestricted funded access.
 
-The product focus is **keep lending, grow a stock-token portfolio with available gains**. The demo separates the earning source from three earnings destinations: Buy stocks, Reinvest and Split both. The summary expresses every destination as a share of new simulated earnings, after loss recovery. Full reinvestment suppresses automatic stock purchases even when an earlier plan left pending earnings; those remain available for a manual action. Existing saved-account and command formats are unchanged.
+## How it works
 
-Live Dashboard shows the principal-baseline calculation, the two-micro-USDG rounding reserve and any shortfall. Surplus includes direct transfers and cannot be described as a pure interest ledger. Stock reviews display the quoted output, encoded minimum and included pool fee, with ETH gas separately. Displayed fee and quote/minimum relationship are checked against the reviewed transaction. Confirmed receipts include block/time, actual purchase amounts, explorer links and JSON downloads. Portfolio Activity saves these records with the signed-in profile. Arbitrary existing-position connections, cost-limited conversion automation and delegated executors remain future work.
+1. **Connect your wallet.** Create or restore your personal Freestock account on Robinhood Chain. The application verifies its deployment and fixed dependencies.
+2. **Deposit USDG.** An exact approval and a separate deposit put USDG into the configured Steakhouse vault. You hold the account's ownership; the backend does not hold your keys.
+3. **Choose where gains go.** Select a stock or basket, or retain gains. Your deposited principal has a separate accounting baseline. The simulation also lets you explore a split between stocks and reinvestment.
+4. **Review a recommendation.** Agentic Lending checks the available surplus, your conversion minimum, stock allocation and estimated ETH gas budget. It explains whether to wait, retain gains or review a purchase.
+5. **Approve and track.** Review a fresh quote in your wallet. Confirmed stock purchases send tokens to your wallet. Portfolio Activity reconciles receipts with chain state and supports saved positions and exports.
 
-**Portfolio Activity** at `/dashboard?view=activity` persists verified account references and transaction history in the user-scoped D1 tables `live_accounts` and `live_transactions`. Restored references undergo fresh chain verification. Bounded sync imports exact account events, reconciles canonical blocks and nonce replacements, and uses atomic version guards to prevent stale concurrent writes. Approvals, pending or failed requests and replacements can be tracked by hash; direct transfers are not discovered by the account-event scan. Coverage, page-only totals and exports are explicit. This is a transaction history, not a lifetime interest or holdings ledger. The first-live-run guide still requires owner-approved wallet actions; no funded public lifecycle has been executed by the builder. Agentic recommendation activity and pending wallet journals retain their existing session/device scope.
+## What is available
 
-Product validation materials: [competitor evidence](docs/COMPETITOR-EVIDENCE.md), [eight-person validation kit](docs/USER-VALIDATION-KIT.md), and [next milestones](docs/PRODUCT-MILESTONES.md). These are plans and dated research, not completed interviews or a claim of uniqueness.
+| Capability | Current implementation |
+| --- | --- |
+| USDG lending | One configured vault in a capped, wallet-approved private pilot |
+| Stock purchases | NVDA, AAPL, TSLA, GOOGL and SPY; single stock or basket |
+| Agentic Lending | Deterministic recommendations, explicit reasons and manual approval; no model or autonomous trader |
+| Compounding | Reserve available gains by increasing the principal baseline; vault returns already accrue while shares are held |
+| Withdrawal | Full exit in the primary interface; the contract also supports partial withdrawal |
+| Portfolio Activity | Saved account references, pending/confirmed transaction tracking, bounded history import and exports |
+| Lending market data | Read-only views of the tracked USDG and stock-lending markets |
+| Try it yourself | Separate simulation modal with simulated balances and time advancement |
+| Stock lending, staking and leveraged LP execution | Not enabled for funded transactions |
+| Background conversion and cross-pool allocation | Not implemented; require a new permission and execution design |
 
-- `/`: Home, with Connect Wallet leading to Dashboard and “Try it yourself” opening the simulation modal.
-- `/dashboard`: a sidebar workspace for Overview, Your position, Agentic Lending, Market explorer and Advanced tools. Actual chain balances, participant status, recovery and wallet transaction reviews stay together. Read-only market and quote checks request no signatures; transactions open the wallet only after explicit review.
-- `/learn`: plain-English concepts, earnings sources, compounding, timing, leverage and stock-token exposure.
-- `/docs`: current capability matrix, exact model mechanics, sources, saved records and execution boundaries.
-- `/live`: compatibility redirect to `/dashboard`; not a separate Wallet page.
-- `/demo`: compatibility entry into the simulation modal’s results view, not a standalone results page.
-- `/transparency`: compatibility entry into the modal’s activity view, including the detailed saved ledger and JSON export.
-- `/fairness`: legacy entry through Demo activity. The draw/prize concept has been retired.
+The pilot's **100 USDG cap** applies when adding deposits against the account's principal baseline. It is not a lifetime contribution limit or a hard ceiling on account value. See [accounting and permissions](docs/CONTRACTS.md#accounting-and-the-cap).
 
-`app/demo/demo-link.tsx` exports `DemoLink` for opening the global simulation modal from any page. Its optional `view` selects `setup`, `results` or `activity`. Setup switches to results only after the scenario is confirmed saved. Simulated positions, balances and holdings stay in the results view; the detailed ledger stays in activity. All three views use no real funds.
+## Architecture
 
-## Accounting and automation
+```mermaid
+flowchart LR
+  UI[Browser dashboard] --> API[Authenticated Worker API]
+  API --> DB[(D1: simulation and saved history)]
+  API --> RPC[Read-only chain RPC and quotes]
+  UI --> Rules[Rule-based lending recommendations]
+  Rules --> Review[Fresh transaction review]
+  Review --> Wallet[Owner wallet signs]
+  Wallet --> Account[Personal FreestockYieldAccount]
+  Account --> Vault[Steakhouse USDG vault]
+  Account --> Router[Fixed swap router]
+  Router --> Stocks[Stock tokens to owner wallet]
+```
 
-A new demo account starts with 10,000 simulated USDG. Open “Try it yourself” to set up a scenario, manage saved results or inspect activity inside the same modal. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
+The backend reads chain state, prepares unsigned transactions, verifies accounts and receipts, and stores user-scoped history. **It has no wallet private key or transaction broadcaster.** Application login and wallet ownership are separate concepts. Read the [backend guide](docs/BACKEND.md) for authentication, storage, APIs, reconciliation and failure handling.
 
-Lending converts the observed seven-day vault APY to an effective daily rate, then accrues linearly within each simulation step. Fractions below one micro-USDG carry into the next step. Compounding happens at step boundaries. The observed rate is fixed for that position, not treated as a forecast or live accrual.
+## Contracts and addresses
 
-The LP model uses leverage, fee APR, borrowing APR, annual costs on exposure and an optional LP value shock. Leverage resets to the selected multiple each step without rebalancing costs. Liquidation thresholds, real collateral mechanics and withdrawal queues are not simulated. Stocks are purchased at disclosed fixed illustrative prices, assuming 1 USDG = $1 and zero gas/spread/trading fees. These are approximate simulated token quantities, not real holdings or current valuations.
+Freestock uses a **per-user `FreestockYieldAccount`**. There is no shared Freestock account, factory or Freestock project-token address configured. Each participant deploys their own account from their wallet and can inspect that address in the dashboard and explorer.
 
-## Data
+| Configured dependency · Robinhood Chain, chain ID 4663 | Address |
+| --- | --- |
+| USDG | [`0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168`](https://robinhoodchain.blockscout.com/address/0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168) |
+| Steakhouse USDG vault | [`0xBeEff033F34C046626B8D0A041844C5d1A5409dd`](https://robinhoodchain.blockscout.com/address/0xBeEff033F34C046626B8D0A041844C5d1A5409dd) |
+| SwapRouter02 | [`0xcaf681a66d020601342297493863e78c959e5cb2`](https://robinhoodchain.blockscout.com/address/0xcaf681a66d020601342297493863e78c959e5cb2) |
 
-`lib/markets.ts` reads current balances and seven-day rates for one tracked Steakhouse USDG vault and five previously verified listed Morpho USDG markets on Robinhood Chain 4663. Directory membership was checked September 8, 2026. This is an explicit subset; it does not claim all-chain pool coverage. Vault and market assets overlap and are never added together. Refresh failure returns the dated snapshot with a prominent status. Read-only observations do not establish an executable route. See the in-app Docs for direct source links.
+These are the addresses configured in this source revision, not a guarantee of current liquidity, returns or provider eligibility. [The full contract reference](docs/CONTRACTS.md) includes all five enabled stock addresses, quote dependencies, permissions, functions, events and verification artifacts.
 
-`/api/stock-lending/markets` reads five separately verified AAPL, GOOGL, NVDA, SPY and TSLA loan-asset markets with USDG collateral. Home provides USDG/Stock lending tabs; Dashboard also shows the stock market feed. Stock lending is data-only: no stock approval, supply or withdrawal route is enabled. Amounts retain 18-decimal precision, missing responses never become zero, and historical rates are independent of balance availability. See [stock-lending verification](docs/STOCK-LENDING.md) and `/docs#stock-lending`.
+- [Solidity source](contracts/src/FreestockYieldAccount.sol)
+- [ABI, bytecode and immutable offsets](contracts/artifacts/FreestockYieldAccount.artifact.json)
+- [Exact compiler standard input](contracts/artifacts/account-standard-input.json)
+- [Local-fork evidence and its limits](contracts/test/FORK-EXECUTION.md)
 
-## Persistence and requests
+## What counts as available gains?
 
-`lib/earn-store.ts` saves independent per-owner state in `earn_accounts` and permanent request receipts in `earn_commands`. A compare-and-swap update and receipt insertion share an atomic D1 batch. Duplicate retries return the original receipt and current state. Server routes obtain account identity from trusted Sites dispatch headers, validate same-origin requests, bound streamed bodies to 4 KB and return uncached private responses.
+```text
+account value = redeemable vault shares + idle USDG
+available surplus = max(account value − principal baseline, 0)
+```
 
-The original `accounts`/`commands` tables and old engine tests are retained for historical data compatibility. New accounts never borrow funds from retired prize accounts. `/api/commands` returns 410 and no longer changes old prize state. Never expose an untrusted raw Worker origin that accepts forged dispatcher identity headers.
+Losses must recover above the principal baseline before gains can be spent. Direct USDG or vault-share donations also increase surplus; this is not a ledger that proves every gain came from lending interest. The client reserves two micro-USDG for rounding when preparing purchases.
 
-## Local development and validation
+A basket executes atomically: if a leg fails, the entire harvest reverts. The contract checks principal coverage around the swaps, but this does not guarantee principal value, future returns or withdrawal liquidity. Portfolio Activity totals cover the displayed page, not lifetime earnings or the wallet's full holdings.
 
-Node 22.13+ and npm are required. Run `npm ci`, `npm run dev`, `npm run lint`, `npm run typecheck`, `npm test` and `npm run build`. Sites supplies local sign-in. D1 schema comes from `db/schema.ts` and append-only Drizzle migrations in `drizzle/`; Sites applies them on deploy.
+## Explore the code
 
-`TEST_ORIGIN=http://localhost:3011 npm run test:api` only accepts local origins, refuses redirects, and creates isolated test identities. Use the same local D1 persistence directory for migrations and the test Worker. Tests cover account isolation, request validation, duplicate/concurrent actions, compounding, baskets, loss recovery, closure and retired routes. No hosted accounts are mutated by these checks.
+| Area | Entry points |
+| --- | --- |
+| Wallet dashboard and public pages | [`app/`](app), [`components/`](components) |
+| Chain configuration and enabled stocks | [`lib/live/config.ts`](lib/live/config.ts), [`lib/live/basket.ts`](lib/live/basket.ts) |
+| Unsigned preparation, simulation and receipts | [`lib/live/pilot.ts`](lib/live/pilot.ts), [`lib/live/account-plan.ts`](lib/live/account-plan.ts) |
+| Recommendation rules | [`lib/live/agentic-lending.ts`](lib/live/agentic-lending.ts) |
+| Browser transaction checks and recovery | [`lib/live/wallet-transaction.ts`](lib/live/wallet-transaction.ts), [`lib/live/wallet-journal.ts`](lib/live/wallet-journal.ts) |
+| Saved history and chain reconciliation | [`lib/live/history-reader.ts`](lib/live/history-reader.ts), [`lib/live/history-store.ts`](lib/live/history-store.ts) |
+| Simulation accounting | [`lib/earn-engine.ts`](lib/earn-engine.ts), [`lib/earn-store.ts`](lib/earn-store.ts) |
+| API handlers and database migrations | [`app/api/`](app/api), [`drizzle/`](drizzle) |
+| Regression checks | [`tests/`](tests), [`scripts/`](scripts) |
 
-Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. The simulated engine never handles real funds. The wallet pilot verifies the exact deployment, owner, dependencies and receipts. A specific signed-in participant is enabled through runtime configuration; country declarations are not identity verification or public launch approval.
+## Run locally
 
-## First live integration
+Use Node.js 22.13 or newer.
 
-See `docs/LIVE-PILOT.md` for verified dependencies, account semantics, fork evidence and exact activation boundaries. `contracts/src/FreestockYieldAccount.sol` is compiled reproducibly in `contracts/artifacts`. No shared mainnet account has been deployed by the builder. Each participant creates their own account directly from an EOA wallet. Private product access does not verify issuer eligibility; stock provider restrictions still apply. No API key is required for the direct AMM route. Set `ROBINHOOD_RPC_URL` to an HTTPS production RPC for dedicated capacity; otherwise reads use the official public RPC and fail closed on provider errors. Runtime values belong in Sites configuration, never source.
+```sh
+git clone https://github.com/flappyfart/freestock.git
+cd freestock
+npm ci
+npm run dev
+```
 
-Private pilot runtime setting: `FREESTOCK_PILOT_USER_ID` must equal the exact trusted Sites application identity. Country and US-person environment values are no longer used for product authorization. Freestock does not collect a separate eligibility questionnaire. This change does not open general funded registration or alter provider restrictions. Disabling entry/trading does not disable verified-account withdrawal preparation. No server signer exists. Transaction recovery stores only owner, request ID, nonce and transaction/account references on that browser; authoritative balances and confirmations come from the chain. Web Locks serialize cross-tab journal updates, and stale replies cannot overwrite successor requests.
+For database setup, local API fixtures, deployment configuration and the trusted-authentication boundary, follow the [developer guide](docs/DEVELOPMENT.md). The checkout uses React, TypeScript, Vinext/Vite, a Cloudflare Worker and D1.
 
-UI switches use the user-provided Uiverse.io design by reglobby: a blue off state, green on state and animated glowing orb, with accessible controls and reduced-motion support.
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
 
-Verified account creation references are remembered per wallet on this browser and rechecked against the chain on return. Live account balances refresh every 30 seconds while visible and idle. Reviews and pending wallet requests pause this refresh. Storage never substitutes for chain balances.
+Publication check on 9 September 2026: all 123 application tests passed. Local and fork tests use fake funds. Passing tests does not establish a completed, funded production lifecycle.
 
-The compact header Connect Wallet button uses the same injected-wallet connection as Dashboard. It opens a wallet chooser, or explains how to open a wallet-enabled browser when no wallet is detected. The connected user continues to `/dashboard` to create or manage a live position. Connecting never submits a financial transaction. “Try it yourself” opens the simulation modal independently of the live account flow.
+## What comes next
 
-The homepage displays Apple, NVIDIA and Sandisk as illustrative floating artwork. The live purchase choices remain NVDA, AAPL, TSLA, GOOGL and SPY. Chain reads use bounded retry/backoff for transient failures, request-scoped in-flight coalescing, and safe upstream status diagnostics. Completed quotes and transaction previews are never cached or automatically submitted. `/api/live/status` reports the actual server-to-chain health without disclosing a provider URL or credentials.
+1. Complete one owner-approved funded lifecycle, reconciling the deposit, available-gain conversion or reservation, and withdrawal against receipts.
+2. Validate whether invited users understand and repeatedly choose the earnings-to-stock experience after seeing actual costs.
+3. Design bounded automation with explicit spending limits, cost limits, expiry, revocation and recovery before granting any execution authority.
+4. Add another earning source only after its accounting, permissions, liquidity and receipt behavior are verified.
+
+See the [delivery roadmap](docs/PRODUCT-MILESTONES.md), [user validation kit](docs/USER-VALIDATION-KIT.md) and [integration readiness notes](docs/INTEGRATION-READINESS.md). Earlier prize/draw documents describe a retired product direction. Microsoft and Sandisk references or artwork do not imply support in the funded five-stock pilot.
+
+## Source and licensing
+
+Public visibility makes the implementation inspectable; it does not by itself grant a repository-wide software license. No repository-wide license is declared. The Solidity source includes its own MIT SPDX identifier, and third-party code, fonts and assets retain their respective [notices and terms](THIRD_PARTY_NOTICES.md).
