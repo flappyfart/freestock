@@ -16,6 +16,9 @@ import {
   type Allocation,
 } from "../lib/earn-engine";
 import type { MarketCatalogue } from "../lib/markets";
+// Older saved ledger text is relabeled for display without rewriting account history.
+const simulationLabel = (text: string) =>
+  text.replace(/\bpractice\b/gi, (word) => (word[0] === "P" ? "Simulated" : "simulated"));
 const money = (micro: number) =>
   new Intl.NumberFormat("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(
     micro / 1e6,
@@ -52,7 +55,7 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
         label="Auto-compound"
         description={
           value.compoundBps > 0
-            ? "Reinvest available earnings in this practice position."
+            ? "Reinvest available earnings in this simulated position."
             : "Send available earnings toward your stock picks."
         }
         checked={value.compoundBps > 0}
@@ -160,7 +163,7 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
             label="Auto-convert"
             description={
               value.auto
-                ? "Buy your stock picks when the practice minimum is reached."
+                ? "Buy your stock picks when the simulated minimum is reached."
                 : "Convert earnings when you choose."
             }
             checked={value.auto}
@@ -168,7 +171,7 @@ function PayoutPicker({ value, change }: { value: Preferences; change: (v: Prefe
           />
           {value.auto && (
             <label>
-              Conversion minimum (practice USDG)
+              Conversion minimum (simulated USDG)
               <input
                 type="number"
                 min="1"
@@ -418,7 +421,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
       setNotice(
         v.replayed
           ? "Your saved action is confirmed. Nothing was applied twice."
-          : "Practice account saved. Balances and earnings are up to date.",
+          : "Demo account saved. Balances and earnings are up to date.",
       );
     } catch (e) {
       if (e instanceof TypeError || e instanceof SyntaxError) setPendingRequest({ key, body });
@@ -438,7 +441,16 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
       new Blob(
         [
           JSON.stringify(
-            { mode: "simulation", exportedAt: new Date().toISOString(), ...state },
+            {
+              mode: "simulation",
+              exportedAt: new Date().toISOString(),
+              ...state,
+              entries: state.entries.map((entry) => ({
+                ...entry,
+                action: simulationLabel(entry.action),
+                detail: simulationLabel(entry.detail),
+              })),
+            },
             null,
             2,
           ),
@@ -448,13 +460,13 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = "freestock-practice-ledger.json";
+    a.download = "freestock-demo-ledger.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   const feedback = (
     <div className="earn-feedback" aria-live="polite">
-      {loading && <p>Loading your practice account and market data…</p>}
+      {loading && <p>Loading your demo account and market data…</p>}
       {error && (
         <p role="alert">
           {error}{" "}
@@ -474,7 +486,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   className="earn-link"
                   onClick={() => window.location.assign("/signin-with-chatgpt?return_to=%2F")}
                 >
-                  Sign in to practice
+                  Sign in to try it
                 </button>
               )}
               <button type="button" onClick={() => void load()}>
@@ -493,16 +505,16 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
     </div>
   );
   return (
-    <EarnShell active={transparency ? "Practice activity" : "Home"}>
+    <EarnShell active={transparency ? "Demo activity" : "Home"}>
       {!transparency && <LandingIntro />}
       <div className="earn-wrap">
         <div className="earn-notice">
           <span>
-            <i /> {transparency ? "PRACTICE ACTIVITY" : "LIVE WALLET PILOT"}
+            <i /> {transparency ? "DEMO ACTIVITY" : "LIVE WALLET PILOT"}
           </span>
           <p>
             {transparency
-              ? "This ledger records practice money only. Your real balances and receipts are in your live account."
+              ? "This ledger records simulated money only. Your real balances and receipts are in your live account."
               : "USDG lending and stock purchases for the configured Norway participant. Every real transaction needs your wallet approval."}
           </p>
         </div>
@@ -563,7 +575,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
               <form
                 className="earn-builder"
                 id="try-it-yourself"
-                aria-describedby="practice-explainer"
+                aria-describedby="demo-explainer"
                 onSubmit={(e) => {
                   e.preventDefault();
                   void command({
@@ -580,10 +592,10 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
               >
                 <div className="earn-row">
                   <h2>Try it yourself</h2>
-                  <span className="earn-pill">Practice money</span>
+                  <span className="earn-pill">Simulated money</span>
                 </div>
-                <p className="earn-small" id="practice-explainer">
-                  Explore with 10,000 practice USDG. These settings and results do not affect your
+                <p className="earn-small" id="demo-explainer">
+                  Explore with 10,000 simulated USDG. These settings and results do not affect your
                   wallet. Auto-convert and leveraged LP options here are simulations.
                 </p>
                 {feedbackLocation === "form" && feedback}
@@ -645,7 +657,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                   </>
                 )}
                 <label>
-                  Deposit amount (practice USDG)
+                  Deposit amount (simulated USDG)
                   <input
                     className="earn-amount"
                     type="number"
@@ -656,7 +668,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
                   />
-                  <small>Available: {state ? money(state.wallet) : "—"} practice USDG</small>
+                  <small>Available: {state ? money(state.wallet) : "—"} simulated USDG</small>
                 </label>
                 <div className="earn-divider">
                   <ArrowDown size={16} />
@@ -671,24 +683,25 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 </button>
                 <a
                   className="earn-link"
-                  href="#practice-results"
+                  href="#demo-results"
                   onClick={() => setShowPracticeResults(true)}
                 >
-                  View your practice results <ArrowRight size={16} />
+                  View your simulated results <ArrowRight size={16} />
                 </a>
               </form>
             </section>
             <section id="live-account" className="home-live-account">
               <LiveWorkspace embedded />
             </section>
+            <span id="practice-results" aria-hidden="true" />
             <details
-              className="practice-results"
-              id="practice-results"
+              className="demo-results"
+              id="demo-results"
               open={showPracticeResults}
               onToggle={(e) => setShowPracticeResults(e.currentTarget.open)}
             >
               <summary>
-                <span>Your practice results</span>
+                <span>Your simulated results</span>
                 <small>
                   Simulated positions and stock tokens · separate from your live account
                 </small>
@@ -698,7 +711,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 <div className="section-title">
                   <div>
                     <span className="earn-eyebrow">TRY IT YOURSELF</span>
-                    <h2>Practice positions</h2>
+                    <h2>Simulated positions</h2>
                   </div>
                   <Link href="/transparency" className="earn-link">
                     See every earnings step <ArrowUpRight size={16} />
@@ -706,7 +719,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 </div>
                 <div className="earn-stats">
                   <div>
-                    <span>Practice DeFi capital</span>
+                    <span>Simulated DeFi capital</span>
                     <strong>
                       {money(capital)} <small>USDG</small>
                     </strong>
@@ -747,9 +760,9 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 <div className="section-title">
                   <div>
                     <span className="earn-eyebrow">BUILD YOUR EXPOSURE</span>
-                    <h2>Practice stock tokens</h2>
+                    <h2>Simulated stock tokens</h2>
                   </div>
-                  <span className="earn-small">Practice quantities · cost, not current value</span>
+                  <span className="earn-small">Simulated quantities · cost, not current value</span>
                 </div>
                 <div className="holdings-grid">
                   {STOCKS.filter((s) => state?.holdings[s.symbol]).map((s) => (
@@ -757,7 +770,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                       <StockMark symbol={s.symbol} size={40} />
                       <div>
                         <h3>{s.symbol}</h3>
-                        <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} practice tokens</p>
+                        <p>{state!.holdings[s.symbol]!.quantity.toFixed(6)} simulated tokens</p>
                         <small>{money(state!.holdings[s.symbol]!.cost)} USDG modeled cost</small>
                       </div>
                     </article>
@@ -853,14 +866,14 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
               <span className="earn-eyebrow">EVERY STEP, EXPLAINED</span>
               <h1>Follow the earnings.</h1>
               <p>
-                Your saved practice record shows deposits, modeled returns, compounding, withdrawals
-                and each stock allocation. These are simulation entries, not blockchain transaction
+                Your saved demo record shows deposits, modeled returns, compounding, withdrawals and
+                each stock allocation. These are simulation entries, not blockchain transaction
                 receipts.
               </p>
             </section>
             <div className="earn-stats">
               <div>
-                <span>Practice wallet</span>
+                <span>Demo wallet</span>
                 <strong>{money(state?.wallet ?? 0)}</strong>
               </div>
               <div>
@@ -887,7 +900,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
             <div className="section-title">
               <h2>Activity record</h2>
               <button className="earn-button" disabled={!state} onClick={exportLedger}>
-                Export practice ledger <ArrowUpRight size={16} />
+                Export demo ledger <ArrowUpRight size={16} />
               </button>
             </div>
             <div className="ledger">
@@ -900,13 +913,13 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                     </span>
                     <strong>{entry.amount === 0 ? "—" : `${money(entry.amount)} USDG`}</strong>
                   </div>
-                  <h3>{entry.action}</h3>
-                  <p>{entry.detail}</p>
+                  <h3>{simulationLabel(entry.action)}</h3>
+                  <p>{simulationLabel(entry.detail)}</p>
                   {entry.purchases && (
                     <ul>
                       {entry.purchases.map((buy) => (
                         <li key={buy.symbol}>
-                          {buy.symbol}: {buy.quantity.toFixed(8)} practice tokens ·{" "}
+                          {buy.symbol}: {buy.quantity.toFixed(8)} simulated tokens ·{" "}
                           {money(buy.amount)} USDG · illustrative price ${buy.price}
                         </li>
                       ))}
@@ -920,7 +933,7 @@ export default function EarnApp({ transparency = false }: { transparency?: boole
                 <RefreshCw size={24} />
                 <h3>No earnings activity yet.</h3>
                 <Link className="earn-link" href="/">
-                  Create a practice position <ArrowRight size={16} />
+                  Create a simulated position <ArrowRight size={16} />
                 </Link>
               </div>
             )}

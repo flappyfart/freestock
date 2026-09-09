@@ -14,8 +14,8 @@ export default function Page() {
           </h1>
           <p>
             Use available lending gains to buy selected Stock Tokens or keep more capital in your
-            lending position. Explore the idea with practice money, or use Wallet if your account is
-            enabled for the private pilot.
+            lending position. Explore the idea with simulated money, or use Wallet if your account
+            is enabled for the private pilot.
           </p>
           <Link href="/#try-it-yourself" className="earn-button">
             Try it yourself <ArrowUpRight size={17} />
@@ -67,7 +67,7 @@ export default function Page() {
               </div>
               <p className="learn-callout">
                 On the home page, Wallet shows your live account. “Try it yourself” is the separate
-                simulator labeled Practice money; its scenarios and holdings are not real positions.
+                simulator with simulated money; its scenarios and holdings are not real positions.
                 The private wallet pilot supports USDG lending and selected Stock Token purchases
                 from available gains. Every real transaction requires the owner’s wallet approval.
               </p>
@@ -108,8 +108,8 @@ export default function Page() {
                   You supply assets to a trading pool and earn a share of eligible swap fees.
                   Trading changes the mix of assets you hold. You can end up worse off than if you
                   had simply held them. A concentrated position stops earning fees while outside its
-                  selected price range. Freestock offers an LP practice model, but no LP or
-                  leveraged LP execution.{" "}
+                  selected price range. Freestock offers an LP demo model, but no LP or leveraged LP
+                  execution.{" "}
                   <a
                     href="https://support.uniswap.org/hc/en-us/articles/37113550065549-What-are-the-risks-when-providing-liquidity"
                     target="_blank"
@@ -124,12 +124,12 @@ export default function Page() {
               <span className="earn-eyebrow">03 / YOUR RULES</span>
               <h2>Convert. Compound. Or split.</h2>
               <p>
-                These automatic rules belong to the home practice simulator. They run only when you
-                advance a scenario and do not authorize real transactions.
+                These automatic rules belong to the home demo. They run only when you advance a
+                scenario and do not authorize real transactions.
               </p>
               <div className="learn-options">
                 <article>
-                  <h3>Practice auto-convert</h3>
+                  <h3>Demo auto-convert</h3>
                   <p>
                     Build up available earnings, then buy your chosen Stock Tokens when the
                     conversion minimum is reached. Choose one stock or a basket whose weights total
@@ -137,7 +137,7 @@ export default function Page() {
                   </p>
                 </article>
                 <article>
-                  <h3>Practice auto-compound</h3>
+                  <h3>Demo auto-compound</h3>
                   <p>
                     Reinvest available earnings into the same DeFi position. A larger position can
                     generate more earnings and also has more capital exposed to the strategy’s
@@ -145,7 +145,7 @@ export default function Page() {
                   </p>
                 </article>
                 <article>
-                  <h3>Practice split</h3>
+                  <h3>Demo split</h3>
                   <p>
                     For example, reinvest 40% and direct 60% toward stocks. From 10 USDG of net
                     earnings, 4 stays in DeFi and 6 goes toward your chosen basket.
@@ -279,7 +279,7 @@ export default function Page() {
                 submitted real transactions.
               </p>
               <p>
-                “Try it yourself” and saved practice positions use practice money. Staking,
+                “Try it yourself” and saved simulated positions use simulated money. Staking,
                 leveraged LP execution and background auto-conversion are not implemented. Live
                 vault shares can accrue their underlying return without another signature; buying
                 stock tokens still requires your approval.

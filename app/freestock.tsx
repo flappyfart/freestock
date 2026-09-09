@@ -168,7 +168,7 @@ function PrizeOverview({
     <section className="prize-overview panel" aria-labelledby="prize-overview-title">
       <div className="prize-overview-heading">
         <div>
-          <p className="small-label">YOUR SAVED PRACTICE ACCOUNT</p>
+          <p className="small-label">YOUR SAVED DEMO ACCOUNT</p>
           <h2 id="prize-overview-title">Your savings and stock prizes</h2>
         </div>
         <Gift size={23} aria-hidden="true" />
@@ -211,13 +211,13 @@ function PrizeOverview({
         </div>
       )}
       {prizes.claimed > 0n && (
-        <div className="claimed-stock-list" aria-label="Claimed practice stock prizes">
+        <div className="claimed-stock-list" aria-label="Claimed simulated stock prizes">
           {Object.entries(state.holdings).map(([symbol, amount]) => (
             <div key={symbol}>
               <StockLogo symbol={symbol as Stock} />
               <span>
                 {names[symbol as Stock]}
-                <small>Claimed practice prize</small>
+                <small>Claimed simulated prize</small>
               </span>
               <strong>{money(amount!)}</strong>
             </div>
@@ -330,9 +330,9 @@ export default function Freestock() {
             : undefined;
         setNotice(
           command.type === "deposit"
-            ? "Practice money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner."
+            ? "Simulated money added. Use Skip ahead to see a draw below, then open Prize draws to reveal the winner."
             : command.type === "withdraw"
-              ? "Withdrawal reserved. Complete it below to return funds to your practice wallet."
+              ? "Withdrawal reserved. Complete it below to return funds to your demo wallet."
               : command.type === "advance"
                 ? `${command.days} simulated day${command.days === 1 ? "" : "s"} completed.`
                 : command.type === "claim"
@@ -431,9 +431,7 @@ export default function Freestock() {
     const n = parseAmount(amount);
     if (n > bigint(mode === "deposit" ? state.wallet : state.balance))
       amountError =
-        mode === "deposit"
-          ? "Amount exceeds your practice wallet."
-          : "Amount exceeds your savings.";
+        mode === "deposit" ? "Amount exceeds your demo wallet." : "Amount exceeds your savings.";
   } catch {
     amountError = "Enter a valid USDG amount.";
   }
@@ -474,7 +472,7 @@ export default function Freestock() {
         label: draw.winner === 0 ? "Prepare my prize" : "Complete draw for winner",
         type: "settle_prize",
       },
-      claimable: { label: "Claim practice prize", type: "claim" },
+      claimable: { label: "Claim simulated prize", type: "claim" },
     };
     const action = actions[draw.status];
     return action ? (
@@ -536,7 +534,7 @@ export default function Freestock() {
       <div className="preview-strip">
         <span>
           <Sparkles size={14} />
-          Non-US launch planned. Explore with practice money.
+          Non-US launch planned. Explore with simulated money.
         </span>
         <span>
           No real funds connected
@@ -547,7 +545,7 @@ export default function Freestock() {
         {pane !== "overview" && (
           <div className="page-heading">
             <div>
-              <p className="small-label">YOUR PRACTICE ACCOUNT</p>
+              <p className="small-label">YOUR DEMO ACCOUNT</p>
               <h1>{pane === "draws" ? "Your stock prize draws." : "Every step, accounted for."}</h1>
               <p>
                 {pane === "draws"
@@ -620,22 +618,22 @@ export default function Freestock() {
           <HomepageIntro />
           <div className="demo-heading">
             <div>
-              <h2>Try a $10 practice draw.</h2>
-              <p>Add practice money. Skip ahead 7 days. Then reveal the draw.</p>
+              <h2>Try a $10 simulated draw.</h2>
+              <p>Add simulated money. Skip ahead 7 days. Then reveal the draw.</p>
             </div>
-            <span className="pill">You start with $10,000 of practice money</span>
+            <span className="pill">You start with $10,000 of simulated money</span>
           </div>
           <div className="dashboard-grid">
             <section className="savings-panel panel">
               <div className="section-top">
-                <h2>Your practice savings</h2>
+                <h2>Your simulated savings</h2>
                 <Wallet size={18} />
               </div>
               <div className="balance">
                 {money(state.balance).split(".")[0]}
                 <span>.{money(state.balance).split(".")[1]}</span>
               </div>
-              <p className="caption">Practice balance · USDG is the demo’s dollar unit</p>
+              <p className="caption">Simulated balance · USDG is the demo’s dollar unit</p>
               <SavingsChart state={state} />
               <div className="savings-bottom">
                 <div>
@@ -646,7 +644,7 @@ export default function Freestock() {
                   </strong>
                 </div>
                 <div>
-                  <span className="caption">Practice prizes claimed</span>
+                  <span className="caption">Simulated prizes claimed</span>
                   <strong>{money(won)}</strong>
                 </div>
               </div>
@@ -695,7 +693,7 @@ export default function Freestock() {
               <div className="deposit-explainer">
                 <div>
                   <Wallet size={16} />
-                  <span>{mode === "deposit" ? "Practice wallet" : "Available savings"}</span>
+                  <span>{mode === "deposit" ? "Demo wallet" : "Available savings"}</span>
                   <strong>{money(mode === "deposit" ? state.wallet : state.balance)}</strong>
                 </div>
                 <div>
@@ -761,7 +759,7 @@ export default function Freestock() {
               </div>
               <div className="pool-divider" />
               <div className="pool-line">
-                <span>Practice earnings available for prizes</span>
+                <span>Simulated earnings available for prizes</span>
                 <span>{money(state.availableYield)}</span>
               </div>
               <p>
@@ -825,7 +823,7 @@ export default function Freestock() {
           </section>
           <p className="simulation-guide">
             After skipping ahead, open Prize draws to reveal who won. A draw can complete only when
-            the pool has enough practice earnings.
+            the pool has enough simulated earnings.
           </p>
           <HomepageQuestions />
         </TabsContent>
@@ -836,7 +834,8 @@ export default function Freestock() {
                 <span className="pill">Example draw #{nextDraw}</span>
                 <h2>Your next stock prize draw.</h2>
                 <p>
-                  A $10 practice prize, paid for only when the pool has enough earnings after costs.
+                  A $10 simulated prize, paid for only when the pool has enough earnings after
+                  costs.
                 </p>
                 <div className="draw-stats">
                   <div>
@@ -891,7 +890,8 @@ export default function Freestock() {
                 <Gift size={27} />
                 <h3>Your first draw starts with savings.</h3>
                 <p>
-                  Add practice money, then use +7 days on Home. Come back here to reveal the winner.
+                  Add simulated money, then use +7 days on Home. Come back here to reveal the
+                  winner.
                 </p>
                 <Button className="secondary" onClick={() => setPane("overview")}>
                   Start with your savings
@@ -1050,7 +1050,7 @@ export default function Freestock() {
         </TabsContent>
         <footer>
           <span>
-            Planned for eligible non-US users. Practice only. Live lending can lose principal and
+            Planned for eligible non-US users. Demo only. Live lending can lose principal and
             withdrawals depend on liquidity.
           </span>
           <button className="text-button" onClick={() => setModal("about")}>
@@ -1069,7 +1069,7 @@ export default function Freestock() {
           <DialogTitle className="modal-title">
             {modal === "funds"
               ? mode === "deposit"
-                ? "Add practice money to savings."
+                ? "Add simulated money to savings."
                 : "Request your withdrawal."
               : "How freestock works."}
           </DialogTitle>
@@ -1092,8 +1092,8 @@ export default function Freestock() {
               </div>
               <p className="modal-copy">
                 {mode === "deposit"
-                  ? "Funds move from your practice wallet into savings. Entries grow with the amount you save and the time it stays in the pool."
-                  : "The requested amount stops building future entries and enters a withdrawal queue. Complete it in the overview to return it to your practice wallet."}
+                  ? "Funds move from your demo wallet into savings. Entries grow with the amount you save and the time it stays in the pool."
+                  : "The requested amount stops building future entries and enters a withdrawal queue. Complete it in the overview to return it to your demo wallet."}
               </p>
               <div className="modal-note">
                 <ShieldCheck size={18} />
@@ -1127,15 +1127,15 @@ export default function Freestock() {
               <section>
                 <h3>Saving earns you chances to win.</h3>
                 <p>
-                  Each practice dollar saved for one day earns one entry. Save $100 for seven days
+                  Each simulated dollar saved for one day earns one entry. Save $100 for seven days
                   to earn 700 entries. Your share of all entries is your chance of winning. Entries
                   start fresh after each weekly demo draw.
                 </p>
               </section>
               <section>
-                <h3>Everything here is practice.</h3>
+                <h3>Everything here is simulated.</h3>
                 <p>
-                  You start with $10,000 of practice money, labeled USDG. Four example savers
+                  You start with $10,000 of simulated money, labeled USDG. Four example savers
                   contribute $32,500. These figures are invented scenario inputs. No real people,
                   funds, lending, shares, or stock tokens are represented.
                 </p>

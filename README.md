@@ -1,12 +1,12 @@
 # freestock
 
-Private USDG lending and Stock Token wallet pilot with a separate practice account for exploring DeFi scenarios. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
+Private USDG lending and Stock Token wallet pilot with a separate demo account for exploring DeFi scenarios. Users can create lending scenarios, model leveraged LP exposure, choose single Stock Tokens or custom baskets, auto-convert simulated earnings, compound them into DeFi, or split between both. The requested white/cobalt design, transparent floating stock artwork, dither background and NVIDIA arrival intro remain in place.
 
 **The homepage leads to your live account and keeps the simulator under “Try it yourself.”** `/live` offers the same private, participant-restricted wallet pilot for USDG lending and purchases of NVIDIA, Apple, Tesla, Alphabet and SPY tokens from available gains. Each deployment, approval, deposit, compound, purchase and withdrawal requires an explicit wallet transaction. No agent has submitted public transactions or moved real funds. Background automation, staking and leveraged LP execution are not enabled.
 
 ## Working routes
 
-- `/`: live wallet account, “Try it yourself” practice box, collapsible saved practice results and read-only market catalogue.
+- `/`: live wallet account, “Try it yourself” simulated box, collapsible saved simulated results and read-only market catalogue.
 - `/live`: wallet connection, actual chain balances, Uniswap V3 quotes, direct deposit simulations and yield-account setup plus reviewed wallet transactions. The read-only checks request no signatures; the separately labeled wallet pilot opens a wallet confirmation only after an explicit review action.
 - `/learn`: plain-English explanations, earnings sources, timing, leverage, tokens and future possibilities.
 - `/docs`: current capability matrix, exact model mechanics, sources and execution boundaries.
@@ -15,11 +15,11 @@ Private USDG lending and Stock Token wallet pilot with a separate practice accou
 
 ## Accounting and automation
 
-A new DeFi account starts with 10,000 practice USDG. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
+A new DeFi account starts with 10,000 simulated USDG. Money uses integer micro-USDG; basket weighting uses BigInt intermediates. `lib/earn-engine.ts` applies pure state transitions. Losing scenarios consume pending earnings then principal; later gains first recover lost principal. A selected percentage of remaining surplus compounds into the position, and the remainder waits for manual or threshold-based stock conversion. Closing returns capital; earnings below the 1 USDG conversion minimum also return to the wallet. Other pending earnings remain convertible after closure.
 
 Lending converts the observed seven-day vault APY to an effective daily rate, then accrues linearly within each simulation step. Fractions below one micro-USDG carry into the next step. Compounding happens at step boundaries. The observed rate is fixed for that position, not treated as a forecast or live accrual.
 
-The LP model uses leverage, fee APR, borrowing APR, annual costs on exposure and an optional LP value shock. Leverage resets to the selected multiple each step without rebalancing costs. Liquidation thresholds, real collateral mechanics and withdrawal queues are not simulated. Stocks are purchased at disclosed fixed illustrative prices, assuming 1 USDG = $1 and zero gas/spread/trading fees. These are approximate practice token quantities, not real holdings or current valuations.
+The LP model uses leverage, fee APR, borrowing APR, annual costs on exposure and an optional LP value shock. Leverage resets to the selected multiple each step without rebalancing costs. Liquidation thresholds, real collateral mechanics and withdrawal queues are not simulated. Stocks are purchased at disclosed fixed illustrative prices, assuming 1 USDG = $1 and zero gas/spread/trading fees. These are approximate simulated token quantities, not real holdings or current valuations.
 
 ## Data
 
@@ -37,7 +37,7 @@ Node 22.13+ and npm are required. Run `npm ci`, `npm run dev`, `npm run lint`, `
 
 `TEST_ORIGIN=http://localhost:3011 npm run test:api` only accepts local origins, refuses redirects, and creates isolated test identities. Use the same local D1 persistence directory for migrations and the test Worker. Tests cover account isolation, request validation, duplicate/concurrent actions, compounding, baskets, loss recovery, closure and retired routes. No hosted accounts are mutated by these checks.
 
-Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. The practice engine never handles real funds. The wallet pilot verifies the exact deployment, owner, dependencies and receipts. A specific signed-in participant is enabled through runtime configuration; country declarations are not identity verification or public launch approval.
+Historical documents are labeled as superseded. `/learn` and `/docs` describe the active product. The simulated engine never handles real funds. The wallet pilot verifies the exact deployment, owner, dependencies and receipts. A specific signed-in participant is enabled through runtime configuration; country declarations are not identity verification or public launch approval.
 
 ## First live integration
 

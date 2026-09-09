@@ -88,7 +88,7 @@ export function assessAvailability(input: AvailabilityInput): AvailabilityResult
     return result(
       "unavailable",
       "The planned launch is unavailable in your region.",
-      "Your answers match a restriction in the stock-token issuer’s current disclosures. You can still explore the practice demo.",
+      "Your answers match a restriction in the stock-token issuer’s current disclosures. You can still explore the demo.",
     );
   }
   if (!residence || !location || input.usPerson !== "no") {

@@ -183,7 +183,7 @@ export async function applyCommand(
     );
   if (c.type === "deposit") {
     const n = parseAmount(c.amount);
-    if (n > BigInt(s.wallet)) return fail("Not enough simulated USDG in your practice wallet.");
+    if (n > BigInt(s.wallet)) return fail("Not enough simulated USDG in your demo wallet.");
     s.wallet = String(BigInt(s.wallet) - n);
     s.balance = String(BigInt(s.balance) + n);
     log(s, "deposit", n, "Added simulated USDG");
@@ -207,7 +207,7 @@ export async function applyCommand(
       s,
       "withdrawal_completed",
       n,
-      "Returned to practice wallet. Simulation assumes full liquidity.",
+      "Returned to demo wallet. Simulation assumes full liquidity.",
     );
   } else if (c.type === "select_stock") {
     if (s.stock === c.stock) return s;

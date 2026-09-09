@@ -35,7 +35,8 @@ export function AvailabilityCheck() {
           <DialogTitle className="modal-title">A non-US launch.</DialogTitle>
           <DialogDescription className="modal-description">
             We’re preparing stock-token purchases for eligible users outside the US. Availability
-            varies by country. For now, freestock uses practice money only.
+            varies by country. “Try it yourself” uses simulated funds. Live actions are limited to
+            the configured private pilot participant.
           </DialogDescription>
           <form
             className="availability-form"

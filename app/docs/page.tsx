@@ -14,8 +14,8 @@ export default function Page() {
             works today.
           </h1>
           <p>
-            Mechanics, data sources and the difference between the home practice simulator and the
-            private wallet pilot.
+            Mechanics, data sources and the difference between the home demo and the private wallet
+            pilot.
           </p>
         </section>
         <div className="education-layout">
@@ -23,8 +23,8 @@ export default function Page() {
             <strong>Contents</strong>
             <a href="#status">Feature status</a>
             <a href="#market-data">Pool coverage</a>
-            <a href="#accounting">Practice accounting</a>
-            <a href="#automation">Practice automation</a>
+            <a href="#accounting">Demo accounting</a>
+            <a href="#automation">Demo automation</a>
             <a href="#pricing">Token quantities</a>
             <a href="#storage">Saved records</a>
             <a href="#execution">Wallet pilot</a>
@@ -48,7 +48,7 @@ export default function Page() {
                     <tr>
                       <td>Try it yourself</td>
                       <td>
-                        Home simulator with practice money, saved scenarios and illustrative stock
+                        Home simulator with simulated money, saved scenarios and illustrative stock
                         purchases; these are not real positions
                       </td>
                     </tr>
@@ -71,7 +71,7 @@ export default function Page() {
                       </td>
                     </tr>
                     <tr>
-                      <td>Practice auto-convert and compound</td>
+                      <td>Demo auto-convert and compound</td>
                       <td>Run only when you advance a scenario; no background stock conversion</td>
                     </tr>
                     <tr>
@@ -121,7 +121,7 @@ export default function Page() {
                 <dt>Vault APY</dt>
                 <dd>
                   Seven-day realized share-price APY, after vault fees and excluding rewards. The
-                  practice model does not subtract those vault fees again.
+                  demo model does not subtract those vault fees again.
                 </dd>
                 <dt>Market APY</dt>
                 <dd>Seven-day supply APY, excluding rewards. It is not the borrowing rate.</dd>
@@ -156,13 +156,13 @@ export default function Page() {
               </p>
             </section>
             <section id="accounting">
-              <h2>How a practice position earns</h2>
+              <h2>How a simulated position earns</h2>
               <p>
-                The home section labeled “Try it yourself” uses practice money. Each practice
-                account starts with 10,000 practice USDG. Creating a scenario moves capital from the
-                practice wallet; it does not create or fund a real position. Saved practice
-                positions can be expanded on the home page. The retired prize account is preserved
-                separately and does not fund this simulator.
+                The home section labeled “Try it yourself” uses simulated money. Each demo account
+                starts with 10,000 simulated USDG. Creating a scenario moves capital from the demo
+                wallet; it does not create or fund a real position. Saved simulated positions can be
+                expanded on the home page. The retired prize account is preserved separately and
+                does not fund this simulator.
               </p>
               <h3>Lending scenario</h3>
               <p>
@@ -195,15 +195,14 @@ export default function Page() {
                 involve additional costs.
               </p>
               <p>
-                Closing returns remaining capital to the practice wallet; earnings of at least 1
-                USDG stay attached to the closed position for conversion. Smaller residuals return
-                to the practice wallet. Closed positions do not earn or compound. Each position
-                keeps its own loss record; the simulator does not combine losses or obligations
-                across positions.
+                Closing returns remaining capital to the demo wallet; earnings of at least 1 USDG
+                stay attached to the closed position for conversion. Smaller residuals return to the
+                demo wallet. Closed positions do not earn or compound. Each position keeps its own
+                loss record; the simulator does not combine losses or obligations across positions.
               </p>
             </section>
             <section id="automation">
-              <h2>Practice conversion and compounding rules</h2>
+              <h2>Demo conversion and compounding rules</h2>
               <p>
                 These rules apply to the simulator. They do not authorize transactions in your live
                 account.
@@ -221,15 +220,15 @@ export default function Page() {
                 </li>
               </ol>
               <p>
-                All five steps save together. You can also convert manually once at least 1 practice
-                USDG is available, or manually compound pending earnings in an active position.
-                Changing allocation weights affects future purchases and does not rebalance existing
-                holdings.
+                All five steps save together. You can also convert manually once at least 1
+                simulated USDG is available, or manually compound pending earnings in an active
+                position. Changing allocation weights affects future purchases and does not
+                rebalance existing holdings.
               </p>
               <p>
                 The minimum is a per-position USDG threshold, not a guaranteed time interval. In
-                practice mode, closing the page runs no jobs and advancing time is always explicit.
-                A 100% compounding rule sends modeled surplus back into the practice position; it
+                demo mode, closing the page runs no jobs and advancing time is always explicit. A
+                100% compounding rule sends modeled surplus back into the simulated position; it
                 does not buy stocks.
               </p>
               <p>
@@ -242,7 +241,7 @@ export default function Page() {
             <section id="pricing">
               <h2>Illustrative token quantities</h2>
               <p>
-                Practice purchases assume 1 USDG equals $1, use the fixed prices below and omit
+                Simulated purchases assume 1 USDG equals $1, use the fixed prices below and omit
                 spread, gas and execution fees. They do not use live quotes or represent the price
                 at which a real trade could fill.
               </p>
@@ -250,7 +249,7 @@ export default function Page() {
                 {STOCKS.map((s) => (
                   <div key={s.symbol}>
                     <strong>{s.symbol}</strong>
-                    <span>${s.modelPrice} per practice token</span>
+                    <span>${s.modelPrice} per simulated token</span>
                   </div>
                 ))}
               </div>
@@ -277,19 +276,19 @@ export default function Page() {
             <section id="storage">
               <h2>Saved state and transparent records</h2>
               <p>
-                Practice positions, allocation rules, practice holdings and activity are saved to
+                Simulated positions, allocation rules, simulated holdings and activity are saved to
                 your signed-in account on the server. Duplicate retries reuse the original request
                 identifier so the same action is not applied twice. Concurrent actions are checked
                 before saving.
               </p>
               <p>
                 The <Link href="/transparency">Transparency page</Link> shows each saved entry and
-                exports the practice ledger. It reconciles wallet balance, capital, available
-                earnings and stock purchase cost against initial funds plus net modeled earnings.
-                Compounding is an internal transfer, not additional income.
+                exports the demo ledger. It reconciles wallet balance, capital, available earnings
+                and stock purchase cost against initial funds plus net modeled earnings. Compounding
+                is an internal transfer, not additional income.
               </p>
               <p>
-                The practice account uses no real funds. Wallet keeps the live account separate: the
+                The demo account uses no real funds. Wallet keeps the live account separate: the
                 owner reviews and signs transactions in their connected wallet. Transaction recovery
                 references are saved in this browser. You can restore a live account from its
                 creation transaction reference, which is checked against the connected owner and

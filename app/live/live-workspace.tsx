@@ -282,7 +282,7 @@ export default function LiveWorkspace({ embedded = false }: { embedded?: boolean
           {providers.length === 0 ? (
             <p>
               Open this page in a browser with an Ethereum wallet installed. You can keep using the
-              practice account in this browser.
+              demo account in this browser.
             </p>
           ) : (
             providers.map((p) => (

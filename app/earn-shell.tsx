@@ -28,7 +28,7 @@ export function EarnShell({
             ["Wallet", "/live"],
             ["Learn", "/learn"],
             ["Docs", "/docs"],
-            ["Practice activity", "/transparency"],
+            ["Demo activity", "/transparency"],
           ].map(([name, url]) => (
             <Link href={url} key={name} aria-current={active === name ? "page" : undefined}>
               {name}
@@ -60,13 +60,13 @@ export function EarnShell({
             Product mechanics <ArrowRight size={16} />
           </Link>
           <Link href="/transparency">
-            Practice activity <ArrowRight size={16} />
+            Demo activity <ArrowRight size={16} />
           </Link>
         </div>
         <div>
           <AvailabilityCheck />
           <p className="earn-small">
-            Your live account uses real funds. “Try it yourself” uses practice money. Stock Tokens
+            Your live account uses real funds. “Try it yourself” uses simulated money. Stock Tokens
             provide economic exposure, not ownership of underlying shares. Independent product; no
             Robinhood affiliation or endorsement.
           </p>

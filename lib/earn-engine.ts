@@ -164,7 +164,7 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
   const state = structuredClone(input);
   requireRule(
     state.entries.length < 3900 || ["close", "convert", "compound"].includes(command.type),
-    "This practice account has reached its simulation limit. You can still convert earnings or close positions.",
+    "This demo account has reached its simulation limit. You can still convert earnings or close positions.",
   );
   const log = (
     p: Position,
@@ -183,7 +183,7 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
       ...(purchases ? { purchases } : {}),
     });
   const convert = (p: Position) => {
-    requireRule(p.pending >= 1_000_000, "At least 1 practice USDG of earnings is needed.");
+    requireRule(p.pending >= 1_000_000, "At least 1 simulated USDG of earnings is needed.");
     requireRule(p.lossCarry === 0, "Previous losses must be recovered first.");
     const budget = p.pending;
     // Allocate integer micro-USDG exactly. Last destination receives the rounding remainder.
@@ -209,13 +209,13 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
       p,
       "Stock conversion",
       budget,
-      "Practice purchase at fixed illustrative prices. Assumes 1 USDG = $1; no gas, spread or trading fees. No real trade.",
+      "Simulated purchase at fixed illustrative prices. Assumes 1 USDG = $1; no gas, spread or trading fees. No real trade.",
       purchases,
     );
   };
   if (command.type === "open") {
-    requireRule(state.positions.length < 24, "Maximum 24 practice positions.");
-    requireRule(command.amount <= state.wallet, "Not enough practice USDG.");
+    requireRule(state.positions.length < 24, "Maximum 24 simulated positions.");
+    requireRule(command.amount <= state.wallet, "Not enough simulated USDG.");
     if (command.kind === "lend")
       requireRule(
         ctx.vault.apy !== null &&
@@ -254,7 +254,7 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
     state.positions.push(p);
     log(
       p,
-      "Practice deposit",
+      "Simulated deposit",
       command.amount,
       p.kind === "lend"
         ? `Rate fixed for this scenario: ${(p.apy * 100).toFixed(4)}% seven-day historical APY, observed ${p.rateAsOf}.`
@@ -287,16 +287,16 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
       p,
       "Earnings compounded",
       amount,
-      "Available practice earnings reinvested into this position; no stock purchase.",
+      "Available simulated earnings reinvested into this position; no stock purchase.",
     );
   } else if (command.type === "close") {
     requireRule(!p.closed, "Position already closed.");
     state.wallet += p.capital;
     log(
       p,
-      "Practice withdrawal",
+      "Simulated withdrawal",
       p.capital,
-      "Capital returned to the practice wallet. Earnings of at least 1 USDG remain available for conversion.",
+      "Capital returned to the demo wallet. Earnings of at least 1 USDG remain available for conversion.",
     );
     p.capital = 0;
     p.closed = true;
@@ -306,7 +306,7 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
         p,
         "Residual earnings returned",
         p.pending,
-        "Earnings below the conversion minimum returned to your practice wallet on closure.",
+        "Earnings below the conversion minimum returned to your demo wallet on closure.",
       );
       p.pending = 0;
     }
@@ -376,14 +376,14 @@ export function applyEarnCommand(input: EarnState, raw: EarnCommand, ctx: Contex
   ];
   requireRule(
     balances.every((v) => Number.isSafeInteger(v) && Math.abs(v) <= 1_000_000_000_000_000),
-    "This scenario exceeds the practice balance limit. Withdraw or use less extreme assumptions.",
+    "This scenario exceeds the simulated balance limit. Withdraw or use less extreme assumptions.",
   );
   requireRule(
     1_000_000_000_000_000 >=
       state.wallet +
         state.positions.reduce((n, v) => n + v.capital + v.pending, 0) +
         Object.values(state.holdings).reduce((n, h) => n + h!.cost, 0),
-    "Practice balance limit reached.",
+    "Simulated balance limit reached.",
   );
   return state;
 }

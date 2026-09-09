@@ -169,7 +169,7 @@
 }
 #try-it-yourself,
 #live-account,
-#practice-results {
+#demo-results {
   scroll-margin-top: 24px;
 }
 #try-it-yourself {
@@ -181,20 +181,20 @@
 .home-live-account {
   padding-block: 0 16px;
 }
-.practice-results {
+.demo-results {
   border: 1px solid #dbe3ef;
   border-radius: 22px;
   background: #f5f8fcdc;
   padding: 22px;
   margin-block: 24px 36px;
 }
-.practice-results > summary {
+.demo-results > summary {
   cursor: pointer;
   font-weight: 600;
   font-size: 18px;
   color: #263957;
 }
-.practice-results > summary small {
+.demo-results > summary small {
   display: block;
   margin: 6px 0 0 22px;
   color: #56647c;
@@ -202,10 +202,10 @@
   line-height: 1.5;
   font-weight: 400;
 }
-.practice-results > .earn-section {
+.demo-results > .earn-section {
   padding-bottom: 12px;
 }
-.practice-results > summary:focus-visible {
+.demo-results > summary:focus-visible {
   outline: 2px solid #2862de;
   outline-offset: 5px;
   border-radius: 8px;

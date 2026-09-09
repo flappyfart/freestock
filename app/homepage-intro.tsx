@@ -50,12 +50,12 @@ export function HomepageIntro() {
           stock-token prizes. A random draw picks the winner.
         </p>
         <a className="primary arrow-button home-cta" href="#try-demo">
-          Try a practice draw
+          Try a simulated draw
           <span className="arrow-capsule" aria-hidden="true">
             <ArrowRight size={17} />
           </span>
         </a>
-        <p className="home-demo-note">Practice draws use $10 prizes. No real money or stocks.</p>
+        <p className="home-demo-note">Simulated draws use $10 prizes. No real money or stocks.</p>
         <AvailabilityCheck />
         <p className="home-tradeoff">
           The earnings go to prizes, instead of interest paid to every saver. Your deposit isn’t
@@ -136,7 +136,7 @@ export function HomepageIntro() {
         <p className="story-note">
           This illustration assumes a constant {poolLabels[examplePool]} pool and one winner
           receiving the entire weekly prize budget. Your chance depends on your share of all
-          entries. It does not change the $10 practice draws in your account.
+          entries. It does not change the $10 simulated draws in your account.
         </p>
       </div>
       <p className="home-risk-note">
@@ -150,11 +150,11 @@ export function HomepageIntro() {
 const questions = [
   [
     "Who is freestock being built for?",
-    "The planned launch is for eligible users outside the United States. US persons and people in the US cannot participate in the planned stock-token product. Other country restrictions also apply. Being outside the US does not automatically establish eligibility. Live availability has not been confirmed for any country; the practice demo is available to explore now.",
+    "The planned launch is for eligible users outside the United States. US persons and people in the US cannot participate in the planned stock-token product. Other country restrictions also apply. Being outside the US does not automatically establish eligibility. Live availability has not been confirmed for any country; the demo is available to explore now.",
   ],
   [
-    "Why does the homepage show a bigger prize than my practice draw?",
-    "The headline illustrates what a larger pool could fund. At $1M in total deposits, a hypothetical 4% annual return generates $40,000 a year. Deducting 10% of those earnings as costs leaves $36,000, or about $690 per seven days. This example awards all of that weekly budget to one winner. Actual returns and future draw rules could differ. The interactive practice account still uses fixed $10 prizes.",
+    "Why does the homepage show a bigger prize than my simulated draw?",
+    "The headline illustrates what a larger pool could fund. At $1M in total deposits, a hypothetical 4% annual return generates $40,000 a year. Deducting 10% of those earnings as costs leaves $36,000, or about $690 per seven days. This example awards all of that weekly budget to one winner. Actual returns and future draw rules could differ. The interactive demo account still uses fixed $10 prizes.",
   ],
   [
     "Where does the prize money come from?",
@@ -162,19 +162,19 @@ const questions = [
   ],
   [
     "What happens if I don’t win?",
-    "You receive no prize, and the draw does not reduce your practice savings balance. For example, $100 saved is still $100 after an unsuccessful draw, provided you haven’t withdrawn it. This is how the demo works, not a guarantee that a future live product would protect your money.",
+    "You receive no prize, and the draw does not reduce your simulated savings balance. For example, $100 saved is still $100 after an unsuccessful draw, provided you haven’t withdrawn it. This is how the demo works, not a guarantee that a future live product would protect your money.",
   ],
   [
     "How do entries and winning chances work?",
-    "Each practice dollar saved for one day earns one entry. Save $100 for seven days and you earn 700 entries. Your chance is your entries divided by everyone’s entries in that draw. For example, 10% of all entries means a 10% chance. Entries start fresh for each weekly demo draw; more entries never guarantee a win.",
+    "Each simulated dollar saved for one day earns one entry. Save $100 for seven days and you earn 700 entries. Your chance is your entries divided by everyone’s entries in that draw. For example, 10% of all entries means a 10% chance. Entries start fresh for each weekly demo draw; more entries never guarantee a win.",
   ],
   [
     "Can I take my money out?",
-    "Yes, in the demo. Choose Withdraw, enter an amount, confirm the request, then select Complete simulated withdrawal. The money returns to your practice wallet. A requested withdrawal stops earning new entries, but entries already earned still count. A future live product would depend on available funds and could have withdrawal delays.",
+    "Yes, in the demo. Choose Withdraw, enter an amount, confirm the request, then select Complete simulated withdrawal. The money returns to your demo wallet. A requested withdrawal stops earning new entries, but entries already earned still count. A future live product would depend on available funds and could have withdrawal delays.",
   ],
   [
     "Are these real dollars or real stocks?",
-    "No. You start with $10,000 of practice money, labeled USDG, and four pretend savers share your example pool. A $10 stock prize is a pretend dollar credit, not a share or token. The planned non-US product would award Robinhood Stock Tokens, which provide economic exposure to a stock without ownership rights in the underlying shares. Real deposits and stock purchases are disabled.",
+    "No. You start with $10,000 of simulated money, labeled USDG, and four pretend savers share your example pool. A $10 stock prize is a pretend dollar credit, not a share or token. The planned non-US product would award Robinhood Stock Tokens, which provide economic exposure to a stock without ownership rights in the underlying shares. Real deposits and stock purchases are disabled.",
   ],
 ] as const;
 
